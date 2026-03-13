@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import Usuario, Persona, Cliente
 
-
+#hola esto en un ensayo para ver si funciona el commit en git hub
 class RegistroClienteForm(UserCreationForm):
 
     dni = forms.CharField(max_length=20)
