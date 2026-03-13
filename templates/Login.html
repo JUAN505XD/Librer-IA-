@@ -1,0 +1,11 @@
+<form method="post">
+    {% csrf_token %}
+
+    {{ form.username.label }}  
+    {{ form.username }}
+
+    {{ form.password.label }}  
+    {{ form.password }}
+
+    <button type="submit">Iniciar sesión</button>
+</form>
