@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Usuario - Librería</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .registro-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 800px;
+            width: 100%;
+            margin: 20px;
+        }
+        .registro-header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .registro-header h2 {
+            margin: 0;
+            font-weight: 600;
+        }
+        .registro-header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+        .registro-body {
+            padding: 40px;
+        }
+        .form-floating {
+            margin-bottom: 20px;
+        }
+        .form-floating > label {
+            padding: 1rem 0.75rem;
+        }
+        .btn-registrar {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        .btn-registrar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+        .row > div {
+            margin-bottom: 20px;
+        }
+        @media (max-width: 768px) {
+            .registro-body {
+                padding: 20px;
+            }
+            .registro-header {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="registro-container">
+        <div class="registro-header">
+            <i class="bi bi-person-plus-fill fs-1 mb-3"></i>
+            <h2>Registro de Usuario</h2>
+            <p>Complete todos los campos para crear su cuenta</p>
+        </div>
+
+        <div class="registro-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+                        <i class="bi bi-{% if message.tags == 'error' %}exclamation-triangle{% else %}check-circle{% endif %}-fill me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="row">
+                    <!-- DNI -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            {{ form.dni }}
+                            <label for="{{ form.dni.id_for_label }}">
+                                <i class="bi bi-credit-card-2-front me-2"></i>DNI
+                            </label>
+                        </div>
+                        {% if form.dni.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.dni.errors %}
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Nombres -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            {{ form.nombres }}
+                            <label for="{{ form.nombres.id_for_label }}">
+                                <i class="bi bi-person me-2"></i>Nombres
+                            </label>
+                        </div>
+                        {% if form.nombres.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.nombres.errors %}
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Apellidos -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            {{ form.apellidos }}
+                            <label for="{{ form.apellidos.id_for_label }}">
+                                <i class="bi bi-person-badge me-2"></i>Apellidos
+                            </label>
+                        </div>
+                        {% if form.apellidos.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.apellidos.errors %}
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Fecha de Nacimiento -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            {{ form.fecha_nacimiento }}
+                            <label for="{{ form.fecha_nacimiento.id_for_label }}">
+                                <i class="bi bi-calendar-date me-2"></i>Fecha de Nacimiento
+                            </label>
+                        </div>
+                        {% if form.fecha_nacimiento.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.fecha_nacimiento.errors %}
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Lugar de Nacimiento -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            {{ form.lugar_nacimiento }}
+                            <label for="{{ form.lugar_nacimiento.id_for_label }}">
+                                <i class="bi bi-geo-alt me-2"></i>Lugar de Nacimiento
+                            </label>
+                        </div>
+                        {% if form.lugar_nacimiento.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.lugar_nacimiento.errors %}
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Género -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            {{ form.genero }}
+                            <label for="{{ form.genero.id_for_label }}">
+                                <i class="bi bi-gender-ambiguous me-2"></i>Género
+                            </label>
+                        </div>
+                        {% if form.genero.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.genero.errors %}
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Dirección de Envío -->
+                <div class="form-floating">
+                    {{ form.direccion_envio }}
+                    <label for="{{ form.direccion_envio.id_for_label }}">
+                        <i class="bi bi-house-door me-2"></i>Dirección de Envío
+                    </label>
+                </div>
+                {% if form.direccion_envio.errors %}
+                    <div class="text-danger small">
+                        {% for error in form.direccion_envio.errors %}
+                            <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="row">
+                    <!-- Correo Electrónico -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            {{ form.email }}
+                            <label for="{{ form.email.id_for_label }}">
+                                <i class="bi bi-envelope me-2"></i>Correo Electrónico
+                            </label>
+                        </div>
+                        {% if form.email.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.email.errors %}
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Nombre de Usuario -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            {{ form.username }}
+                            <label for="{{ form.username.id_for_label }}">
+                                <i class="bi bi-at me-2"></i>Nombre de Usuario
+                            </label>
+                        </div>
+                        {% if form.username.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.username.errors %}
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Contraseña -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            {{ form.password1 }}
+                            <label for="{{ form.password1.id_for_label }}">
+                                <i class="bi bi-lock me-2"></i>Contraseña
+                            </label>
+                        </div>
+                        {% if form.password1.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.password1.errors %}
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Confirmar Contraseña -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            {{ form.password2 }}
+                            <label for="{{ form.password2.id_for_label }}">
+                                <i class="bi bi-lock-fill me-2"></i>Confirmar Contraseña
+                            </label>
+                        </div>
+                        {% if form.password2.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.password2.errors %}
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-registrar btn-lg">
+                        <i class="bi bi-person-plus me-2"></i>Registrar Usuario
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
