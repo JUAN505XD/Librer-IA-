@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from libros.models import Genero, Autor
 
 # =========================
 # MANAGER DE USUARIO
@@ -114,3 +115,13 @@ class Cliente(models.Model):
     correo = models.EmailField()
     direccion_envio = models.CharField(max_length=200)
 
+# =========================
+# Preferencias
+# =========================
+
+
+class Preferencias(models.Model):
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
+
+    generos = models.ManyToManyField(Genero, blank=True)
+    autores = models.ManyToManyField(Autor, blank=True)

@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
-from .Forms import RegistroClienteForm, LoginForm
+from django.contrib.auth import authenticate, login, logout
+from .Forms import RegistroClienteForm, LoginForm, PreferenciasForm
+from .models import Usuario, Preferencias
+from django.contrib.auth.decorators import login_required
 
 
 def registro(request):
@@ -11,9 +13,12 @@ def registro(request):
         form = RegistroClienteForm(request.POST)
 
         if form.is_valid():
-            form.save()
-            messages.success(request, "Usuario registrado correctamente")
-            return redirect("registro")
+            usuario = form.save()
+
+            # ✅ LOGIN AUTOMÁTICO
+            login(request, usuario)
+
+            return redirect("preferencias")
 
     else:
         form = RegistroClienteForm()
@@ -45,3 +50,40 @@ def iniciar_sesion(request):
         form = LoginForm()
 
     return render(request, "login.html", {"form": form})
+
+def cerrar_sesion(request):
+    logout(request)
+    return redirect("inicio")
+
+
+@login_required
+def preferencias(request):
+
+    # 👉 evitar que vuelva a entrar si ya tiene preferencias
+    if Preferencias.objects.filter(usuario=request.user).exists():
+        return redirect("inicio")
+
+    if request.method == "POST":
+
+        if "saltar" in request.POST:
+            return redirect("inicio")
+
+        form = PreferenciasForm(request.POST)
+
+        if form.is_valid():
+            preferencias = form.save(commit=False)
+            preferencias.usuario = request.user
+            preferencias.save()
+
+            form.save_m2m()  # 🔥 ESTO ES CLAVE (ManyToMany)
+
+            return redirect("inicio")
+
+    else:
+        form = PreferenciasForm()
+
+    return render(request, "preferencias.html", {"form": form})
+
+def inicio(request):
+    return render(request, "inicio.html")
+

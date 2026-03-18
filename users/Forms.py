@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Usuario, Persona, Cliente
+from .models import Usuario, Persona, Cliente, Preferencias
 
 #hola esto en un ensayo para ver si funciona el commit en git hub
 class RegistroClienteForm(UserCreationForm):
@@ -53,3 +53,14 @@ class LoginForm(forms.Form):
 
     username = forms.CharField(max_length=150)
     password = forms.CharField(widget=forms.PasswordInput)
+
+
+
+class PreferenciasForm(forms.ModelForm):
+    class Meta:
+        model = Preferencias
+        fields = ["generos", "autores"]
+        widgets = {
+            "generos": forms.CheckboxSelectMultiple,
+            "autores": forms.CheckboxSelectMultiple,
+        }
