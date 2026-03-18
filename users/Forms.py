@@ -61,6 +61,6 @@ class PreferenciasForm(forms.ModelForm):
         model = Preferencias
         fields = ["generos", "autores"]
         widgets = {
-            "generos": forms.CheckboxSelectMultiple,
-            "autores": forms.CheckboxSelectMultiple,
+            "generos": forms.CheckboxSelectMultiple(),
+            "autores": forms.CheckboxSelectMultiple(),
         }

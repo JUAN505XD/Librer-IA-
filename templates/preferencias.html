@@ -17,36 +17,12 @@
 
         <h5>Géneros</h5>
 <div class="mb-3">
-    {% for checkbox in form.generos %}
-    <input
-        type="checkbox"
-        class="btn-check"
-        id="genero{{ forloop.counter }}"
-        name="{{ checkbox.name }}"
-        value="{{ checkbox.choice_value }}"
-        {% if checkbox.is_checked %}checked{% endif %}
-    >
-    <label class="btn btn-outline-primary mb-2" for="genero{{ forloop.counter }}">
-        {{ checkbox.choice_label }}
-    </label>
-    {% endfor %}
+    {{ form.generos }}
 </div>
 
 <h5 class="mt-3">Autores</h5>
 <div class="mb-3">
-    {% for checkbox in form.autores %}
-    <input
-        type="checkbox"
-        class="btn-check"
-        id="autor{{ forloop.counter }}"
-        name="{{ checkbox.name }}"
-        value="{{ checkbox.choice_value }}"
-        {% if checkbox.is_checked %}checked{% endif %}
-    >
-    <label class="btn btn-outline-success mb-2" for="autor{{ forloop.counter }}">
-        {{ checkbox.choice_label }}
-    </label>
-    {% endfor %}
+    {{ form.autores }}
 </div>
 
         <button type="submit" class="btn btn-success w-100 mb-2">

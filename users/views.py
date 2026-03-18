@@ -59,23 +59,26 @@ def cerrar_sesion(request):
 @login_required
 def preferencias(request):
 
-    # 👉 evitar que vuelva a entrar si ya tiene preferencias
     if Preferencias.objects.filter(usuario=request.user).exists():
         return redirect("inicio")
 
     if request.method == "POST":
 
+        print("POST:", request.POST)   # ✅ AQUÍ
+        form = PreferenciasForm(request.POST)
+
+        print("VALID:", form.is_valid())  # ✅ AQUÍ
+        print("ERRORES:", form.errors)    # ✅ AQUÍ
+
         if "saltar" in request.POST:
             return redirect("inicio")
-
-        form = PreferenciasForm(request.POST)
 
         if form.is_valid():
             preferencias = form.save(commit=False)
             preferencias.usuario = request.user
             preferencias.save()
 
-            form.save_m2m()  # 🔥 ESTO ES CLAVE (ManyToMany)
+            form.save_m2m()
 
             return redirect("inicio")
 
