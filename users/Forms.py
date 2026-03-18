@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 #hola esto en un ensayo para ver si funciona el commit en git hub
 class RegistroClienteForm(UserCreationForm):
 
-    dni = forms.CharField(max_length=20)
+    dni = forms.IntegerField()
     nombres = forms.CharField(max_length=100)
     apellidos = forms.CharField(max_length=100)
     fecha_nacimiento = forms.DateField(widget=forms.DateInput(attrs={
