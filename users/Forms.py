@@ -1,14 +1,20 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import Usuario, Persona, Cliente, Preferencias
+from datetime import date
+from django.core.exceptions import ValidationError
 
 #hola esto en un ensayo para ver si funciona el commit en git hub
 class RegistroClienteForm(UserCreationForm):
 
-    dni = forms.CharField(max_length=20)
+    dni = forms.IntegerField()
     nombres = forms.CharField(max_length=100)
     apellidos = forms.CharField(max_length=100)
-    fecha_nacimiento = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    fecha_nacimiento = forms.DateField(widget=forms.DateInput(attrs={
+            'type': 'date',
+            'max': date.today().isoformat(),
+            'min': f"{date.today().year - 100}-01-01",
+            }))
     lugar_nacimiento = forms.CharField(max_length=100)
 
     genero = forms.ChoiceField(choices=[
@@ -49,6 +55,7 @@ class RegistroClienteForm(UserCreationForm):
             )
 
         return usuario
+
     
 class LoginForm(forms.Form):
 
@@ -68,13 +75,17 @@ class PreferenciasForm(forms.ModelForm):
 
 class EditarPerfilForm(forms.Form):
 
-    dni = forms.CharField(max_length=20, required=False)
+    dni = forms.IntegerField(required=False)
     username = forms.CharField(max_length=150, required=False)
 
     nombres = forms.CharField(max_length=100, required=False)
     apellidos = forms.CharField(max_length=100, required=False)
     fecha_nacimiento = forms.DateField(
-        widget=forms.DateInput(attrs={'type': 'date'}),
+        widget=forms.DateInput(attrs={
+            'type': 'date',
+            'max': date.today().isoformat(),
+            'min': f"{date.today().year - 100}-01-01",
+        }),
         required=False
     )
     lugar_nacimiento = forms.CharField(max_length=100, required=False)
