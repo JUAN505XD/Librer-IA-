@@ -105,6 +105,10 @@ def editar_perfil(request):
 
             data = form.cleaned_data
 
+            #dni
+            if data["dni"]:
+                persona.dni = data["dni"]
+
             # Usuario
             if data["username"]:
                 usuario.username = data["username"]
@@ -141,6 +145,7 @@ def editar_perfil(request):
 
     else:
         form = EditarPerfilForm({
+        "dni": persona.dni,
         "username": usuario.username,
 
         "nombres": persona.nombre,

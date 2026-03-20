@@ -33,6 +33,7 @@ class RegistroClienteForm(UserCreationForm):
             usuario.save()
 
             Persona.objects.create(
+                dni=self.cleaned_data["dni"],
                 usuario=usuario,
                 nombre=self.cleaned_data["nombres"],
                 apellido=self.cleaned_data["apellidos"],
@@ -67,6 +68,7 @@ class PreferenciasForm(forms.ModelForm):
 
 class EditarPerfilForm(forms.Form):
 
+    dni = forms.CharField(max_length=20, required=False)
     username = forms.CharField(max_length=150, required=False)
 
     nombres = forms.CharField(max_length=100, required=False)

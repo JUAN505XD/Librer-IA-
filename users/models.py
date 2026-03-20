@@ -82,6 +82,7 @@ class Usuario(AbstractBaseUser):
 
 class Persona(models.Model):
 
+    dni = models.CharField(max_length=20)
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
 
     nombre = models.CharField(max_length=100)
