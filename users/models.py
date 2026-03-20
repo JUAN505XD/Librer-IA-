@@ -82,6 +82,15 @@ class Usuario(AbstractBaseUser):
 # =========================
 
 class Persona(models.Model):
+    def validar_fecha_nacimiento(value):
+        hoy = date.today()
+        anio_limite = hoy.year - 100
+
+        if value > hoy:
+            raise ValidationError("La fecha no es actual")
+
+        if value.year < anio_limite:
+            raise ValidationError("La fecha no puede ser tan antigua")
 
     dni = models.IntegerField()
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
