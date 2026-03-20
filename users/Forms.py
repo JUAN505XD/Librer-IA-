@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Usuario, Persona, Cliente
+from .models import Usuario, Persona, Cliente, Preferencias
 from datetime import date
 from django.core.exceptions import ValidationError
 
@@ -39,6 +39,7 @@ class RegistroClienteForm(UserCreationForm):
             usuario.save()
 
             Persona.objects.create(
+                dni=self.cleaned_data["dni"],
                 usuario=usuario,
                 nombre=self.cleaned_data["nombres"],
                 apellido=self.cleaned_data["apellidos"],
@@ -54,3 +55,49 @@ class RegistroClienteForm(UserCreationForm):
             )
 
         return usuario
+
+    
+class LoginForm(forms.Form):
+
+    username = forms.CharField(max_length=150)
+    password = forms.CharField(widget=forms.PasswordInput)
+
+
+
+class PreferenciasForm(forms.ModelForm):
+    class Meta:
+        model = Preferencias
+        fields = ["generos", "autores"]
+        widgets = {
+            "generos": forms.CheckboxSelectMultiple(),
+            "autores": forms.CheckboxSelectMultiple(),
+        }
+
+class EditarPerfilForm(forms.Form):
+
+    dni = forms.IntegerField(required=False)
+    username = forms.CharField(max_length=150, required=False)
+
+    nombres = forms.CharField(max_length=100, required=False)
+    apellidos = forms.CharField(max_length=100, required=False)
+    fecha_nacimiento = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'type': 'date',
+            'max': date.today().isoformat(),
+            'min': f"{date.today().year - 100}-01-01",
+        }),
+        required=False
+    )
+    lugar_nacimiento = forms.CharField(max_length=100, required=False)
+
+    genero = forms.ChoiceField(
+        choices=[
+            ('M', 'Masculino'),
+            ('F', 'Femenino'),
+            ('O', 'Otro')
+        ],
+        required=False
+    )
+
+    direccion_envio = forms.CharField(max_length=200, required=False)
+    email = forms.EmailField(required=False)

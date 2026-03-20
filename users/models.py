@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from libros.models import Genero, Autor
 from django.core.exceptions import ValidationError
 
 # =========================
@@ -91,13 +92,13 @@ class Persona(models.Model):
         if value.year < anio_limite:
             raise ValidationError("La fecha no puede ser tan antigua")
 
+    dni = models.IntegerField()
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
 
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
 
-    fecha_nacimiento = models.DateField(
-            validators=[validar_fecha_nacimiento])
+    fecha_nacimiento = models.DateField()
 
     lugar_nacimiento = models.CharField(max_length=100)
 
@@ -126,3 +127,13 @@ class Cliente(models.Model):
     correo = models.EmailField()
     direccion_envio = models.CharField(max_length=200)
 
+# =========================
+# Preferencias
+# =========================
+
+
+class Preferencias(models.Model):
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
+
+    generos = models.ManyToManyField(Genero, blank=True)
+    autores = models.ManyToManyField(Autor, blank=True)
