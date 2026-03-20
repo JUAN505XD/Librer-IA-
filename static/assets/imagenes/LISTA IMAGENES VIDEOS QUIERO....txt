@@ -1,0 +1,14 @@
+        <iframe src="https://www.youtube.com/embed/G_bV8v4g4Jw?autoplay=1&mute=1" allowfullscreen></iframe>
+        <iframe src="https://www.youtube.com/embed/5iSjCiJ6ppE?autoplay=1&mute=1" allowfullscreen></iframe>
+        <iframe src="https://www.youtube.com/embed/G_bV8v4g4Jw?autoplay=1&mute=1" allowfullscreen></iframe>
+
+        <a href="https://www.facebook.com"><img src="imagenes/logofacebook.png" alt="Facebook"></a>
+        <a href="https://www.twitter.com"><img src="imagenes/logotwitter.jpeg" alt="Twitter"></a>assets/imagenes/imagen de registro.png"
+ <img src="assets/imagenes/registerfondo.png" <img src="assets/imagenes/Vista.png" PUBLICIDAD
+  <img src="assets/imagenes/pr.png" alt="Publicidad"
+ <img src="assets/imagenes/baner ventas.jpeg" alt="Publicidad" 
+  <img src="assets/imagenes/DATOS.png" alt="Publicidad
+ <img src="assets/imagenes/PC.png" alt="Publicidad"
+
+      <img src="assets/imagenes/banerdeinformacion.png" alt="Publicidad" 
+    <img src="assets/imagenes/logo1.png" alt="Logo Librería UTP

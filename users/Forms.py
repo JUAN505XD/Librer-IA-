@@ -64,3 +64,27 @@ class PreferenciasForm(forms.ModelForm):
             "generos": forms.CheckboxSelectMultiple(),
             "autores": forms.CheckboxSelectMultiple(),
         }
+
+class EditarPerfilForm(forms.Form):
+
+    username = forms.CharField(max_length=150, required=False)
+
+    nombres = forms.CharField(max_length=100, required=False)
+    apellidos = forms.CharField(max_length=100, required=False)
+    fecha_nacimiento = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        required=False
+    )
+    lugar_nacimiento = forms.CharField(max_length=100, required=False)
+
+    genero = forms.ChoiceField(
+        choices=[
+            ('M', 'Masculino'),
+            ('F', 'Femenino'),
+            ('O', 'Otro')
+        ],
+        required=False
+    )
+
+    direccion_envio = forms.CharField(max_length=200, required=False)
+    email = forms.EmailField(required=False)

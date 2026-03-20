@@ -1,0 +1,12 @@
+body { font-family: Arial; margin:0; padding:0; }
+header { display:flex; justify-content:space-between; padding:10px; background:#007efd; color:white; }
+nav { padding:10px; background:#ecf0f1; }
+nav button { margin-right:10px; }
+.hidden { display:none; }
+.card {
+    border:1px solid #ccc;
+    padding:10px;
+    margin:10px;
+    border-radius:5px;
+}
+button { padding:5px 10px; cursor:pointer; }
