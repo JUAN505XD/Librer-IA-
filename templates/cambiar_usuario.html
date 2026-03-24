@@ -3,30 +3,22 @@
 {% block content %}
 
 <style>
-.container-password {
+.container-user {
     background: white;
     border-radius: 15px;
-    max-width: 600px;
+    max-width: 500px;
     margin: 50px auto;
     padding: 30px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
-.header-password {
+.header-user {
     background: #87CEEB;
     color: white;
     padding: 20px;
     text-align: center;
     border-radius: 10px;
-    margin-bottom: 30px;
-}
-
-.seccion {
     margin-bottom: 20px;
-}
-
-.seccion label {
-    font-weight: bold;
 }
 
 input {
@@ -34,68 +26,50 @@ input {
     padding: 10px;
     border-radius: 6px;
     border: 1px solid #ccc;
+    margin-bottom: 15px;
 }
 
-/* BOTONES */
 .btn-guardar {
     background: #0066cc;
     color: white;
-    border: none;
-    padding: 12px;
+    padding: 10px;
     border-radius: 8px;
     width: 100%;
-    font-weight: bold;
+    border: none;
     margin-bottom: 10px;
-}
-
-.btn-guardar:hover {
-    background: #0055aa;
 }
 
 .btn-cancelar {
     background: gray;
     color: white;
-    border-radius: 8px;
     padding: 10px;
+    border-radius: 8px;
     display: block;
     text-align: center;
     text-decoration: none;
 }
 </style>
 
-<div class="container-password">
+<div class="container-user">
 
-    <div class="header-password">
-        <h2>Cambiar Contraseña</h2>
-        <p>Actualiza tu contraseña de forma segura</p>
+    <div class="header-user">
+        <h2>Cambiar Usuario</h2>
+        <p>Solo disponible para ROOT</p>
     </div>
 
     <form method="post">
         {% csrf_token %}
 
-        <div class="seccion">
-            <label>Contraseña actual</label>
-            {{ form.old_password }}
-        </div>
-
-        <div class="seccion">
-            <label>Nueva contraseña</label>
-            {{ form.new_password1 }}
-        </div>
-
-        <div class="seccion">
-            <label>Confirmar nueva contraseña</label>
-            {{ form.new_password2 }}
-        </div>
+        <label>Nuevo nombre de usuario</label>
+        <input type="text" name="username" value="{{ user.username }}" required>
 
         <button type="submit" class="btn-guardar">
-            Guardar contraseña
+            Guardar cambios
         </button>
 
         <a href="{% url 'inicio' %}" class="btn-cancelar">
             Cancelar
         </a>
-
     </form>
 
 </div>

@@ -175,3 +175,16 @@ def cambiar_password(request):
         form = PasswordChangeForm(request.user)
 
     return render(request, "cambiar_password.html", {"form": form})
+
+@login_required
+def cambiar_usuario(request):
+
+    if request.method == "POST":
+        nuevo_username = request.POST.get("username")
+
+        if nuevo_username:
+            request.user.username = nuevo_username
+            request.user.save()
+            return redirect("inicio")
+
+    return render(request, "cambiar_usuario.html")
