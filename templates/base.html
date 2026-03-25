@@ -135,8 +135,13 @@ main {
                 <a href="{% url 'cambiar_password' %}">Cambiar Contraseña</a>
                 <a href="{% url 'logout' %}">Cerrar Sesión</a>
             {% else %}
-                <a href="{% url 'editar_perfil' %}">Editar Perfil</a>
-                <a href="{% url 'logout' %}">Cerrar Sesión</a>
+                {% if user.rol == "ADMIN" %}
+                    <a href="{% url 'editar_perfil_admin' %}">Editar Perfil</a>
+                    <a href="{% url 'logout' %}">Cerrar Sesión</a>
+                {% elif user.rol == "CLIENTE" %}
+                    <a href="{% url 'editar_perfil_cliente' %}">Editar Perfil</a>
+                    <a href="{% url 'logout' %}">Cerrar Sesión</a>
+                {% endif %}
             {% endif %}
         {% else %}
             <a href="{% url 'login' %}">Iniciar Sesión</a>
@@ -157,7 +162,7 @@ main {
             <li><a href="#">Dashboard Admin</a></li>
             <li><a href="#">Gestionar Usuarios</a></li>
             <li><a href="#">Gestionar Libros</a></li>
-            <li><a href="/admin/">Panel Django</a></li>
+
 
         {% elif user.rol == "CLIENTE" %}
             <li><a href="#">Noticias</a></li>
@@ -166,8 +171,8 @@ main {
             <li><a href="#">Carrito</a></li>
 
         {% elif user.rol == "ROOT" %}
-            <li><a href="#">Super Admin</a></li>
-            <li><a href="#">Control Total</a></li>
+            <li><a href="{% url 'crear_admin' %}">Crear Administrador</a></li>
+            <li><a href="{% url 'eliminar_admin' %}">Eliminar Administrador</a></li>
             <li><a href="/admin/">Admin Completo</a></li>
 
         {% endif %}
@@ -177,13 +182,6 @@ main {
 
 {% endif %}
 
-
-<!-- ADMIN -->
-<div style="margin:10px;">
-    {% if user.is_authenticated and user.rol == "ADMIN" %}
-        <a href="/admin/">Admin</a>
-    {% endif %}
-</div>
 
 <!-- CONTENIDO DINÁMICO -->
 {% block content %}

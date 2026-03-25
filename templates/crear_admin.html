@@ -4,16 +4,16 @@
 {% block content %}
 
 <style>
-.editar-container {
+.registro-container {
     background: white;
     border-radius: 15px;
-    max-width: 800px;
-    margin: 50px auto;
+    max-width: 900px;
+    margin: 40px auto;
     padding: 30px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
-.editar-header {
+.registro-header {
     background: #87CEEB;
     color: white;
     padding: 20px;
@@ -49,51 +49,25 @@ input, select {
     flex: 1;
 }
 
-.btn-guardar {
+.btn-registrar {
     background: #0066cc;
     color: white;
     border: none;
-    padding: 12px;
+    padding: 12px 25px;
     border-radius: 8px;
-    width: 100%;
     font-weight: bold;
-    margin-bottom: 10px;
 }
 
-.btn-guardar:hover {
+.btn-registrar:hover {
     background: #0055aa;
-}
-
-.btn-cancelar {
-    background: gray;
-    color: white;
-    border-radius: 8px;
-    padding: 10px;
-    display: block;
-    text-align: center;
-    text-decoration: none;
-}
-.btn-password {
-    background: #ff9800;
-    color: white;
-    border-radius: 8px;
-    padding: 10px;
-    display: block;
-    text-align: center;
-    text-decoration: none;
-    margin-bottom: 10px;
-}
-
-.btn-password:hover {
-    background: #e68900;
 }
 </style>
 
-<div class="editar-container">
+<div class="registro-container">
 
-    <div class="editar-header">
-        <h2>Editar Perfil</h2>
-        <p>Actualiza tu información</p>
+    <div class="registro-header">
+        <h2>Registro de Administrador</h2>
+        <p>Completa la información</p>
     </div>
 
     <form method="post">
@@ -103,7 +77,6 @@ input, select {
         <div class="seccion">
             <h4>Datos Personales</h4>
 
-            <!-- DNI PRIMERO -->
             <div class="row">
                 <div class="col">
                     <label>DNI</label>
@@ -147,12 +120,6 @@ input, select {
                     <label>Email</label>
                     {{ form.email }}
                 </div>
-                {% if user.rol == "CLIENTE" %}
-                <div class="col">
-                    <label>Dirección</label>
-                    {{ form.direccion_envio }}
-                </div>
-                {% endif %}
             </div>
         </div>
 
@@ -166,20 +133,25 @@ input, select {
                     {{ form.username }}
                 </div>
             </div>
+
+            <div class="row">
+                <div class="col">
+                    <label>Contraseña</label>
+                    {{ form.password1 }}
+                </div>
+                <div class="col">
+                    <label>Confirmar Contraseña</label>
+                    {{ form.password2 }}
+                </div>
+            </div>
         </div>
 
-        <!-- BOTONES -->
-        <button type="submit" class="btn-guardar">
-            Guardar Cambios
-        </button>
-
-        <a href="{% url 'cambiar_password' %}" class="btn-password">
-            Cambiar Contraseña
-        </a>
-
-        <a href="{% url 'inicio' %}" class="btn-cancelar">
-            Cancelar
-        </a>
+        <!-- BOTÓN -->
+        <div style="text-align:center; margin-top:20px;">
+            <button type="submit" class="btn-registrar">
+                Registrar Administrador
+            </button>
+        </div>
 
     </form>
 
