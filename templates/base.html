@@ -10,16 +10,21 @@
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* 🔥 CLAVE */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: url("{% static 'assets/imagenes/Logo.png' %}") no-repeat center center fixed;
     background-size: cover;
+
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-/* HEADER PRINCIPAL */
+/* HEADER */
 .main-header {
     background: #87CEEB;
-    padding: 15px;
+    padding: 10px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -58,6 +63,11 @@ body {
 .menu a {
     color: white;
     text-decoration: none;
+}
+
+/* 🔥 CONTENEDOR FLEX */
+.content {
+    flex: 1;
 }
 
 /* CONTENIDO */
@@ -115,20 +125,15 @@ main {
 
     <div>
         {% if user.is_authenticated %}
-            Bienvenido {{ user.username }}
+            Bienvenido a Librer_IA
         {% endif %}
     </div>
 
     <div class="user-section">
 
     {% if request.resolver_match.url_name != 'inicio' %}
-
-        <!-- EN CUALQUIER PÁGINA QUE NO SEA INICIO -->
         <a href="{% url 'inicio' %}">Volver al inicio</a>
-
     {% else %}
-
-        <!-- SOLO EN INICIO -->
         {% if user.is_authenticated %}
             {% if user.rol == "ROOT" %}
                 <a href="{% url 'cambiar_usuario' %}">Cambiar Usuario</a>
@@ -147,22 +152,18 @@ main {
             <a href="{% url 'login' %}">Iniciar Sesión</a>
             <a href="{% url 'registro' %}">Registrarse</a>
         {% endif %}
-
     {% endif %}
     </div>
 
 </header>
 
 {% if user.is_authenticated %}
-
 <div class="menu">
     <ul>
-
         {% if user.rol == "ADMIN" %}
             <li><a href="#">Dashboard Admin</a></li>
             <li><a href="#">Gestionar Usuarios</a></li>
             <li><a href="#">Gestionar Libros</a></li>
-
 
         {% elif user.rol == "CLIENTE" %}
             <li><a href="#">Noticias</a></li>
@@ -174,18 +175,18 @@ main {
             <li><a href="{% url 'crear_admin' %}">Crear Administrador</a></li>
             <li><a href="{% url 'eliminar_admin' %}">Eliminar Administrador</a></li>
             <li><a href="/admin/">Admin Completo</a></li>
-
         {% endif %}
-
     </ul>
 </div>
-
 {% endif %}
 
+<!-- 🔥 ENVOLTORIO CLAVE -->
+<div class="content">
 
-<!-- CONTENIDO DINÁMICO -->
-{% block content %}
-{% endblock %}
+    {% block content %}
+    {% endblock %}
+
+</div>
 
 <!-- FOOTER -->
 <div class="footer">

@@ -13,4 +13,5 @@ urlpatterns = [
     path("cambiar-usuario/", views.cambiar_usuario, name="cambiar_usuario"),
     path("crear-admin/", views.crear_admin, name="crear_admin"),
     path("eliminar-admin/", views.eliminar_admin, name="eliminar_admin"),
+    path("eliminar-cuenta/", views.eliminar_cuenta, name="eliminar_cuenta"),
 ]

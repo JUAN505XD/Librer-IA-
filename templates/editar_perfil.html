@@ -64,8 +64,23 @@ input, select {
     background: #0055aa;
 }
 
+
+.btn-eliminar {
+    background: #ff0000;
+    color: white;
+    border-radius: 8px;
+    padding: 10px;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    margin-bottom: 10px;
+}
+.btn-eliminar:hover {
+    background: #8d0000;
+}
+
 .btn-cancelar {
-    background: gray;
+    background: #ff6b01;
     color: white;
     border-radius: 8px;
     padding: 10px;
@@ -73,8 +88,13 @@ input, select {
     text-align: center;
     text-decoration: none;
 }
+
+.btn-cancelar:hover {
+    background: #953e00;
+}
+
 .btn-password {
-    background: #ff9800;
+    background: #007215;
     color: white;
     border-radius: 8px;
     padding: 10px;
@@ -85,9 +105,10 @@ input, select {
 }
 
 .btn-password:hover {
-    background: #e68900;
+    background: #003f0c;
 }
 </style>
+
 
 <div class="editar-container">
 
@@ -176,7 +197,11 @@ input, select {
         <a href="{% url 'cambiar_password' %}" class="btn-password">
             Cambiar Contraseña
         </a>
-
+        {% if user.rol == "CLIENTE" %}
+        <a href="{% url 'eliminar_cuenta' %}" class="btn-eliminar">
+            Eliminar Cuenta
+        </a>
+        {% endif %}
         <a href="{% url 'inicio' %}" class="btn-cancelar">
             Cancelar
         </a>

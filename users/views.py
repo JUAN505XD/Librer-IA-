@@ -290,3 +290,13 @@ def eliminar_admin(request):
     return render(request, "eliminar_admin.html", {
         "admins": admins
     })
+
+@login_required
+def eliminar_cuenta(request):
+
+    if request.method == "POST":
+        usuario = request.user
+        usuario.delete()
+        return redirect("inicio")
+
+    return render(request, "eliminar_cuenta.html")
