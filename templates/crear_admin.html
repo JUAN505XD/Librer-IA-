@@ -89,8 +89,8 @@ ul.errorlist {
 <div class="registro-container">
 
     <div class="registro-header">
-        <h2>Registro de Usuario</h2>
-        <p>Completa tu información</p>
+        <h2>Registro de Administrador</h2>
+        <p>Completa la información</p>
     </div>
 
     <form method="post">
@@ -171,13 +171,6 @@ ul.errorlist {
                         <div class="error-text">{{ form.email.errors.0 }}</div>
                     {% endif %}
                 </div>
-                <div class="col">
-                    <label>Dirección</label>
-                    {{ form.direccion_envio }}
-                    {% if form.direccion_envio.errors %}
-                        <div class="error-text">{{ form.direccion_envio.errors.0 }}</div>
-                    {% endif %}
-                </div>
             </div>
         </div>
 
@@ -216,7 +209,7 @@ ul.errorlist {
         <!-- BOTÓN -->
         <div style="text-align:center; margin-top:20px;">
             <button type="submit" class="btn-registrar">
-                Registrar Usuario
+                Registrar Administrador
             </button>
         </div>
 

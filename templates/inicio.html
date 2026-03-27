@@ -1,129 +1,20 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>Librer_ía</title>
+{% block title %}Inicio{% endblock %}
 
-<link rel="stylesheet" href="{% static 'styles.css' %}">
-<link rel="stylesheet" href="{% static 'assets/css/estilos.css' %}">
+{% block content %}
 
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: url("{% static 'assets/imagenes/Logo.png' %}") no-repeat center center fixed;
-    background-size: cover;
-}
-
-header {
-    background: #87CEEB;
-    color: #fff;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.user-section a {
-    background: #0066cc;
-    padding: 8px 15px;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 4px;
-    margin-left: 10px;
-}
-
-.main-container {
-    display: flex;
-    margin: 20px;
-    gap: 20px;
-}
-
-aside {
-    flex: 1;
-    background: #e6e6e6;
-    padding: 20px;
-    border-radius: 8px;
-}
-
-main {
-    flex: 3;
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-}
-</style>
-
-</head>
-
-<body>
-
-<!-- HEADER -->
-<header class="main-header">
-
-    <!-- LOGO -->
-    <div class="logo">
-        <img src="{% static 'assets/imagenes/Logo1.png' %}" width="200">
-    </div>
-
-    <!-- USUARIO -->
-    <div style="text-align:center;">
-        {% if user.is_authenticated %}
-            <p style="margin:0; font-weight:bold; margin-right:10px;">
-                Bienvenido {{ user.username }}
-            </p>
-        {% endif %}
-    </div>
-
-    <!-- BOTONES -->
-    <div class="user-section">
-        {% if user.is_authenticated %}
-            <a href="{% url 'editar_perfil' %}">Editar Perfil</a>
-            <a href="{% url 'logout' %}">Cerrar Sesión</a>
-        {% else %}
-            <a href="{% url 'login' %}">Iniciar Sesión</a>
-            <a href="{% url 'registro' %}">Registrarse</a>
-        {% endif %}
-    </div>
-
-</header>
-
-<!-- MENÚ -->
-<header>
-    <nav>
-        <ul style="display:flex; gap:20px; list-style:none;">
-            <li><a href="#">Noticias</a></li>
-            <li><a href="#">Catálogo</a></li>
-            <li><a href="#">Mis Reservas</a></li>
-            <li><a href="#">Carrito</a></li>
-        </ul>
-    </nav>
-</header>
-
-<!-- ADMIN -->
-<div style="margin:10px;">
-    {% if user.is_authenticated and user.rol == "ADMIN" %}
-    <a href="/admin/">Admin</a>
-{% endif %}
-</div>
-
-<!-- CONTENIDO -->
 <div class="main-container">
 
-    <!-- ASIDE -->
     <aside>
         <h2>Novedades</h2>
 
         <img src="{% static 'assets/imagenes/nicolas.jpg' %}" width="100%">
-        <p>Espacio reservado para anuncios</p>
 
         <img src="{% static 'assets/imagenes/Logo.png' %}" width="100%">
         <p>Promociones del mes</p>
     </aside>
 
-    <!-- MAIN -->
     <main>
 
         <h2>Bienvenido a Librer_IA online</h2>
@@ -146,10 +37,4 @@ main {
 
 </div>
 
-<!-- FOOTER -->
-<div style="background:black; color:white; padding:10px; text-align:center;">
-    © 2026 Librer_IA
-</div>
-
-</body>
-</html>
+{% endblock %}

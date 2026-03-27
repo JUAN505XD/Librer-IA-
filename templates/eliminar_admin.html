@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div style="max-width: 800px; margin: 30px auto; background:white; padding:20px; border-radius:10px;">
+
+    <h2 style="text-align:center; margin-bottom:20px;">
+        Eliminar Administradores
+    </h2>
+
+    {% if admins %}
+    
+        <table style="width:100%; border-collapse: collapse;">
+
+            <thead>
+                <tr style="background:#87CEEB; color:white;">
+                    <th style="padding:10px;">Usuario</th>
+                    <th style="padding:10px;">Acción</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for admin in admins %}
+                <tr style="border-bottom:1px solid #ccc;">
+
+                    <td style="padding:10px;">
+                        {{ admin.username }}
+                    </td>
+
+                    <td style="padding:10px; text-align:center;">
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="user_id" value="{{ admin.id }}">
+
+                            <button type="submit" 
+                                    style="background:red; color:white; border:none; padding:6px 12px; border-radius:5px; cursor:pointer;">
+                                Eliminar
+                            </button>
+                        </form>
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+
+    {% else %}
+        <p style="text-align:center;">No hay administradores registrados.</p>
+    {% endif %}
+
+</div>
+
+{% endblock %}

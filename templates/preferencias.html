@@ -1,40 +1,104 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Preferencias</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+{% extends "base.html" %}
+{% load static %}
 
-<body style="background: linear-gradient(135deg, #667eea, #764ba2); min-height:100vh; display:flex; align-items:center; justify-content:center;">
+{% block content %}
 
-<div class="card p-4" style="width:500px; border-radius:15px;">
+<style>
+.preferencias-container {
+    background: white;
+    border-radius: 15px;
+    max-width: 700px;
+    margin: 50px auto;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
 
-    <h3 class="text-center mb-4">Preferencias (Opcional)</h3>
+.preferencias-header {
+    background: #87CEEB;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.seccion {
+    margin-bottom: 25px;
+}
+
+.seccion h4 {
+    margin-bottom: 10px;
+    color: #004080;
+    border-bottom: 2px solid #87CEEB;
+    padding-bottom: 5px;
+}
+
+select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    min-height: 120px; /* para múltiples opciones */
+}
+
+.btn-guardar {
+    background: #0066cc;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    width: 100%;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.btn-guardar:hover {
+    background: #0055aa;
+}
+
+.btn-saltar {
+    background: gray;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    width: 100%;
+}
+</style>
+
+<div class="preferencias-container">
+
+    <div class="preferencias-header">
+        <h2>Preferencias</h2>
+        <p>Personaliza tu experiencia (opcional)</p>
+    </div>
 
     <form method="post">
         {% csrf_token %}
 
-        <h5>Géneros</h5>
-<div class="mb-3">
-    {{ form.generos }}
-</div>
+        <!-- 📚 GÉNEROS -->
+        <div class="seccion">
+            <h4>Géneros favoritos</h4>
+            {{ form.generos }}
+        </div>
 
-<h5 class="mt-3">Autores</h5>
-<div class="mb-3">
-    {{ form.autores }}
-</div>
+        <!-- ✍️ AUTORES -->
+        <div class="seccion">
+            <h4>Autores favoritos</h4>
+            {{ form.autores }}
+        </div>
 
-        <button type="submit" class="btn btn-success w-100 mb-2">
-            Guardar
+        <!-- BOTONES -->
+        <button type="submit" class="btn-guardar">
+            Guardar Preferencias
         </button>
 
-        <button type="submit" name="saltar" class="btn btn-secondary w-100">
+        <button type="submit" name="saltar" class="btn-saltar">
             Saltar
         </button>
+
     </form>
 
 </div>
 
-</body>
-</html>
+{% endblock %}

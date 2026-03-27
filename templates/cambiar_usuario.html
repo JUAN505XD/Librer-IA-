@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+.container-user {
+    background: white;
+    border-radius: 15px;
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.header-user {
+    background: #87CEEB;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+}
+
+.btn-guardar {
+    background: #0066cc;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    width: 100%;
+    border: none;
+    margin-bottom: 10px;
+}
+
+.btn-cancelar {
+    background: gray;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+}
+</style>
+
+<div class="container-user">
+
+    <div class="header-user">
+        <h2>Cambiar Usuario</h2>
+        <p>Solo disponible para ROOT</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <label>Nuevo nombre de usuario</label>
+        <input type="text" name="username" value="{{ user.username }}" required>
+
+        <button type="submit" class="btn-guardar">
+            Guardar cambios
+        </button>
+
+        <a href="{% url 'inicio' %}" class="btn-cancelar">
+            Cancelar
+        </a>
+    </form>
+
+</div>
+
+{% endblock %}

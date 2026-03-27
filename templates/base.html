@@ -1,0 +1,195 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>{% block title %}Librer_ía{% endblock %}</title>
+
+<link rel="stylesheet" href="{% static 'styles.css' %}">
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* 🔥 CLAVE */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: url("{% static 'assets/imagenes/Logo.png' %}") no-repeat center center fixed;
+    background-size: cover;
+
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* HEADER */
+.main-header {
+    background: #87CEEB;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.logo img {
+    width: 80px;
+}
+
+.user-section {
+    display: flex;
+    gap: 10px;
+}
+
+.user-section a {
+    background: #0066cc;
+    padding: 8px 12px;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+/* MENÚ */
+.menu {
+    background: #222;
+    padding: 10px;
+}
+
+.menu ul {
+    display: flex;
+    gap: 20px;
+    list-style: none;
+}
+
+.menu a {
+    color: white;
+    text-decoration: none;
+}
+
+/* 🔥 CONTENEDOR FLEX */
+.content {
+    flex: 1;
+}
+
+/* CONTENIDO */
+.main-container {
+    display: flex;
+    margin: 20px;
+    gap: 20px;
+}
+
+aside {
+    flex: 1;
+    background: #e6e6e6;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+main {
+    flex: 3;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+/* FOOTER */
+.footer {
+    background: black;
+    color: white;
+    text-align: center;
+    padding: 10px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .main-container {
+        flex-direction: column;
+    }
+
+    .menu ul {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header class="main-header">
+
+    <div class="logo">
+        <img src="{% static 'assets/imagenes/Logo1.png' %}">
+    </div>
+
+    <div>
+            Bienvenido a Librer_IA
+    </div>
+
+    <div class="user-section">
+
+    {% if request.resolver_match.url_name != 'inicio' %}
+        <a href="{% url 'inicio' %}">Volver al inicio</a>
+    {% else %}
+        {% if user.is_authenticated %}
+            {% if user.rol == "ROOT" %}
+                <a href="{% url 'cambiar_usuario' %}">Cambiar Usuario</a>
+                <a href="{% url 'cambiar_password' %}">Cambiar Contraseña</a>
+                <a href="{% url 'logout' %}">Cerrar Sesión</a>
+            {% else %}
+                {% if user.rol == "ADMIN" %}
+                    <a href="{% url 'editar_perfil_admin' %}">Editar Perfil</a>
+                    <a href="{% url 'logout' %}">Cerrar Sesión</a>
+                {% elif user.rol == "CLIENTE" %}
+                    <a href="{% url 'editar_perfil_cliente' %}">Editar Perfil</a>
+                    <a href="{% url 'logout' %}">Cerrar Sesión</a>
+                {% endif %}
+            {% endif %}
+        {% else %}
+            <a href="{% url 'login' %}">Iniciar Sesión</a>
+            <a href="{% url 'registro' %}">Registrarse</a>
+        {% endif %}
+    {% endif %}
+    </div>
+
+</header>
+
+{% if user.is_authenticated %}
+<div class="menu">
+    <ul>
+        {% if user.rol == "ADMIN" %}
+            <li><a href="#">Dashboard Admin</a></li>
+            <li><a href="#">Gestionar Usuarios</a></li>
+            <li><a href="#">Gestionar Libros</a></li>
+
+        {% elif user.rol == "CLIENTE" %}
+            <li><a href="#">Noticias</a></li>
+            <li><a href="#">Catálogo</a></li>
+            <li><a href="#">Mis Reservas</a></li>
+            <li><a href="#">Carrito</a></li>
+
+        {% elif user.rol == "ROOT" %}
+            <li><a href="{% url 'crear_admin' %}">Crear Administrador</a></li>
+            <li><a href="{% url 'eliminar_admin' %}">Eliminar Administrador</a></li>
+            <li><a href="/admin/">Admin Completo</a></li>
+        {% endif %}
+    </ul>
+</div>
+{% endif %}
+
+<!-- 🔥 ENVOLTORIO CLAVE -->
+<div class="content">
+
+    {% block content %}
+    {% endblock %}
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+    © 2026 Librer_IA
+</div>
+
+</body>
+</html>

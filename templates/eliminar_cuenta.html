@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+.confirmar-container {
+    background: white;
+    border-radius: 15px;
+    max-width: 500px;
+    margin: 80px auto;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+.confirmar-header {
+    background: #ff4d4d;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.btn-confirmar {
+    background: red;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    width: 100%;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.btn-confirmar:hover {
+    background: darkred;
+}
+
+.btn-cancelar {
+    background: gray;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    display: block;
+    text-decoration: none;
+}
+</style>
+
+<div class="confirmar-container">
+
+    <div class="confirmar-header">
+        <h2>Eliminar Cuenta</h2>
+    </div>
+
+    <p>¿Estás seguro de que deseas eliminar tu cuenta?</p>
+    <p><strong>Esta acción no se puede deshacer.</strong></p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <button type="submit" class="btn-confirmar">
+            Sí, eliminar mi cuenta
+        </button>
+    </form>
+
+    <a href="{% url 'editar_perfil_cliente' %}" class="btn-cancelar">
+        Cancelar
+    </a>
+
+</div>
+
+{% endblock %}
