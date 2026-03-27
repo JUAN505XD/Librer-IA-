@@ -6,6 +6,9 @@ from datetime import date
 
 #hola esto en un ensayo para ver si funciona el commit en git hub
 class RegistroClienteForm(UserCreationForm):
+    error_messages = {
+        "password_mismatch": "Las contraseñas no coinciden",
+    }
 
     dni = forms.IntegerField()
     nombres = forms.CharField(max_length=100)
@@ -29,6 +32,21 @@ class RegistroClienteForm(UserCreationForm):
     class Meta:
         model = Usuario
         fields = ["username", "password1", "password2"]
+
+    def clean_username(self):
+        username = self.cleaned_data.get("username")
+
+        if Usuario.objects.filter(username=username).exists():
+         raise forms.ValidationError("Este usuario ya existe")
+
+        return username
+    def clean_dni(self):
+        dni = self.cleaned_data.get("dni")
+
+        if Persona.objects.filter(dni=dni).exists():
+            raise forms.ValidationError("Este DNI ya está registrado")
+
+        return dni
 
     def save(self, commit=True):
 
@@ -55,7 +73,11 @@ class RegistroClienteForm(UserCreationForm):
             )
 
         return usuario
+    
 class RegistroAdminForm(UserCreationForm):
+    error_messages = {
+        "password_mismatch": "Las contraseñas no coinciden",
+    }
 
     dni = forms.IntegerField()
     nombres = forms.CharField(max_length=100)
@@ -80,6 +102,23 @@ class RegistroAdminForm(UserCreationForm):
     class Meta:
         model = Usuario
         fields = ["username", "password1", "password2"]
+
+    def clean_username(self):
+        username = self.cleaned_data.get("username")
+
+        if Usuario.objects.filter(username=username).exists():
+         raise forms.ValidationError("Este usuario ya existe")
+
+        return username
+    
+    def clean_dni(self):
+        dni = self.cleaned_data.get("dni")
+
+        if Persona.objects.filter(dni=dni).exists():
+            raise forms.ValidationError("Este DNI ya está registrado")
+
+        return dni
+
 
     def save(self, commit=True):
 

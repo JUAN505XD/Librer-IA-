@@ -61,6 +61,29 @@ input, select {
 .btn-registrar:hover {
     background: #0055aa;
 }
+
+/* 🔥 ERRORES */
+ul.errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.error-box {
+    background: #ffe6e6;
+    color: #cc0000;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
 </style>
 
 <div class="registro-container">
@@ -73,6 +96,13 @@ input, select {
     <form method="post">
         {% csrf_token %}
 
+        <!-- 🔥 ERROR GENERAL -->
+        {% if form.non_field_errors %}
+            <div class="error-box">
+                {{ form.non_field_errors.0 }}
+            </div>
+        {% endif %}
+
         <!-- 🔵 DATOS PERSONALES -->
         <div class="seccion">
             <h4>Datos Personales</h4>
@@ -81,10 +111,16 @@ input, select {
                 <div class="col">
                     <label>DNI</label>
                     {{ form.dni }}
+                    {% if form.dni.errors %}
+                        <div class="error-box">{{ form.dni.errors.0 }}</div>
+                    {% endif %}
                 </div>
                 <div class="col">
                     <label>Género</label>
                     {{ form.genero }}
+                    {% if form.genero.errors %}
+                        <div class="error-text">{{ form.genero.errors.0 }}</div>
+                    {% endif %}
                 </div>
             </div>
 
@@ -92,10 +128,16 @@ input, select {
                 <div class="col">
                     <label>Nombres</label>
                     {{ form.nombres }}
+                    {% if form.nombres.errors %}
+                        <div class="error-text">{{ form.nombres.errors.0 }}</div>
+                    {% endif %}
                 </div>
                 <div class="col">
                     <label>Apellidos</label>
                     {{ form.apellidos }}
+                    {% if form.apellidos.errors %}
+                        <div class="error-text">{{ form.apellidos.errors.0 }}</div>
+                    {% endif %}
                 </div>
             </div>
 
@@ -103,10 +145,16 @@ input, select {
                 <div class="col">
                     <label>Fecha de Nacimiento</label>
                     {{ form.fecha_nacimiento }}
+                    {% if form.fecha_nacimiento.errors %}
+                        <div class="error-text">{{ form.fecha_nacimiento.errors.0 }}</div>
+                    {% endif %}
                 </div>
                 <div class="col">
                     <label>Lugar de Nacimiento</label>
                     {{ form.lugar_nacimiento }}
+                    {% if form.lugar_nacimiento.errors %}
+                        <div class="error-text">{{ form.lugar_nacimiento.errors.0 }}</div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -119,6 +167,9 @@ input, select {
                 <div class="col">
                     <label>Email</label>
                     {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="error-text">{{ form.email.errors.0 }}</div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -131,6 +182,9 @@ input, select {
                 <div class="col">
                     <label>Usuario</label>
                     {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="error-box">{{ form.username.errors.0 }}</div>
+                    {% endif %}
                 </div>
             </div>
 
@@ -138,10 +192,16 @@ input, select {
                 <div class="col">
                     <label>Contraseña</label>
                     {{ form.password1 }}
+                    {% if form.password1.errors %}
+                        <div class="error-box">{{ form.password1.errors.0 }}</div>
+                    {% endif %}
                 </div>
                 <div class="col">
                     <label>Confirmar Contraseña</label>
                     {{ form.password2 }}
+                    {% if form.password2.errors %}
+                        <div class="error-box">{{ form.password2.errors.0 }}</div>
+                    {% endif %}
                 </div>
             </div>
         </div>
