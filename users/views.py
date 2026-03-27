@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import authenticate, login, logout
-from .Forms import EditarAdminForm, EditarclienteForm, RegistroAdminForm, RegistroClienteForm, LoginForm, PreferenciasForm
+from .Forms import EditarAdminForm, EditarclienteForm, RegistroAdminForm, RegistroClienteForm, LoginForm, PreferenciasForm, CustomPasswordChangeForm
 from .models import Administrador, Administrador, Preferencias, Persona, Cliente, Usuario, Usuario
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
@@ -229,12 +229,21 @@ def editar_perfil_admin(request):
 def cambiar_password(request):
 
     if request.method == "POST":
-        form = PasswordChangeForm(request.user, request.POST)
+        form = CustomPasswordChangeForm(request.user, request.POST)
 
         if form.is_valid():
             user = form.save()
-            update_session_auth_hash(request, user)  # 🔥 mantiene sesión activa
+            update_session_auth_hash(request, user)
             return redirect("inicio")
+        else:
+            # 🔥 CONTROL DE PRIORIDAD DE ERRORES
+
+            if form.has_error("old_password"):
+                form._errors = {"old_password": form.errors["old_password"]}
+            
+            elif form.has_error("new_password2"):
+                # dejar solo error de no coinciden
+                form._errors = {"new_password2": form.errors["new_password2"]}
 
     else:
         form = PasswordChangeForm(request.user)
