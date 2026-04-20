@@ -4,7 +4,6 @@ from .models import Usuario, Persona, Cliente, Preferencias, Administrador
 from datetime import date
 
 
-#hola esto en un ensayo para ver si funciona el commit en git hub
 class RegistroClienteForm(UserCreationForm):
     error_messages = {
         "password_mismatch": "Las contraseñas no coinciden",
@@ -15,7 +14,7 @@ class RegistroClienteForm(UserCreationForm):
     apellidos = forms.CharField(max_length=100)
     fecha_nacimiento = forms.DateField(widget=forms.DateInput(attrs={
             'type': 'date',
-            'max': date.today().isoformat(),
+            'max': f"{date.today().year - 12}-01-01",
             'min': f"{date.today().year - 100}-01-01",
             }))
     lugar_nacimiento = forms.CharField(max_length=100)
@@ -85,7 +84,7 @@ class RegistroAdminForm(UserCreationForm):
 
     fecha_nacimiento = forms.DateField(widget=forms.DateInput(attrs={
         'type': 'date',
-        'max': date.today().isoformat(),
+	'max': f"{date.today().year - 12}-01-01",
         'min': f"{date.today().year - 100}-01-01",
     }))
 
@@ -172,7 +171,7 @@ class EditarclienteForm(forms.Form):
     fecha_nacimiento = forms.DateField(
         widget=forms.DateInput(attrs={
             'type': 'date',
-            'max': date.today().isoformat(),
+            'max': f"{date.today().year - 12}-01-01",
             'min': f"{date.today().year - 100}-01-01",
         }),
         required=False
@@ -201,7 +200,7 @@ class EditarAdminForm(forms.Form):
     fecha_nacimiento = forms.DateField(
         widget=forms.DateInput(attrs={
             'type': 'date',
-            'max': date.today().isoformat(),
+            
             'min': f"{date.today().year - 100}-01-01",
         }),
         required=False
