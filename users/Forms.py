@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm
 from .models import Usuario, Persona, Cliente, Preferencias, Administrador
+from django_countries.fields import CountryField
 from datetime import date
 
 
@@ -17,7 +18,7 @@ class RegistroClienteForm(UserCreationForm):
             'max': f"{date.today().year - 12}-01-01",
             'min': f"{date.today().year - 100}-01-01",
             }))
-    lugar_nacimiento = forms.CharField(max_length=100)
+    lugar_nacimiento = CountryField().formfield(blank_label="País de nacimiento")
 
     genero = forms.ChoiceField(choices=[
         ('M', 'Masculino'),
@@ -55,13 +56,15 @@ class RegistroClienteForm(UserCreationForm):
         if commit:
             usuario.save()
 
+            codigo_pais=self.cleaned_data.get("lugar_nacimiento")
+
             Persona.objects.create(
                 dni=self.cleaned_data["dni"],
                 usuario=usuario,
                 nombre=self.cleaned_data["nombres"],
                 apellido=self.cleaned_data["apellidos"],
                 fecha_nacimiento=self.cleaned_data["fecha_nacimiento"],
-                lugar_nacimiento=self.cleaned_data["lugar_nacimiento"],
+                lugar_nacimiento=dict(self.fields["lugar_nacimiento"].choices).get(codigo_pais),
                 sexo=self.cleaned_data["genero"],
             )
 
@@ -88,7 +91,8 @@ class RegistroAdminForm(UserCreationForm):
         'min': f"{date.today().year - 100}-01-01",
     }))
 
-    lugar_nacimiento = forms.CharField(max_length=100)
+    lugar_nacimiento = CountryField().formfield(blank_label="País de nacimiento")
+
 
     genero = forms.ChoiceField(choices=[
         ('M', 'Masculino'),
@@ -126,6 +130,8 @@ class RegistroAdminForm(UserCreationForm):
 
         if commit:
             usuario.save()
+            
+            codigo_pais=self.cleaned_data.get("lugar_nacimiento")
 
             Persona.objects.create(
                 dni=self.cleaned_data["dni"],
@@ -133,7 +139,7 @@ class RegistroAdminForm(UserCreationForm):
                 nombre=self.cleaned_data["nombres"],
                 apellido=self.cleaned_data["apellidos"],
                 fecha_nacimiento=self.cleaned_data["fecha_nacimiento"],
-                lugar_nacimiento=self.cleaned_data["lugar_nacimiento"],
+                lugar_nacimiento=dict(self.fields["lugar_nacimiento"].choices).get(codigo_pais),
                 sexo=self.cleaned_data["genero"],
             )
 
@@ -176,7 +182,9 @@ class EditarclienteForm(forms.Form):
         }),
         required=False
     )
-    lugar_nacimiento = forms.CharField(max_length=100, required=False)
+    lugar_nacimiento = CountryField().formfield(blank_label="País de nacimiento")
+
+
 
     genero = forms.ChoiceField(
         choices=[
@@ -205,7 +213,8 @@ class EditarAdminForm(forms.Form):
         }),
         required=False
     )
-    lugar_nacimiento = forms.CharField(max_length=100, required=False)
+    lugar_nacimiento = CountryField().formfield(blank_label="País de nacimiento")
+
 
     genero = forms.ChoiceField(
         choices=[
