@@ -64,7 +64,7 @@ class RegistroClienteForm(UserCreationForm):
                 nombre=self.cleaned_data["nombres"],
                 apellido=self.cleaned_data["apellidos"],
                 fecha_nacimiento=self.cleaned_data["fecha_nacimiento"],
-                lugar_nacimiento=dict(self.fields["lugar_nacimiento"].choices).get(codigo_pais),
+                lugar_nacimiento=self.cleaned_data.get("lugar_nacimiento"),
                 sexo=self.cleaned_data["genero"],
             )
 
@@ -130,8 +130,6 @@ class RegistroAdminForm(UserCreationForm):
 
         if commit:
             usuario.save()
-            
-            codigo_pais=self.cleaned_data.get("lugar_nacimiento")
 
             Persona.objects.create(
                 dni=self.cleaned_data["dni"],
@@ -139,7 +137,7 @@ class RegistroAdminForm(UserCreationForm):
                 nombre=self.cleaned_data["nombres"],
                 apellido=self.cleaned_data["apellidos"],
                 fecha_nacimiento=self.cleaned_data["fecha_nacimiento"],
-                lugar_nacimiento=dict(self.fields["lugar_nacimiento"].choices).get(codigo_pais),
+                lugar_nacimiento=self.cleaned_data.get("lugar_nacimiento"),
                 sexo=self.cleaned_data["genero"],
             )
 

@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from libros.models import Genero, Autor
 from django.core.exceptions import ValidationError
 from datetime import date
+from django_countries.fields import CountryField
 
 # =========================
 # MANAGER DE USUARIO
@@ -92,7 +93,7 @@ class Persona(models.Model):
 
     fecha_nacimiento = models.DateField()
 
-    lugar_nacimiento = models.CharField(max_length=100)
+    lugar_nacimiento = CountryField()
 
     sexo = models.CharField(max_length=1)
 
