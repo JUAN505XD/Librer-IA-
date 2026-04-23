@@ -10,7 +10,6 @@
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* 🔥 CLAVE */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: url("{% static 'assets/imagenes/Logo.png' %}") no-repeat center center fixed;
@@ -48,10 +47,13 @@ body {
     border-radius: 5px;
 }
 
-/* MENÚ */
+/* 🔥 MENÚ MEJORADO */
 .menu {
     background: #222;
     padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .menu ul {
@@ -63,14 +65,19 @@ body {
 .menu a {
     color: white;
     text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 5px;
 }
 
-/* 🔥 CONTENEDOR FLEX */
+.menu a:hover {
+    background: #444;
+}
+
+/* CONTENIDO */
 .content {
     flex: 1;
 }
 
-/* CONTENIDO */
 .main-container {
     display: flex;
     margin: 20px;
@@ -105,6 +112,11 @@ main {
         flex-direction: column;
     }
 
+    .menu {
+        flex-direction: column;
+        gap: 10px;
+    }
+
     .menu ul {
         flex-direction: column;
         align-items: center;
@@ -124,7 +136,7 @@ main {
     </div>
 
     <div>
-            Bienvenido a Librer_IA
+        Bienvenido a Librer_IA
     </div>
 
     <div class="user-section">
@@ -157,6 +169,8 @@ main {
 
 {% if user.is_authenticated %}
 <div class="menu">
+
+    <!-- IZQUIERDA -->
     <ul>
         {% if user.rol == "ADMIN" %}
             <li><a href="#">Dashboard Admin</a></li>
@@ -175,15 +189,39 @@ main {
             <li><a href="/admin/">Admin Completo</a></li>
         {% endif %}
     </ul>
+
+    <!-- DERECHA 🔍 -->
+    <ul>
+        <div style="flex:1; text-align:center;">
+
+    <form method="get" action="{% url 'buscar_libros' %}" style="display:inline-flex; gap:5px;">
+
+        <input 
+            type="text" 
+            name="q" 
+            placeholder="Buscar libros..." 
+            style="padding:6px; border-radius:5px; border:none; width:200px;"
+        >
+
+        <button 
+            type="submit" 
+            style="background:#0066cc; color:white; border:none; padding:6px 10px; border-radius:5px;"
+        >
+            🔍
+        </button>
+
+    </form>
+
+</div>
+    </ul>
+
 </div>
 {% endif %}
 
-<!-- 🔥 ENVOLTORIO CLAVE -->
+<!-- CONTENIDO -->
 <div class="content">
-
     {% block content %}
     {% endblock %}
-
 </div>
 
 <!-- FOOTER -->

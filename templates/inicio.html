@@ -58,8 +58,7 @@
         <p>
             Descubre una amplia variedad de libros y novedades literarias.
         </p>
-
-        <div class="catalogo-container">
+<div class="catalogo-container">
 
     <h2 class="catalogo-titulo">Libros Recientes</h2>
 
@@ -72,7 +71,7 @@
                 <p><strong>Autor:</strong> {{ libro.autor }}</p>
                 <p><strong>Género:</strong> {{ libro.genero }}</p>
                 <p><strong>Idioma:</strong> {{ libro.idioma }}</p>
-		<p><strong>Stock:</strong> {{ libro.stock }}</p>
+		            <p><strong>Stock:</strong> {{ libro.stock }}</p>
                 <p><strong>Precio:</strong> ${{ libro.precio }}</p>
 
 		{% if user.is_authenticated and user.rol == "CLIENTE" %}
@@ -88,11 +87,11 @@
             </div>
         {% empty %}
             <p>No hay libros disponibles.</p>
+            <p>Total libros: {{ libros|length }}</p>
         {% endfor %}
     </div>
 
 </div>
-
         <hr>
 
         <h3>Contenido destacado</h3>
