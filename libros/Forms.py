@@ -10,7 +10,6 @@ class LibroForm(forms.ModelForm):
             "titulo",
             "autor",
             "genero",
-            "anio_publicacion",
             "numero_paginas",
             "editorial",
             "issn",
@@ -45,14 +44,6 @@ class LibroForm(forms.ModelForm):
 
         return editorial.strip()
 
-    # 🔹 IDIOMA
-    def clean_idioma(self):
-        idioma = self.cleaned_data.get("idioma")
-
-        if not idioma or idioma.strip() == "":
-            raise forms.ValidationError("El idioma no puede estar vacío")
-
-        return idioma.strip()
 
     # 🔹 ISSN
     def clean_issn(self):
@@ -66,20 +57,6 @@ class LibroForm(forms.ModelForm):
 
         return issn.strip()
 
-    # 🔹 AÑO
-    def clean_anio_publicacion(self):
-        anio = self.cleaned_data.get("anio_publicacion")
-
-        if anio is None:
-            raise forms.ValidationError("El año es obligatorio")
-
-        if anio > date.today().year:
-            raise forms.ValidationError("El año no puede ser futuro")
-
-        if anio < 1500:
-            raise forms.ValidationError("Año demasiado antiguo")
-
-        return anio
 
     # 🔹 PÁGINAS
     def clean_numero_paginas(self):
@@ -107,16 +84,3 @@ class LibroForm(forms.ModelForm):
             raise forms.ValidationError("La fecha no puede ser superior a ayer")
 
         return fecha
-
-    # 🔹 VALIDACIÓN GENERAL (COHERENCIA)
-    def clean(self):
-        cleaned_data = super().clean()
-
-        anio = cleaned_data.get("anio_publicacion")
-        fecha = cleaned_data.get("fecha_publicacion")
-
-        if anio and fecha:
-            if fecha.year != anio:
-                self.add_error("fecha_publicacion", "El año y la fecha no coinciden")
-
-        return cleaned_data

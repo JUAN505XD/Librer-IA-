@@ -52,6 +52,13 @@ input, select {
             </div>
         </div>
 
+         <div class="row">
+            <div class="col">
+                <label>ISSN</label>
+                {{ form.issn }}
+            </div>
+        </div>
+
         <div class="row">
             <div class="col">
                 <label>Autor</label>
@@ -63,16 +70,6 @@ input, select {
             </div>
         </div>
 
-        <div class="row">
-            <div class="col">
-                <label>Año</label>
-                {{ form.anio_publicacion }}
-            </div>
-            <div class="col">
-                <label>Páginas</label>
-                {{ form.numero_paginas }}
-            </div>
-        </div>
 
         <div class="row">
             <div class="col">
@@ -80,8 +77,8 @@ input, select {
                 {{ form.editorial }}
             </div>
             <div class="col">
-                <label>ISSN</label>
-                {{ form.issn }}
+                <label>Páginas</label>
+                {{ form.numero_paginas }}
             </div>
         </div>
 

@@ -39,7 +39,6 @@ class Libro(models.Model):
         on_delete=models.PROTECT  # 🔥 mismo para género
     )
 
-    anio_publicacion = models.IntegerField()
     numero_paginas = models.IntegerField()
 
     editorial = models.CharField(max_length=150)

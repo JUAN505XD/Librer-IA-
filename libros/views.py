@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from .Forms import LibroForm
+from libros.models import Libro
 
 def crear_libro(request):
 
@@ -14,3 +15,12 @@ def crear_libro(request):
         form = LibroForm()
 
     return render(request, "crear_libro.html", {"form": form})
+
+
+def inicio(request):
+
+    libros = Libro.objects.all().order_by('-id')[:6]  # 🔥 últimos 6
+
+    return render(request, "inicio.html", {
+        "libros": libros
+    })
