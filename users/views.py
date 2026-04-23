@@ -144,8 +144,6 @@ def editar_perfil_cliente(request):
             return redirect("inicio")
 
     else:
-        print(persona.lugar_nacimiento.code)
-        print(type(persona.lugar_nacimiento.code))
         form = EditarclienteForm(initial={
         "dni": persona.dni,
         "username": usuario.username,
@@ -159,7 +157,6 @@ def editar_perfil_cliente(request):
         "direccion_envio": cliente.direccion_envio
     })
 
-    print(list(form.fields['lugar_nacimiento'].choices)[:5])
     return render(request, "editar_perfil.html", {"form": form})
 
 @login_required

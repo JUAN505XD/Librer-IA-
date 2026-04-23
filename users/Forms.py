@@ -63,6 +63,17 @@ class RegistroClienteForm(UserCreationForm):
 
         return dni
 
+    def clean_password1(self):
+        password = self.cleaned_data.get("password1")
+
+        if password:
+            if len(set(password)) < 4:
+                raise forms.ValidationError(
+                        "Contraseña demasiado predecible"
+                        )
+
+        return password
+
     def save(self, commit=True):
 
         usuario = super().save(commit=False)
