@@ -206,12 +206,12 @@ class PreferenciasForm(forms.ModelForm):
 
 class EditarclienteForm(forms.Form):
 
-    dni = forms.IntegerField(required=False)
+    dni = forms.IntegerField(required=False, disabled = True)
     username = forms.CharField(max_length=150, required=False)
 
     nombres = forms.CharField(max_length=100, required=False)
     apellidos = forms.CharField(max_length=100, required=False)
-    fecha_nacimiento = forms.DateField(
+    fecha_nacimiento = forms.DateField(disabled = True,
         widget=forms.DateInput(attrs={
             'type': 'date',
             'max': f"{date.today().year - 12}-01-01",
@@ -219,11 +219,11 @@ class EditarclienteForm(forms.Form):
         }),
         required=False
     )
-    lugar_nacimiento = CountryField().formfield(blank_label="País de nacimiento")
+    lugar_nacimiento = CountryField().formfield(disabled=True,blank_label="País de nacimiento")
 
 
 
-    genero = forms.ChoiceField(
+    genero = forms.ChoiceField(disabled=True,
         choices=[
             ('M', 'Masculino'),
             ('F', 'Femenino'),
@@ -233,16 +233,16 @@ class EditarclienteForm(forms.Form):
     )
 
     direccion_envio = forms.CharField(max_length=200, required=False)
-    email = forms.EmailField(required=False)
+    email = forms.EmailField(disabled=True,required=False)
 
 class EditarAdminForm(forms.Form):
 
-    dni = forms.IntegerField(required=False)
+    dni = forms.IntegerField(disabled=True,required=False)
     username = forms.CharField(max_length=150, required=False)
 
     nombres = forms.CharField(max_length=100, required=False)
     apellidos = forms.CharField(max_length=100, required=False)
-    fecha_nacimiento = forms.DateField(
+    fecha_nacimiento = forms.DateField(disabled=True,
         widget=forms.DateInput(attrs={
             'type': 'date',
             
@@ -250,10 +250,10 @@ class EditarAdminForm(forms.Form):
         }),
         required=False
     )
-    lugar_nacimiento = CountryField().formfield(blank_label="País de nacimiento")
+    lugar_nacimiento = CountryField().formfield(disabled=True,blank_label="País de nacimiento")
 
 
-    genero = forms.ChoiceField(
+    genero = forms.ChoiceField(disabled=True,
         choices=[
             ('M', 'Masculino'),
             ('F', 'Femenino'),
@@ -262,7 +262,7 @@ class EditarAdminForm(forms.Form):
         required=False
     )
 
-    email = forms.EmailField(required=False)
+    email = forms.EmailField(disabled=True,required=False)
     
 class CustomPasswordChangeForm(PasswordChangeForm):
 
