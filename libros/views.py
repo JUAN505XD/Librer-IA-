@@ -19,7 +19,7 @@ def crear_libro(request):
 
 def inicio(request):
 
-    libros = Libro.objects.all().order_by('-id')[:6]  # 🔥 últimos 6
+    libros = Libro.objects.all()  # 🔥 últimos 6
 
     return render(request, "inicio.html", {
         "libros": libros
