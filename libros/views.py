@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .Forms import LibroForm
-from libros.models import Libro
+from libros.models import Libro, Autor, Genero, Idioma
 
 def crear_libro(request):
 
@@ -25,8 +25,7 @@ def inicio(request):
         "libros": libros
     })
 
-from django.shortcuts import render
-from .models import Libro, Autor, Genero, Idioma
+
 
 def buscar_libros(request):
 
