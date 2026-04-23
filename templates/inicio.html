@@ -71,8 +71,19 @@
                 <p><strong>Autor:</strong> {{ libro.autor }}</p>
                 <p><strong>Género:</strong> {{ libro.genero }}</p>
                 <p><strong>Idioma:</strong> {{ libro.idioma }}</p>
+		            <p><strong>Stock:</strong> {{ libro.stock }}</p>
                 <p><strong>Precio:</strong> ${{ libro.precio }}</p>
 
+		{% if user.is_authenticated and user.rol == "CLIENTE" %}
+		    {% if libro.stock > 0 %}
+		        <a href="{% url 'agregar_al_carrito' libro.id %}"
+			   style="display: block; background: #066cc; color: white; text-align: center; padding: 10px; border-radius: 5px; text-decoration: none; margin-top: 10px;">
+				Añadir al carrito
+			</a>
+		    {% else %}
+		        <p style="color:red; margin-top: 10px;">Agotado</p>
+		    {% endif %}
+		{% endif %}
             </div>
         {% empty %}
             <p>No hay libros disponibles.</p>

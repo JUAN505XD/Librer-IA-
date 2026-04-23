@@ -24,6 +24,8 @@ class Idioma(models.Model):
 class Libro(models.Model):
     titulo = models.CharField(max_length=200)
 
+    stock = models.PositiveIntegerField(default=10)
+
     ESTADO_CHOICES = [
         ('NUEVO', 'Nuevo'),
         ('USADO', 'Usado'),
