@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Mi Carrito{% endblock %}
+
+{% block content %}
+<div class="main-container">
+    <aside>
+        <h2>Resumen</h2>
+        <p>Total de artículos: {{ carrito.items.count|default:"0" }}</p>
+        <hr>
+        <p><strong>Total a pagar:</strong></p>
+        <h2 style="color: #0066cc;">${{ carrito.get_total|default:"0.00" }}</h2>
+    </aside>
+
+    <main>
+        <h2>Tu Carrito de Compras</h2>
+        <br>
+        {% if carrito and carrito.items.all %}
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                <thead style="background: #e6e6e6;">
+                    <tr>
+                        <th style="padding: 10px; text-align: left;">Libro</th>
+                        <th style="padding: 10px;">Cantidad</th>
+                        <th style="padding: 10px;">Precio</th>
+                        <th style="padding: 10px;">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in carrito.items.all %}
+                    <tr style="border-bottom: 1px solid #ddd;">
+                        <td style="padding: 10px;">{{ item.libro.titulo }}</td>
+                        <td style="padding: 10px; text-align: center;">{{ item.cantidad }}</td>
+                        <td style="padding: 10px; text-align: center;">${{ item.precio_unitario }}</td>
+                        <td style="padding: 10px; text-align: center;">${{ item.get_subtotal }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <a href="{% url 'vaciar_carrito' %}" style="background: #cc0000; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Vaciar</a>
+                <a href="{% url 'pagar_carrito' %}" style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Pagar ahora</a>
+            </div>
+        {% else %}
+            <p>El carrito está vacío. <a href="{% url 'inicio' %}">Ir al catálogo</a></p>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}
