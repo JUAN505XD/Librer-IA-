@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+.busqueda-container {
+    background: white;
+    border-radius: 15px;
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.busqueda-header {
+    background: #87CEEB;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.filtros {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.btn-buscar {
+    background: #0066cc;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    width: 100%;
+}
+
+.btn-buscar:hover {
+    background: #0055aa;
+}
+
+.resultados-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.libro-card {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+    .filtros {
+        grid-template-columns: 1fr;
+    }
+
+    .resultados-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<div class="busqueda-container">
+
+    <div class="busqueda-header">
+        <h2>Buscar Libros</h2>
+        <p>Filtra por diferentes criterios</p>
+    </div>
+
+    <!-- 🔎 FORMULARIO -->
+    <form method="get">
+
+        <!-- BUSCADOR -->
+        <input type="text" name="q" placeholder="Buscar por título..." value="{{ request.GET.q }}">
+
+        <div class="filtros">
+
+            <!-- AUTOR -->
+            <select name="autor">
+                <option value="">Autor</option>
+                {% for a in autores %}
+                    <option value="{{ a.id }}" {% if request.GET.autor == a.id|stringformat:"s" %}selected{% endif %}>
+                        {{ a.nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <!-- GENERO -->
+            <select name="genero">
+                <option value="">Género</option>
+                {% for g in generos %}
+                    <option value="{{ g.id }}" {% if request.GET.genero == g.id|stringformat:"s" %}selected{% endif %}>
+                        {{ g.nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <!-- IDIOMA -->
+            <select name="idioma">
+                <option value="">Idioma</option>
+                {% for i in idiomas %}
+                    <option value="{{ i.id }}" {% if request.GET.idioma == i.id|stringformat:"s" %}selected{% endif %}>
+                        {{ i.nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <!-- ESTADO -->
+            <select name="estado">
+                <option value="">Estado</option>
+                <option value="NUEVO" {% if request.GET.estado == "NUEVO" %}selected{% endif %}>Nuevo</option>
+                <option value="USADO" {% if request.GET.estado == "USADO" %}selected{% endif %}>Usado</option>
+            </select>
+
+            <!-- PRECIO -->
+            <input type="number" name="precio_min" placeholder="Precio mínimo" value="{{ request.GET.precio_min }}">
+            <input type="number" name="precio_max" placeholder="Precio máximo" value="{{ request.GET.precio_max }}">
+
+            <!-- AÑO -->
+            <input type="number" name="anio" placeholder="Año" value="{{ request.GET.anio }}">
+
+            <!-- PÁGINAS -->
+            <input type="number" name="paginas_min" placeholder="Páginas mínimas" value="{{ request.GET.paginas_min }}">
+            <input type="number" name="paginas_max" placeholder="Páginas máximas" value="{{ request.GET.paginas_max }}">
+
+        </div>
+
+        <button type="submit" class="btn-buscar">Buscar</button>
+
+    </form>
+
+    <hr>
+
+    <!-- 📚 RESULTADOS -->
+    <h3>Resultados</h3>
+
+    <div class="resultados-grid">
+        {% for libro in libros %}
+            <div class="libro-card">
+                <h4>{{ libro.titulo }}</h4>
+                <p><strong>Autor:</strong> {{ libro.autor }}</p>
+                <p><strong>Género:</strong> {{ libro.genero }}</p>
+                <p><strong>Idioma:</strong> {{ libro.idioma }}</p>
+                <p><strong>Precio:</strong> ${{ libro.precio }}</p>
+            </div>
+        {% empty %}
+            <p>No se encontraron libros.</p>
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endblock %}
