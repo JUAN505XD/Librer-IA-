@@ -3,6 +3,7 @@ from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm
 from .models import Usuario, Persona, Cliente, Preferencias, Administrador
 from django_countries.fields import CountryField
 from datetime import date
+from email_validator import validate_email, EmailNotValidError
 
 
 class RegistroClienteForm(UserCreationForm):
@@ -40,6 +41,20 @@ class RegistroClienteForm(UserCreationForm):
          raise forms.ValidationError("Este usuario ya existe")
 
         return username
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+
+        try:
+            valid = validate_email(email, check_deliverability= True)
+
+            email = valid.email
+
+        except EmailNotValidError as e:
+            raise forms.ValidationError("Dominio inexistente")
+
+        return email
+
     def clean_dni(self):
         dni = self.cleaned_data.get("dni")
 
@@ -113,7 +128,20 @@ class RegistroAdminForm(UserCreationForm):
          raise forms.ValidationError("Este usuario ya existe")
 
         return username
-    
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+
+        try:
+            valid = validate_email(email, check_deliverability= True)
+
+            email = valid.email
+
+        except EmailNotValidError as e:
+            raise forms.ValidationError("Dominio inexistente")
+
+        return email
+
     def clean_dni(self):
         dni = self.cleaned_data.get("dni")
 
