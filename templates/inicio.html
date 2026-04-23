@@ -4,6 +4,30 @@
 
 {% block content %}
 <style>
+
+.btn-carrito {
+    display: block;
+    background: #0066cc;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    margin-top: 10px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.btn-carrito:hover {
+    background: #0055aa;
+    transform: scale(1.03);
+}
+
+.agotado {
+    color: red;
+    margin-top: 10px;
+    font-weight: bold;
+}
 .catalogo-container {
     max-width: 1000px;
     margin: 30px auto;
@@ -60,7 +84,7 @@
         </p>
 <div class="catalogo-container">
 
-    <h2 class="catalogo-titulo">Libros Recientes</h2>
+    <h2 class="catalogo-titulo">Catálogo</h2>
 
     <div class="catalogo-grid">
         {% for libro in libros %}
@@ -71,19 +95,20 @@
                 <p><strong>Autor:</strong> {{ libro.autor }}</p>
                 <p><strong>Género:</strong> {{ libro.genero }}</p>
                 <p><strong>Idioma:</strong> {{ libro.idioma }}</p>
-		            <p><strong>Stock:</strong> {{ libro.stock }}</p>
+		        <p><strong>Stock:</strong> {{ libro.stock }}</p>
                 <p><strong>Precio:</strong> ${{ libro.precio }}</p>
 
 		{% if user.is_authenticated and user.rol == "CLIENTE" %}
-		    {% if libro.stock > 0 %}
-		        <a href="{% url 'agregar_al_carrito' libro.id %}"
-			   style="display: block; background: #066cc; color: white; text-align: center; padding: 10px; border-radius: 5px; text-decoration: none; margin-top: 10px;">
-				Añadir al carrito
-			</a>
-		    {% else %}
-		        <p style="color:red; margin-top: 10px;">Agotado</p>
-		    {% endif %}
-		{% endif %}
+
+        {% if libro.stock > 0 %}
+        <a href="{% url 'agregar_al_carrito' libro.id %}" class="btn-carrito">
+            Añadir al carrito
+        </a>
+        {% else %}
+        <p class="agotado">Agotado</p>
+        {% endif %}
+
+        {% endif %}
             </div>
         {% empty %}
             <p>No hay libros disponibles.</p>
