@@ -27,10 +27,29 @@
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .libro-card:hover {
     transform: scale(1.03);
+}
+
+.btn-carrito {
+    display: block; 
+    background: #0066cc; /* Fixed hex code */
+    color: white; 
+    text-align: center; 
+    padding: 10px; 
+    border-radius: 5px; 
+    text-decoration: none; 
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.btn-carrito:hover {
+    background: #004499;
 }
 
 @media (max-width: 768px) {
@@ -41,68 +60,54 @@
 </style>
 
 <div class="main-container">
-
     <aside>
         <h2>Novedades</h2>
-
-        <img src="{% static 'assets/imagenes/nicolas.jpg' %}" width="100%">
-
-        <img src="{% static 'assets/imagenes/Logo.png' %}" width="100%">
-        <p>Promociones del mes</p>
+        <img src="{% static 'assets/imagenes/nicolas.jpg' %}" width="100%" style="margin-bottom:10px; border-radius:5px;">
+        <img src="{% static 'assets/imagenes/Logo.png' %}" width="100%" style="border-radius:5px;">
+        <p style="text-align:center; margin-top:5px;">Promociones del mes</p>
     </aside>
 
     <main>
-
         <h2>Bienvenido a Librer_IA online</h2>
+        <p>Descubre una amplia variedad de libros y novedades literarias.</p>
 
-        <p>
-            Descubre una amplia variedad de libros y novedades literarias.
-        </p>
-<div class="catalogo-container">
+        <div class="catalogo-container">
+            <h2 class="catalogo-titulo">Libros Recientes</h2>
 
-    <h2 class="catalogo-titulo">Libros Recientes</h2>
+            <div class="catalogo-grid">
+                {% for libro in libros %}
+                    <div class="libro-card">
+                        <div>
+                            <h3>{{ libro.titulo }}</h3>
+                            <p><strong>Autor:</strong> {{ libro.autor }}</p>
+                            <p><strong>Género:</strong> {{ libro.genero }}</p>
+                            <p><strong>Stock:</strong> {{ libro.stock }}</p>
+                            <p><strong>Precio:</strong> <span style="color: #28a745; font-weight: bold;">${{ libro.precio }}</span></p>
+                        </div>
 
-    <div class="catalogo-grid">
-        {% for libro in libros %}
-            <div class="libro-card">
-
-                <h3>{{ libro.titulo }}</h3>
-
-                <p><strong>Autor:</strong> {{ libro.autor }}</p>
-                <p><strong>Género:</strong> {{ libro.genero }}</p>
-                <p><strong>Idioma:</strong> {{ libro.idioma }}</p>
-		            <p><strong>Stock:</strong> {{ libro.stock }}</p>
-                <p><strong>Precio:</strong> ${{ libro.precio }}</p>
-
-		{% if user.is_authenticated and user.rol == "CLIENTE" %}
-		    {% if libro.stock > 0 %}
-		        <a href="{% url 'agregar_al_carrito' libro.id %}"
-			   style="display: block; background: #066cc; color: white; text-align: center; padding: 10px; border-radius: 5px; text-decoration: none; margin-top: 10px;">
-				Añadir al carrito
-			</a>
-		    {% else %}
-		        <p style="color:red; margin-top: 10px;">Agotado</p>
-		    {% endif %}
-		{% endif %}
+                        {% if user.is_authenticated and user.rol == "CLIENTE" %}
+                            {% if libro.stock > 0 %}
+                                <a href="{% url 'agregar_al_carrito' libro.id %}" class="btn-carrito">
+                                    Añadir al carrito
+                                </a>
+                            {% else %}
+                                <p style="color:red; margin-top: 10px; font-weight: bold; text-align: center;">Agotado</p>
+                            {% endif %}
+                        {% elif not user.is_authenticated %}
+                            <small class="text-muted" style="margin-top:10px; display:block; text-align:center;">
+                                <a href="{% url 'login' %}">Inicia sesión</a> para comprar
+                            </small>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <p>No hay libros disponibles en este momento.</p>
+                {% endfor %}
             </div>
-        {% empty %}
-            <p>No hay libros disponibles.</p>
-            <p>Total libros: {{ libros|length }}</p>
-        {% endfor %}
-    </div>
-
-</div>
+        </div>
+        
         <hr>
-
         <h3>Contenido destacado</h3>
-
-        <p>
-            Aquí luego puedes mostrar libros dinámicos desde la base de datos 🔥
-        </p>
-
+        <p>Próximamente: Recomendaciones basadas en tus preferencias 🔥</p>
     </main>
-
 </div>
-
-
 {% endblock %}
