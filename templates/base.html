@@ -161,7 +161,7 @@ main {
         {% if user.rol == "ADMIN" %}
             <li><a href="#">Dashboard Admin</a></li>
             <li><a href="#">Gestionar Usuarios</a></li>
-            <li><a href="#">Gestionar Libros</a></li>
+            <li><a href="{% url 'crear_libro' %}">Registrar Libro</a></li>
 
         {% elif user.rol == "CLIENTE" %}
             <li><a href="#">Noticias</a></li>
