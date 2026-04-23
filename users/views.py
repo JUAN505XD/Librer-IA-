@@ -144,16 +144,15 @@ def editar_perfil_cliente(request):
             return redirect("inicio")
 
     else:
-        form = EditarclienteForm({
+        form = EditarclienteForm(initial={
         "dni": persona.dni,
         "username": usuario.username,
 
         "nombres": persona.nombre,
         "apellidos": persona.apellido,
         "fecha_nacimiento": persona.fecha_nacimiento,
-        "lugar_nacimiento": persona.lugar_nacimiento,
+        "lugar_nacimiento": persona.lugar_nacimiento.code,
         "genero": persona.sexo,
-
         "email": cliente.correo,
         "direccion_envio": cliente.direccion_envio
     })

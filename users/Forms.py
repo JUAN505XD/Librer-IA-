@@ -1,10 +1,11 @@
 from django import forms
 from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm
 from .models import Usuario, Persona, Cliente, Preferencias, Administrador
+from django_countries.fields import CountryField
 from datetime import date
+from email_validator import validate_email, EmailNotValidError
 
 
-#hola esto en un ensayo para ver si funciona el commit en git hub
 class RegistroClienteForm(UserCreationForm):
     error_messages = {
         "password_mismatch": "Las contraseñas no coinciden",
@@ -15,10 +16,10 @@ class RegistroClienteForm(UserCreationForm):
     apellidos = forms.CharField(max_length=100)
     fecha_nacimiento = forms.DateField(widget=forms.DateInput(attrs={
             'type': 'date',
-            'max': date.today().isoformat(),
+            'max': f"{date.today().year - 12}-01-01",
             'min': f"{date.today().year - 100}-01-01",
             }))
-    lugar_nacimiento = forms.CharField(max_length=100)
+    lugar_nacimiento = CountryField().formfield(blank_label="País de nacimiento")
 
     genero = forms.ChoiceField(choices=[
         ('M', 'Masculino'),
@@ -40,6 +41,20 @@ class RegistroClienteForm(UserCreationForm):
          raise forms.ValidationError("Este usuario ya existe")
 
         return username
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+
+        try:
+            valid = validate_email(email, check_deliverability= True)
+
+            email = valid.email
+
+        except EmailNotValidError as e:
+            raise forms.ValidationError("Dominio inexistente")
+
+        return email
+
     def clean_dni(self):
         dni = self.cleaned_data.get("dni")
 
@@ -47,6 +62,17 @@ class RegistroClienteForm(UserCreationForm):
             raise forms.ValidationError("Este DNI ya está registrado")
 
         return dni
+
+    def clean_password1(self):
+        password = self.cleaned_data.get("password1")
+
+        if password:
+            if len(set(password)) < 4:
+                raise forms.ValidationError(
+                        "Contraseña demasiado predecible"
+                        )
+
+        return password
 
     def save(self, commit=True):
 
@@ -56,13 +82,15 @@ class RegistroClienteForm(UserCreationForm):
         if commit:
             usuario.save()
 
+            codigo_pais=self.cleaned_data.get("lugar_nacimiento")
+
             Persona.objects.create(
                 dni=self.cleaned_data["dni"],
                 usuario=usuario,
                 nombre=self.cleaned_data["nombres"],
                 apellido=self.cleaned_data["apellidos"],
                 fecha_nacimiento=self.cleaned_data["fecha_nacimiento"],
-                lugar_nacimiento=self.cleaned_data["lugar_nacimiento"],
+                lugar_nacimiento=self.cleaned_data.get("lugar_nacimiento"),
                 sexo=self.cleaned_data["genero"],
             )
 
@@ -85,11 +113,12 @@ class RegistroAdminForm(UserCreationForm):
 
     fecha_nacimiento = forms.DateField(widget=forms.DateInput(attrs={
         'type': 'date',
-        'max': date.today().isoformat(),
+	'max': f"{date.today().year - 12}-01-01",
         'min': f"{date.today().year - 100}-01-01",
     }))
 
-    lugar_nacimiento = forms.CharField(max_length=100)
+    lugar_nacimiento = CountryField().formfield(blank_label="País de nacimiento")
+
 
     genero = forms.ChoiceField(choices=[
         ('M', 'Masculino'),
@@ -110,7 +139,20 @@ class RegistroAdminForm(UserCreationForm):
          raise forms.ValidationError("Este usuario ya existe")
 
         return username
-    
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+
+        try:
+            valid = validate_email(email, check_deliverability= True)
+
+            email = valid.email
+
+        except EmailNotValidError as e:
+            raise forms.ValidationError("Dominio inexistente")
+
+        return email
+
     def clean_dni(self):
         dni = self.cleaned_data.get("dni")
 
@@ -134,7 +176,7 @@ class RegistroAdminForm(UserCreationForm):
                 nombre=self.cleaned_data["nombres"],
                 apellido=self.cleaned_data["apellidos"],
                 fecha_nacimiento=self.cleaned_data["fecha_nacimiento"],
-                lugar_nacimiento=self.cleaned_data["lugar_nacimiento"],
+                lugar_nacimiento=self.cleaned_data.get("lugar_nacimiento"),
                 sexo=self.cleaned_data["genero"],
             )
 
@@ -164,22 +206,24 @@ class PreferenciasForm(forms.ModelForm):
 
 class EditarclienteForm(forms.Form):
 
-    dni = forms.IntegerField(required=False)
+    dni = forms.IntegerField(required=False, disabled = True)
     username = forms.CharField(max_length=150, required=False)
 
     nombres = forms.CharField(max_length=100, required=False)
     apellidos = forms.CharField(max_length=100, required=False)
-    fecha_nacimiento = forms.DateField(
+    fecha_nacimiento = forms.DateField(disabled = True,
         widget=forms.DateInput(attrs={
             'type': 'date',
-            'max': date.today().isoformat(),
+            'max': f"{date.today().year - 12}-01-01",
             'min': f"{date.today().year - 100}-01-01",
         }),
         required=False
     )
-    lugar_nacimiento = forms.CharField(max_length=100, required=False)
+    lugar_nacimiento = CountryField().formfield(disabled=True,blank_label="País de nacimiento")
 
-    genero = forms.ChoiceField(
+
+
+    genero = forms.ChoiceField(disabled=True,
         choices=[
             ('M', 'Masculino'),
             ('F', 'Femenino'),
@@ -189,26 +233,27 @@ class EditarclienteForm(forms.Form):
     )
 
     direccion_envio = forms.CharField(max_length=200, required=False)
-    email = forms.EmailField(required=False)
+    email = forms.EmailField(disabled=True,required=False)
 
 class EditarAdminForm(forms.Form):
 
-    dni = forms.IntegerField(required=False)
+    dni = forms.IntegerField(disabled=True,required=False)
     username = forms.CharField(max_length=150, required=False)
 
     nombres = forms.CharField(max_length=100, required=False)
     apellidos = forms.CharField(max_length=100, required=False)
-    fecha_nacimiento = forms.DateField(
+    fecha_nacimiento = forms.DateField(disabled=True,
         widget=forms.DateInput(attrs={
             'type': 'date',
-            'max': date.today().isoformat(),
+            
             'min': f"{date.today().year - 100}-01-01",
         }),
         required=False
     )
-    lugar_nacimiento = forms.CharField(max_length=100, required=False)
+    lugar_nacimiento = CountryField().formfield(disabled=True,blank_label="País de nacimiento")
 
-    genero = forms.ChoiceField(
+
+    genero = forms.ChoiceField(disabled=True,
         choices=[
             ('M', 'Masculino'),
             ('F', 'Femenino'),
@@ -217,7 +262,7 @@ class EditarAdminForm(forms.Form):
         required=False
     )
 
-    email = forms.EmailField(required=False)
+    email = forms.EmailField(disabled=True,required=False)
     
 class CustomPasswordChangeForm(PasswordChangeForm):
 
