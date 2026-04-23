@@ -14,10 +14,16 @@ class Autor(models.Model):
     def __str__(self):
         return self.nombre
     
+class Idioma(models.Model):
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+    
     
 class Libro(models.Model):
     titulo = models.CharField(max_length=200)
-    
+
     ESTADO_CHOICES = [
         ('NUEVO', 'Nuevo'),
         ('USADO', 'Usado'),
@@ -39,7 +45,10 @@ class Libro(models.Model):
     editorial = models.CharField(max_length=150)
     issn = models.CharField(max_length=50, unique=True)
 
-    idioma = models.CharField(max_length=50)
+    idioma = models.ForeignKey(
+        Idioma,
+        on_delete=models.PROTECT
+    )
     fecha_publicacion = models.DateField()
 
     estado = models.CharField(
