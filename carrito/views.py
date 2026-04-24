@@ -1,3 +1,4 @@
+from datetime import timedelta
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -14,12 +15,13 @@ def agregar_al_carrito(request, libro_id):
         messages.error(request, f"El libro {libro.titulo} está agotado.")
         return redirect('inicio')
 
-    carrito, created = Carrito.objects.get_or_create(usuario=request.user, estado='ACTIVO')
+    carrito, created = Carrito.objects.get_or_create(
+        usuario=request.user,
+        estado='ACTIVO'
+    )
 
-    if not created and carrito.es_antiguo():
-        carrito.estado = 'CANCELADO'
-        carrito.save()
-        carrito = Carrito.objects.create(usuario=request.user, estado='ACTIVO')
+    # 🔥 limpiar items expirados antes de todo
+    limpiar_items_expirados(carrito)
 
     total_en_carrito = sum(item.cantidad for item in carrito.items.all())
     if total_en_carrito >= 5:
@@ -36,7 +38,6 @@ def agregar_al_carrito(request, libro_id):
         messages.warning(request, "Máximo 3 copias del mismo libro.")
         return redirect('ver_carrito')
 
-    # 🔥 CLAVE: operación atómica
     with transaction.atomic():
         libro.stock -= 1
         libro.save()
@@ -50,13 +51,15 @@ def agregar_al_carrito(request, libro_id):
 @login_required
 def ver_carrito(request):
     carrito = Carrito.objects.filter(usuario=request.user, estado='ACTIVO').first()
-    
-    # Cleanup if they just open an old cart
-    if carrito and carrito.es_antiguo():
-        carrito.estado = 'CANCELADO'
-        carrito.save()
-        carrito = None
-        messages.info(request, "Tu carrito anterior expiró (24h de inactividad).")
+
+    if carrito:
+        # 🔥 limpiar SOLO items expirados
+        limpiar_items_expirados(carrito)
+
+        # 🔥 si después de limpiar ya no hay items
+        if not carrito.items.exists():
+            carrito = None
+            messages.info(request, "Tu carrito está vacío.")
 
     return render(request, 'ver_carrito.html', {'carrito': carrito})
 
@@ -97,3 +100,55 @@ def vaciar_carrito(request):
         messages.error(request, "No hay carrito activo.")
 
     return redirect('inicio')
+
+
+def limpiar_items_expirados(carrito):
+    ahora = timezone.now()
+
+    with transaction.atomic():
+        for item in carrito.items.all():
+            if ahora > item.creado_en + timedelta(minutes=10):
+
+                # 🔥 devolver stock
+                libro = item.libro
+                libro.stock += item.cantidad
+                libro.save()
+
+                # 🔥 eliminar item
+                item.delete()
+
+@login_required
+def sumar_item(request, item_id):
+    item = get_object_or_404(ItemCarrito, id=item_id, carrito__usuario=request.user)
+    libro = item.libro
+
+    if libro.stock <= 0:
+        messages.error(request, "No hay más stock disponible.")
+        return redirect('ver_carrito')
+
+    with transaction.atomic():
+        libro.stock -= 1
+        libro.save()
+
+        item.cantidad += 1
+        item.save()
+
+    return redirect('ver_carrito')
+
+
+@login_required
+def restar_item(request, item_id):
+    item = get_object_or_404(ItemCarrito, id=item_id, carrito__usuario=request.user)
+    libro = item.libro
+
+    with transaction.atomic():
+        libro.stock += 1
+        libro.save()
+
+        if item.cantidad > 1:
+            item.cantidad -= 1
+            item.save()
+        else:
+            item.delete()  # 🔥 si queda en 1 → se elimina
+
+    return redirect('ver_carrito')
