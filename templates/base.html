@@ -180,8 +180,7 @@ main {
         {% elif user.rol == "CLIENTE" %}
             <li><a href="#">Noticias</a></li>
             <li><a href="#">Catálogo</a></li>
-            <li><a href="#">Mis Reservas</a></li>
-	    <li><a href="{% url 'ver_carrito' %}">Carrito🛒</a></li>
+	    <li><a href="{% url 'ver_carrito' %}">Carrito 🛒</a></li>
 
         {% elif user.rol == "ROOT" %}
             <li><a href="{% url 'crear_admin' %}">Crear Administrador</a></li>
