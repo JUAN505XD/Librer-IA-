@@ -64,25 +64,17 @@ def pagar_carrito(request):
     if not carrito or not carrito.items.exists():
         return redirect('ver_carrito')
 
-    with transaction.atomic():
-        for item in carrito.items.all():
-            if item.libro.stock < item.cantidad:
-                messages.error(request, f"Ya no hay stock suficiente de {item.libro.titulo}")
-                return redirect('ver_carrito')
-            
-            item.libro.stock -= item.cantidad
-            item.libro.save()
-
-        carrito.estado = 'PAGADO'
-        carrito.save()
+    carrito.estado = 'PAGADO'
+    carrito.fecha_pago = timezone.now()
+    carrito.save()
     
     messages.success(request, "¡Compra exitosa!")
     return redirect('historial_compras')
 
 @login_required
 def historial_compras(request):
-    compras = Carrito.objects.filter(usuario=request.user, estado='PAGADO').order_by('-actualizado_en')
-    return render(request, 'carrito/historial.html', {'compras': compras})
+    compras = Carrito.objects.filter(usuario=request.user, estado='PAGADO').order_by('-fecha_pago')
+    return render(request, 'historial.html', {'compras': compras})
 
 @login_required
 def vaciar_carrito(request):
