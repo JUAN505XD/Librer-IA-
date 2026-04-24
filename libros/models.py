@@ -1,4 +1,7 @@
 from django.db import models
+import requests
+import os
+from django.conf import settings
 
 # Create your models here.
 class Genero(models.Model):
@@ -33,12 +36,12 @@ class Libro(models.Model):
 
     autor = models.ForeignKey(
         Autor,
-        on_delete=models.PROTECT  # 🔥 evita borrar autor si tiene libros
+        on_delete=models.PROTECT
     )
 
     genero = models.ForeignKey(
         Genero,
-        on_delete=models.PROTECT  # 🔥 mismo para género
+        on_delete=models.PROTECT
     )
 
     numero_paginas = models.IntegerField()
@@ -50,6 +53,7 @@ class Libro(models.Model):
         Idioma,
         on_delete=models.PROTECT
     )
+
     fecha_publicacion = models.DateField()
 
     estado = models.CharField(
@@ -61,3 +65,28 @@ class Libro(models.Model):
 
     def __str__(self):
         return self.titulo
+
+    # 🔥 NUEVO: descarga automática de portada
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.issn:
+            try:
+                url = f"https://covers.openlibrary.org/b/isbn/{self.issn}-L.jpg"
+
+                ruta = os.path.join(settings.BASE_DIR, "static/assets/portadas/")
+                os.makedirs(ruta, exist_ok=True)
+
+                ruta_imagen = os.path.join(ruta, f"{self.issn}.jpg")
+
+                # 🔒 evita descargar si ya existe
+                if not os.path.exists(ruta_imagen):
+                    response = requests.get(url, timeout=5)
+
+                    if response.status_code == 200 and response.content:
+                        with open(ruta_imagen, "wb") as f:
+                            f.write(response.content)
+
+            except Exception as e:
+                # ⚠️ nunca romper el guardado por esto
+                print(f"Error descargando portada: {e}")

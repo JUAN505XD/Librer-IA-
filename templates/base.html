@@ -122,6 +122,20 @@ main {
         align-items: center;
     }
 }
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-container img {
+    width: 80px;
+}
+
+.titulo-header {
+    font-size: 18px;
+    font-weight: bold;
+}
 </style>
 
 </head>
@@ -132,11 +146,9 @@ main {
 <header class="main-header">
 
     <div class="logo">
-        <img src="{% static 'assets/imagenes/Logo1.png' %}">
-    </div>
+        <img src="{% static 'assets/imagenes/Aprove.png' %}">
 
-    <div>
-        Bienvenido a Librer_IA
+        <span class="titulo-header">Bienvenido a Librer_IA</span>
     </div>
 
     <div class="user-section">
