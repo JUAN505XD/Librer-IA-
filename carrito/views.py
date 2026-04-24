@@ -71,15 +71,16 @@ def pagar_carrito(request):
         return redirect('ver_carrito')
 
     carrito.estado = 'PAGADO'
+    carrito.fecha_pago = timezone.now()
     carrito.save()
-
+    
     messages.success(request, "¡Compra exitosa!")
     return redirect('historial_compras')
 
 @login_required
 def historial_compras(request):
-    compras = Carrito.objects.filter(usuario=request.user, estado='PAGADO').order_by('-actualizado_en')
-    return render(request, 'carrito/historial.html', {'compras': compras})
+    compras = Carrito.objects.filter(usuario=request.user, estado='PAGADO').order_by('-fecha_pago')
+    return render(request, 'historial.html', {'compras': compras})
 
 @login_required
 def vaciar_carrito(request):

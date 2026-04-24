@@ -6,7 +6,7 @@
 
     <aside>
         <h2>Resumen</h2>
-        <p>Total de artículos: {{ carrito.items.count|default:"0" }}</p>
+        <p>Total de artículos: {{ carrito.items.count|default:"0" }} / 5</p>
         <hr>
         <p><strong>Total a pagar:</strong></p>
         <h2 style="color: #0066cc;">${{ carrito.get_total|default:"0.00" }}</h2>
@@ -78,6 +78,13 @@
 
                     </tr>
                     {% endfor %}
+                    
+                    <tr style="background: #f9f9f9; font-weight: bold;">
+                        <td colspan="3" style="padding: 15px; text-align: right;">Total Carrito:</td>
+                        <td style="padding: 15px; text-align: center; color: #0066cc; font-size: 1.1em;">
+                            ${{ carrito.get_total }}
+                        </td>
+                    </tr>
                 </tbody>
 
             </table>
@@ -97,7 +104,10 @@
             </div>
 
         {% else %}
-            <p>El carrito está vacío. <a href="{% url 'inicio' %}">Ir al catálogo</a></p>
+            <div style="text-align: center; padding: 40px;">
+                <p>El carrito está vacío.</p>
+                <a href="{% url 'inicio' %}" style="color: #0066cc; text-decoration: underline;">Ir al catálogo</a>
+            </div>
         {% endif %}
 
     </main>
