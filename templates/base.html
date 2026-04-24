@@ -22,16 +22,24 @@ body {
 
 /* HEADER */
 .main-header {
-    background: #87CEEB;
-    padding: 10px;
     display: flex;
+    background: #87CEEB;
+    padding: 0 20px;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
 }
 
+.welcome-text {
+	display: flex;
+	font-size: 1.0rem;
+	color: #003366;
+	align-items: center;
+	gap: 15px;
+}
+
 .logo img {
-    width: 80px;
+    width: 280px;
 }
 
 .user-section {
@@ -135,8 +143,19 @@ main {
         <img src="{% static 'assets/imagenes/Logo1.png' %}">
     </div>
 
-    <div>
-        Bienvenido a Librer_IA
+    <div class="welcome-text">
+	    <h4>
+        Bienvenido a Librer_IA,
+	    </h4>
+	<strong>
+		{% if user.is_authenticated %}
+		<h5>
+		    {{ user.username }}
+		</h5>
+		{% else %}
+			Invitado
+		{% endif %}
+	</strong>
     </div>
 
     <div class="user-section">
