@@ -2,6 +2,7 @@
 {% block content %}
 
 <style>
+
 .container {
     background: white;
     border-radius: 15px;
@@ -36,6 +37,19 @@ input, select {
     border: none;
     width: 100%;
 }
+
+/* 🔥 ERRORES IGUAL QUE TU OTRO HTML */
+.error-box {
+    background: #ffe6e6;
+    color: #cc0000;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 5px;
+    font-size: 14px;
+    text-align: center;
+    font-weight: bold;
+}
+
 </style>
 
 <div class="container">
@@ -45,62 +59,101 @@ input, select {
     <form method="post">
         {% csrf_token %}
 
+        <!-- TITULO -->
         <div class="row">
             <div class="col">
                 <label>Título</label>
                 {{ form.titulo }}
+                {% if form.titulo.errors %}
+                    <div class="error-box">{{ form.titulo.errors.0 }}</div>
+                {% endif %}
             </div>
         </div>
 
-         <div class="row">
+        <!-- ISSN -->
+        <div class="row">
             <div class="col">
                 <label>ISSN</label>
                 {{ form.issn }}
+                {% if form.issn.errors %}
+                    <div class="error-box">{{ form.issn.errors.0 }}</div>
+                {% endif %}
             </div>
         </div>
 
+        <!-- AUTOR Y GENERO -->
         <div class="row">
             <div class="col">
                 <label>Autor</label>
                 {{ form.autor }}
+                {% if form.autor.errors %}
+                    <div class="error-box">{{ form.autor.errors.0 }}</div>
+                {% endif %}
             </div>
+
             <div class="col">
                 <label>Género</label>
                 {{ form.genero }}
+                {% if form.genero.errors %}
+                    <div class="error-box">{{ form.genero.errors.0 }}</div>
+                {% endif %}
             </div>
         </div>
 
-
+        <!-- EDITORIAL Y PAGINAS -->
         <div class="row">
             <div class="col">
                 <label>Editorial</label>
                 {{ form.editorial }}
+                {% if form.editorial.errors %}
+                    <div class="error-box">{{ form.editorial.errors.0 }}</div>
+                {% endif %}
             </div>
+
             <div class="col">
                 <label>Páginas</label>
                 {{ form.numero_paginas }}
+                {% if form.numero_paginas.errors %}
+                    <div class="error-box">{{ form.numero_paginas.errors.0 }}</div>
+                {% endif %}
             </div>
         </div>
 
+        <!-- IDIOMA Y FECHA -->
         <div class="row">
             <div class="col">
                 <label>Idioma</label>
                 {{ form.idioma }}
+                {% if form.idioma.errors %}
+                    <div class="error-box">{{ form.idioma.errors.0 }}</div>
+                {% endif %}
             </div>
+
             <div class="col">
                 <label>Fecha Publicación</label>
                 {{ form.fecha_publicacion }}
+                {% if form.fecha_publicacion.errors %}
+                    <div class="error-box">{{ form.fecha_publicacion.errors.0 }}</div>
+                {% endif %}
             </div>
         </div>
 
+        <!-- ESTADO Y PRECIO -->
         <div class="row">
             <div class="col">
                 <label>Estado</label>
                 {{ form.estado }}
+                {% if form.estado.errors %}
+                    <div class="error-box">{{ form.estado.errors.0 }}</div>
+                {% endif %}
             </div>
+
             <div class="col">
                 <label>Precio</label>
                 {{ form.precio }}
+                {% if form.precio.errors %}
+                    <div class="error-box">{{ form.precio.errors.0 }}</div>
+                {% endif %}
             </div>
         </div>
 
