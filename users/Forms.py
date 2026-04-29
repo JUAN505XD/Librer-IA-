@@ -278,3 +278,4 @@ class CustomPasswordChangeForm(PasswordChangeForm):
             raise forms.ValidationError("Las contraseñas no coinciden")
 
         return p2
+# esto es para el nuevo commit de juan
