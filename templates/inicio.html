@@ -77,12 +77,18 @@
 		{% if user.is_authenticated and user.rol == "CLIENTE" %}
 		    {% if libro.stock > 0 %}
 		        <a href="{% url 'agregar_al_carrito' libro.id %}"
-			   style="display: block; background: #066cc; color: white; text-align: center; padding: 10px; border-radius: 5px; text-decoration: none; margin-top: 10px;">
+			   style="display: block; background: #0066cc; color: white; text-align: center; padding: 10px; border-radius: 5px; text-decoration: none; margin-top: 10px;">
 				Añadir al carrito
 			</a>
 		    {% else %}
 		        <p style="color:red; margin-top: 10px;">Agotado</p>
 		    {% endif %}
+
+		{% else %}
+		    <a href="{% url 'login' %}"
+		       style="display: block; background: #555; color: white; text-align: center; padding: 10px; border-radius: 5px; text-decoration: none; margin-top: 10px">
+			    Inicia sesión para añadir al carrito
+		    </a>
 		{% endif %}
             </div>
         {% empty %}
