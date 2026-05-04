@@ -1,6 +1,7 @@
 from django.db import models
 import requests
 import os
+from pathlib import Path
 from django.conf import settings
 
 # Create your models here.
@@ -66,27 +67,43 @@ class Libro(models.Model):
     def __str__(self):
         return self.titulo
 
-    # 🔥 NUEVO: descarga automática de portada
     def save(self, *args, **kwargs):
+        # 1. Save the book data first
         super().save(*args, **kwargs)
 
-        if self.issn:
+        # 2. Check if we have an ISBN (Make sure this matches your model field name!)
+        # If your field is called 'isbn', change 'issn' to 'isbn' below
+        isbn_to_use = getattr(self, 'issn', None) or getattr(self, 'isbn', None)
+
+        if isbn_to_use:
             try:
-                url = f"https://covers.openlibrary.org/b/isbn/{self.issn}-L.jpg"
-
-                ruta = os.path.join(settings.BASE_DIR, "static/assets/portadas/")
+                # Clean ISBN (remove dashes/spaces)
+                clean_isbn = str(isbn_to_use).replace("-", "").replace(" ", "")
+                url = f"https://covers.openlibrary.org/b/isbn/{clean_isbn}-L.jpg"
+                
+                # Windows
+                ruta = os.path.join(settings.BASE_DIR, "static", "assets", "portadas")
                 os.makedirs(ruta, exist_ok=True)
+                ruta_imagen = os.path.join(ruta, f"{isbn_to_use}.jpg")
 
-                ruta_imagen = os.path.join(ruta, f"{self.issn}.jpg")
+                # Linux
+                ruta = Path(settings.BASE_DIR) / "static" / "assets" / "portadas"
+                ruta.mkdir(parents=True, exist_ok=True)
 
-                # 🔒 evita descargar si ya existe
-                if not os.path.exists(ruta_imagen):
+                ruta_imagenL = ruta / f"{isbn_to_use}.jpg"
+
+    
+                if not os.path.exists(ruta_imagen) or not ruta_imagen.exists():
                     response = requests.get(url, timeout=5)
-
-                    if response.status_code == 200 and response.content:
+                    
+                    # OpenLibrary returns a tiny pixel if image isn't found. 
+                    # We only save if it's larger than 1000 bytes (1KB).
+                    if response.status_code == 200 and len(response.content) > 1000:
                         with open(ruta_imagen, "wb") as f:
                             f.write(response.content)
-
+                        print(f"✅ Portada descargada para: {isbn_to_use}")
+                    else:
+                        print(f"⚠️ OpenLibrary no tiene portada para ISBN: {isbn_to_use}")
+    
             except Exception as e:
-                # ⚠️ nunca romper el guardado por esto
-                print(f"Error descargando portada: {e}")
+                print(f"❌ Error descargando portada: {e}")
