@@ -113,13 +113,14 @@
 
                         <!-- 🔥 INFO -->
                         <div class="info-libro">
+			    {% load humanize %}
                             <h3>{{ libro.titulo }}</h3>
                             <p><strong>Autor:</strong> {{ libro.autor }}</p>
                             <p><strong>Género:</strong> {{ libro.genero }}</p>
                             <p><strong>Stock:</strong> {{ libro.stock }}</p>
                             <p><strong>Precio:</strong> 
                                 <span style="color: #28a745; font-weight: bold;">
-                                    ${{ libro.precio }}
+                                    ${{ libro.precio|intcomma }}
                                 </span>
                             </p>
                         </div>
