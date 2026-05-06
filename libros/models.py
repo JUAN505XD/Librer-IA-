@@ -1,4 +1,9 @@
 from django.db import models
+import requests
+import os
+from pathlib import Path
+from django.conf import settings
+from django.core.validators import MaxValueValidator
 
 # Create your models here.
 class Genero(models.Model):
@@ -33,15 +38,15 @@ class Libro(models.Model):
 
     autor = models.ForeignKey(
         Autor,
-        on_delete=models.PROTECT  # 🔥 evita borrar autor si tiene libros
+        on_delete=models.PROTECT
     )
 
     genero = models.ForeignKey(
         Genero,
-        on_delete=models.PROTECT  # 🔥 mismo para género
+        on_delete=models.PROTECT
     )
 
-    numero_paginas = models.IntegerField()
+    numero_paginas = models.IntegerField(validators=[MaxValueValidator(2000)])
 
     editorial = models.CharField(max_length=150)
     issn = models.CharField(max_length=50, unique=True)
@@ -50,6 +55,7 @@ class Libro(models.Model):
         Idioma,
         on_delete=models.PROTECT
     )
+
     fecha_publicacion = models.DateField()
 
     estado = models.CharField(
@@ -57,7 +63,13 @@ class Libro(models.Model):
         choices=ESTADO_CHOICES
     )
 
-    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    precio = models.DecimalField(max_digits=8, decimal_places=2)
 
     def __str__(self):
         return self.titulo
+
+    @property
+    def portada_url(self):
+        if self.issn:
+            clean_issn = str(self.issn).replace("-","").replace(" ", "")
+            return f"https://covers.openlibrary.org/b/isbn/{clean_issn}-M.jpg"
