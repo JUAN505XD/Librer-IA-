@@ -106,9 +106,9 @@
 
                         <!-- 🔥 PORTADA -->
                         <img 
-                            src="{% static 'assets/portadas/' %}{{ libro.issn }}.jpg" 
-                            class="portada"
-                            onerror="this.src='{% static 'assets/portadas/default.jpg' %}';"
+			 src="{{ libro.portada_url }}"
+                         class="portada"
+                         onerror="this.src='{% static 'assets/portadas/default.jpg' %}';"
                         >
 
                         <!-- 🔥 INFO -->

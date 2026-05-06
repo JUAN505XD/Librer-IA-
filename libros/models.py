@@ -3,6 +3,7 @@ import requests
 import os
 from pathlib import Path
 from django.conf import settings
+from django.core.validators import MaxValueValidator
 
 # Create your models here.
 class Genero(models.Model):
@@ -45,7 +46,7 @@ class Libro(models.Model):
         on_delete=models.PROTECT
     )
 
-    numero_paginas = models.IntegerField()
+    numero_paginas = models.IntegerField(validators=[MaxValueValidator(2000)])
 
     editorial = models.CharField(max_length=150)
     issn = models.CharField(max_length=50, unique=True)
@@ -67,43 +68,8 @@ class Libro(models.Model):
     def __str__(self):
         return self.titulo
 
-    def save(self, *args, **kwargs):
-        # 1. Save the book data first
-        super().save(*args, **kwargs)
-
-        # 2. Check if we have an ISBN (Make sure this matches your model field name!)
-        # If your field is called 'isbn', change 'issn' to 'isbn' below
-        isbn_to_use = getattr(self, 'issn', None) or getattr(self, 'isbn', None)
-
-        if isbn_to_use:
-            try:
-                # Clean ISBN (remove dashes/spaces)
-                clean_isbn = str(isbn_to_use).replace("-", "").replace(" ", "")
-                url = f"https://covers.openlibrary.org/b/isbn/{clean_isbn}-L.jpg"
-                
-                # Windows
-                ruta = os.path.join(settings.BASE_DIR, "static", "assets", "portadas")
-                os.makedirs(ruta, exist_ok=True)
-                ruta_imagen = os.path.join(ruta, f"{isbn_to_use}.jpg")
-
-                # Linux
-                ruta = Path(settings.BASE_DIR) / "static" / "assets" / "portadas"
-                ruta.mkdir(parents=True, exist_ok=True)
-
-                ruta_imagenL = ruta / f"{isbn_to_use}.jpg"
-
-    
-                if not os.path.exists(ruta_imagen) or not ruta_imagen.exists():
-                    response = requests.get(url, timeout=5)
-                    
-                    # OpenLibrary returns a tiny pixel if image isn't found. 
-                    # We only save if it's larger than 1000 bytes (1KB).
-                    if response.status_code == 200 and len(response.content) > 1000:
-                        with open(ruta_imagen, "wb") as f:
-                            f.write(response.content)
-                        print(f"✅ Portada descargada para: {isbn_to_use}")
-                    else:
-                        print(f"⚠️ OpenLibrary no tiene portada para ISBN: {isbn_to_use}")
-    
-            except Exception as e:
-                print(f"❌ Error descargando portada: {e}")
+    @property
+    def portada_url(self):
+        if self.issn:
+            clean_issn = str(self.issn).replace("-","").replace(" ", "")
+            return f"https://covers.openlibrary.org/b/isbn/{clean_issn}-M.jpg"
