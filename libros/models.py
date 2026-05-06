@@ -63,7 +63,7 @@ class Libro(models.Model):
         choices=ESTADO_CHOICES
     )
 
-    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    precio = models.DecimalField(max_digits=8, decimal_places=2)
 
     def __str__(self):
         return self.titulo
