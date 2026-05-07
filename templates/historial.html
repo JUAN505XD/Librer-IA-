@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Mis Compras{% endblock %}
+
+{% block content %}
+<div class="main-container">
+    <aside>
+        <h2>Mi Perfil</h2>
+        <p><strong>Usuario:</strong> {{ user.username }}</p>
+        <p><strong>Compras:</strong> {{ compras.count }}</p>
+        <hr>
+        <a href="{% url 'inicio' %}" style="text-decoration: none; color: #0066cc;">← Volver a la tienda</a>
+    </aside>
+
+    <main>
+        <h2>Historial de Compras</h2>
+        <br>
+        
+        {% if compras %}
+            {% for compra in compras %}
+                <div style="border: 1px solid #ddd; border-radius: 8px; margin-bottom: 35px; background: #fff; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                    
+                    <div style="background: #f1f7ff; padding: 15px; border-bottom: 1px solid #e0e6ed; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #004080; font-weight: bold;">Pedido #{{ compra.id }}</span>
+                        <span style="color: #555; font-size: 0.95em;">
+                            <strong>Fecha:</strong> {{ compra.fecha_pago|date:"d/m/Y H:i" }}
+                        </span>
+                    </div>
+
+                    <div style="padding: 15px;">
+                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 10px; color: #777; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px;">
+                            <div>Libro</div>
+                            <div style="text-align: center;">Cant.</div>
+                            <div style="text-align: right;">Precio</div>
+                        </div>
+
+                        {% for item in compra.items.all %}
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 10px 0; border-bottom: 1px solid #f2f2f2; align-items: center;">
+                                <div>
+                                    <strong style="color: #333;">{{ item.libro.titulo }}</strong>
+                                    <br><small style="color: #888;">{{ item.libro.autor }}</small>
+                                </div>
+                                <div style="text-align: center; color: #555;">
+                                    {{ item.cantidad }}
+                                </div>
+                                <div style="text-align: right; font-weight: 500;">
+                                    ${{ item.get_subtotal }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div style="background: #fafafa; padding: 15px; border-top: 1px solid #eee; text-align: right;">
+                        <span style="margin-right: 15px; color: #666; font-size: 0.9em;">Total de la transacción:</span>
+                        <strong style="color: #28a745; font-size: 1.4em;">${{ compra.get_total }}</strong>
+                    </div>
+
+                </div>
+            {% endfor %}
+        {% else %}
+            <div style="text-align: center; padding: 60px; background: white; border-radius: 8px;">
+                <p style="color: #999; font-size: 1.1em;">Aún no has realizado ninguna compra.</p>
+                <br>
+                <a href="{% url 'inicio' %}" style="background: #0066cc; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                    Ir al Catálogo
+                </a>
+            </div>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}

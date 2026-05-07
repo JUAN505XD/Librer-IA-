@@ -30,5 +30,7 @@ class ItemCarrito(models.Model):
     cantidad = models.PositiveIntegerField(default=1)
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
 
+    creado_en = models.DateTimeField(auto_now_add=True)  # 🔥 CLAVE
+
     def get_subtotal(self):
         return self.cantidad * self.precio_unitario

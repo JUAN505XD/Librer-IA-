@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
+from carrito.models import Carrito
+from carrito.views import limpiar_items_expirados
 from .Forms import LibroForm
-from libros.models import Libro
+from libros.models import Libro, Autor, Genero, Idioma
 
 def crear_libro(request):
 
@@ -18,15 +20,18 @@ def crear_libro(request):
 
 
 def inicio(request):
+    libros = Libro.objects.all().order_by('-id')[:6]
 
-    libros = Libro.objects.all()  # 🔥 últimos 6
+    if request.user.is_authenticated:
+        carrito = Carrito.objects.filter(usuario=request.user, estado='ACTIVO').first()
+        if carrito:
+            limpiar_items_expirados(carrito)
 
     return render(request, "inicio.html", {
         "libros": libros
     })
 
-from django.shortcuts import render
-from .models import Libro, Autor, Genero, Idioma
+
 
 def buscar_libros(request):
 
