@@ -1,4 +1,5 @@
 import requests
+import json
 from bs4 import BeautifulSoup
 
 url = 'https://openlibrary.org/subjects'
@@ -22,3 +23,7 @@ for materia_principal in materias.find_all('h3'):
         for sub_materia in materia_principal.next_sibling.next_sibling.stripped_strings:
             generos.append(sub_materia)
 
+with open("generos_cache.json","w", encoding="utf-8") as json_file:
+    json.dump(generos, json_file, indent=4,ensure_ascii=False)
+
+print(f"Guardados {len(generos)} generos")

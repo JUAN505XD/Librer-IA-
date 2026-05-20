@@ -1,4 +1,5 @@
 import requests
+import json
 from bs4 import BeautifulSoup
 
 url = 'https://openlibrary.org/subjects'
@@ -23,3 +24,7 @@ for materia_principal in materias.find_all('h3'):
             if idioma != "Ver más...":
                 idiomas.append(idioma)
 
+with open("idiomas_cache.json", "w", encoding="utf-8") as json_file:
+    json.dump(idiomas,json_file,indent=4,ensure_ascii=False)
+
+print(f"Guardados {len(idiomas)} idiomas")
