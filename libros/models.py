@@ -12,7 +12,6 @@ class Genero(models.Model):
     def __str__(self):
         return self.nombre
 
-
 class Autor(models.Model):
     nombre = models.CharField(max_length=100)
 
@@ -41,10 +40,7 @@ class Libro(models.Model):
         ('USADO', 'Usado'),
     ]
 
-    autor = models.ForeignKey(
-        Autor,
-        on_delete=models.PROTECT
-    )
+    autores = models.ManyToManyField(Autor)
 
     genero = models.ForeignKey(
         Genero,
