@@ -33,7 +33,7 @@ class Editorial(models.Model):
 class Libro(models.Model):
     titulo = models.CharField(max_length=200)
 
-    stock = models.PositiveIntegerField(default=10)
+    stock = models.PositiveIntegerField(default=50)
 
     ESTADO_CHOICES = [
         ('NUEVO', 'Nuevo'),
