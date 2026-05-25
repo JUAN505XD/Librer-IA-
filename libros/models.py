@@ -25,6 +25,11 @@ class Idioma(models.Model):
     def __str__(self):
         return self.nombre
     
+class Editorial(models.Model):
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
     
 class Libro(models.Model):
     titulo = models.CharField(max_length=200)
