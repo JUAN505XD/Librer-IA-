@@ -53,7 +53,11 @@ class Libro(models.Model):
 
     numero_paginas = models.IntegerField(validators=[MaxValueValidator(2000)])
 
-    editorial = models.CharField(max_length=150)
+    editorial = models.ForeignKey(
+            Editorial,
+            on_delete=models.PROTECT
+    )
+
     issn = models.CharField(max_length=50, unique=True)
 
     idioma = models.ForeignKey(
