@@ -47,7 +47,7 @@ class Libro(models.Model):
         on_delete=models.PROTECT
     )
 
-    numero_paginas = models.IntegerField(validators=[MaxValueValidator(2000)])
+    numero_paginas = models.PositiveIntegerField(validators=[MaxValueValidator(2000)])
 
     editorial = models.ForeignKey(
             Editorial,
