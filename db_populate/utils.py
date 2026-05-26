@@ -37,7 +37,9 @@ def generar_precio(paginas):
 
     variable = paginas * factor
 
-    precio = precio_base + precio_pagina
+    precio = precio_base + variable
+
+    return precio
 
 def generar_estado(precio):
     if precio < 40000:
