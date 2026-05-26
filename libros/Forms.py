@@ -53,7 +53,7 @@ class LibroForm(forms.ModelForm):
         if not issn or issn.strip() == "":
             raise forms.ValidationError("El ISSN no puede estar vacío")
 
-        if Libro.objects.filter(issn=issn).exists():
+        if Libro.objects.filter(issn=issn).exclude(pk=self.instance.pk).exists():
             raise forms.ValidationError("Este ISSN ya está registrado")
 
         return issn.strip()
