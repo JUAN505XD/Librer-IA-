@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 from django.conf import settings
 from django.core.validators import MaxValueValidator
+from datetime import date
 
 # Create your models here.
 class Genero(models.Model):
@@ -61,7 +62,7 @@ class Libro(models.Model):
         on_delete=models.PROTECT
     )
 
-    año_publicacion = models.PositiveIntegerField(validators=[MaxValueValidator(date.today().year)])
+    año_publicacion = models.PositiveIntegerField(validators=[MaxValueValidator(date.today().year)], default=date.today().year)
 
     estado = models.CharField(
         max_length=10,
