@@ -1,6 +1,6 @@
 from django import forms
 from .models import Libro
-from datetime import date, timedelta
+from datetime import date
 
 class LibroForm(forms.ModelForm):
 
@@ -8,21 +8,22 @@ class LibroForm(forms.ModelForm):
         model = Libro
         fields = [
             "titulo",
-            "autor",
+            "autores",
             "genero",
             "numero_paginas",
             "editorial",
             "issn",
             "idioma",
-            "fecha_publicacion",
+            "año_publicacion",
             "estado",
             "precio"
         ]
 
         widgets = {
-            "fecha_publicacion": forms.DateInput(attrs={
-                "type": "date",
-                "max": (date.today() - timedelta(days=1)).isoformat()
+            "año_publicacion": forms.NumberInput(attrs={
+                "min": 0,
+                "max": date.today().year,
+                "placeholder": "Ej: 2026"
             }),
         }
 
@@ -77,10 +78,10 @@ class LibroForm(forms.ModelForm):
         return precio
 
     # 🔹 FECHA
-    def clean_fecha_publicacion(self):
-        fecha = self.cleaned_data.get("fecha_publicacion")
+    def clean_año_publicacion(self):
+        año = self.cleaned_data.get("año_publicacion")
 
-        if fecha and fecha > (date.today() - timedelta(days=1)):
-            raise forms.ValidationError("La fecha no puede ser superior a ayer")
+        if año and año > (date.today().year):
+            raise forms.ValidationError("El año no debe ser mayor al actual")
 
-        return fecha
+        return año

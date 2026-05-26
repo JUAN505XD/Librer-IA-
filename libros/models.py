@@ -61,7 +61,7 @@ class Libro(models.Model):
         on_delete=models.PROTECT
     )
 
-    fecha_publicacion = models.DateField()
+    año_publicacion = models.IntegerField(validators=[MaxValueValidator(2026)])
 
     estado = models.CharField(
         max_length=10,
