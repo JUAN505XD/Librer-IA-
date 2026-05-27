@@ -11,6 +11,7 @@ def crear_libro(request):
 
         if form.is_valid():
             form.save()
+            form.save_m2m()
             return redirect("inicio")  # o a lista de libros
 
     else:

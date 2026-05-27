@@ -1,5 +1,6 @@
 from django import forms
 from .models import Libro
+from django_select2 import forms as s2forms
 from datetime import date
 
 class LibroForm(forms.ModelForm):
@@ -23,9 +24,12 @@ class LibroForm(forms.ModelForm):
             "año_publicacion": forms.NumberInput(attrs={
                 "min": 0,
                 "max": date.today().year,
-                "placeholder": "Ej: 2026"
-            }),
-        }
+                "placeholder": "Ej: 2026"}),
+            "autores": s2forms.Select2MultipleWidget(attrs={
+                "style": "width: 100%",
+                "data-placeholder": "Selecciona uno o mas autores.."
+                }),
+            }
 
     # 🔹 TITULO
     def clean_titulo(self):

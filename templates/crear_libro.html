@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
+<script src="https:code.jquery.com/jquery-3.6.0.min.js"></script>
+{{ form.media }}
 
 <style>
 
@@ -84,10 +86,10 @@ input, select {
         <!-- AUTOR Y GENERO -->
         <div class="row">
             <div class="col">
-                <label>Autor</label>
-                {{ form.autor }}
-                {% if form.autor.errors %}
-                    <div class="error-box">{{ form.autor.errors.0 }}</div>
+                <label>Autores</label>
+                {{ form.autores }}
+                {% if form.autores.errors %}
+                    <div class="error-box">{{ form.autores.errors.0 }}</div>
                 {% endif %}
             </div>
 
