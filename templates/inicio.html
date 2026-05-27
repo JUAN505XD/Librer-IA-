@@ -115,7 +115,13 @@
                         <div class="info-libro">
 			    {% load humanize %}
                             <h3>{{ libro.titulo }}</h3>
-                            <p><strong>Autor:</strong> {{ libro.autor }}</p>
+                            <p><strong>Autor:</strong>
+			    	{% if libro.autores.all.first %}
+					{{ libro.autores.all.first.nombre }}
+				{% else %}
+					Autor desconocido
+					{% endif %}
+			    </p>
                             <p><strong>Género:</strong> {{ libro.genero }}</p>
                             <p><strong>Stock:</strong> {{ libro.stock }}</p>
                             <p><strong>Precio:</strong> 
@@ -139,7 +145,7 @@
 					style="display : block; background: #0055aa; color : white; text-align: center; padding: 10 px; border-radius: 5px; text-decoration: none; margin: 10px; padding: 6px">Inicia sesión para añadir al carrito
 				</a> 
                         {% endif %}
-			
+		    </div>		
 		{% endfor %}
             </div>
         </div>
