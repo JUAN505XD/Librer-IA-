@@ -164,7 +164,13 @@ input, select {
 			 onerror="this.src='{% static 'assets/portadas/default.jpg' %}';"
 			 >
                 <h4>{{ libro.titulo }}</h4>
-                <p><strong>Autor:</strong> {{ libro.autor }}</p>
+                <p><strong>Autor:</strong>
+			{% if libro.autores.all.first %}
+				{{ libro.autores.all.first.nombre }}
+			{% else %}
+				Autor desconocido
+				{% endif %}
+		</p>
                 <p><strong>Género:</strong> {{ libro.genero }}</p>
                 <p><strong>Idioma:</strong> {{ libro.idioma }}</p>
                 <p><strong>Precio:</strong> ${{ libro.precio }}</p>
