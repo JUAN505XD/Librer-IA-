@@ -39,7 +39,7 @@ def generar_precio(paginas):
 
     precio = precio_base + variable
 
-    return precio
+    return int(round(precio/1000)*1000)
 
 def generar_estado(precio):
     if precio < 40000:
