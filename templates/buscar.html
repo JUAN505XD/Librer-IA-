@@ -63,6 +63,14 @@ input, select {
     box-shadow: 0 5px 10px rgba(0,0,0,0.1);
 }
 
+.portada {
+	width: 100%;
+	height:220px;
+	object-fit: cover;
+	border-radius: 8px;
+	margin-bottom: 10px;
+}
+
 @media (max-width: 768px) {
     .filtros {
         grid-template-columns: 1fr;
@@ -151,6 +159,10 @@ input, select {
     <div class="resultados-grid">
         {% for libro in libros %}
             <div class="libro-card">
+		    <img src="{{ libro.portada_url }}"
+			 class="portada"
+			 onerror="this.src='{% static 'assets/portadas/default.jpg' %}';"
+			 >
                 <h4>{{ libro.titulo }}</h4>
                 <p><strong>Autor:</strong> {{ libro.autor }}</p>
                 <p><strong>Género:</strong> {{ libro.genero }}</p>
