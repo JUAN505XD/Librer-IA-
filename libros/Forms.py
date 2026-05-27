@@ -37,6 +37,9 @@ class LibroForm(forms.ModelForm):
 
         if not titulo or titulo.strip() == "":
             raise forms.ValidationError("El título no puede estar vacío")
+        
+        if len(set(titulo.strip().replace(" ", ""))) < 3:
+            raise forms.ValidationError("Titulo no valido")
 
         return titulo.strip()
 
@@ -78,6 +81,8 @@ class LibroForm(forms.ModelForm):
 
         if precio is None or precio <= 0:
             raise forms.ValidationError("El precio debe ser mayor a 0")
+        if precio % 1000 != 0:
+            raise forms.ValidationError("El precio debe ser múltiplo de 1000")
 
         return precio
 
