@@ -10,7 +10,8 @@ def crear_libro(request):
         form = LibroForm(request.POST)
 
         if form.is_valid():
-            form.save()
+            libro=form.save(commit=False)
+            libro.save()
             form.save_m2m()
             return redirect("inicio")  # o a lista de libros
 

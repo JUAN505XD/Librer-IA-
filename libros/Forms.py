@@ -44,10 +44,10 @@ class LibroForm(forms.ModelForm):
     def clean_editorial(self):
         editorial = self.cleaned_data.get("editorial")
 
-        if not editorial or editorial.strip() == "":
+        if not editorial: 
             raise forms.ValidationError("La editorial no puede estar vacía")
 
-        return editorial.strip()
+        return editorial
 
 
     # 🔹 ISSN
