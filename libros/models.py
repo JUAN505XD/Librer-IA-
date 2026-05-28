@@ -78,4 +78,4 @@ class Libro(models.Model):
     def portada_url(self):
         if self.issn:
             clean_issn = str(self.issn).replace("-","").replace(" ", "")
-            return f"https://covers.openlibrary.org/b/isbn/{clean_issn}-M.jpg"
+            return f"https://covers.openlibrary.org/b/isbn/{clean_issn}-M.jpg?default=false"
