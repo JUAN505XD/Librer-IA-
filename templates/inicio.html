@@ -4,7 +4,6 @@
 
 {% block content %}
 <style>
-
 .catalogo-container {
     max-width: 1000px;
     margin: 30px auto;
@@ -63,11 +62,25 @@
     margin-top: 10px;
     font-weight: bold;
     transition: 0.2s;
+    width: 100%;
 }
 
 .btn-carrito:hover {
     background: #0055aa;
     transform: scale(1.03);
+}
+
+.btn-login {
+    display: block; 
+    background: #0055aa; 
+    color: white; 
+    text-align: center; 
+    border-radius: 5px; 
+    text-decoration: none; 
+    margin-top: 10px; 
+    padding: 8px;
+    width: 100%;
+    font-size: 0.9em;
 }
 
 .agotado {
@@ -104,24 +117,22 @@
                 {% for libro in libros %}
                     <div class="libro-card">
 
-                        <!-- 🔥 PORTADA -->
                         <img 
-			 src="{{ libro.portada_url }}"
-                         class="portada"
-                         onerror="this.src='{% static 'assets/portadas/default.jpg' %}';"
+                            src="{{ libro.portada_url }}"
+                            class="portada"
+                            onerror="this.src='{% static 'assets/portadas/default.jpg' %}';"
                         >
 
-                        <!-- 🔥 INFO -->
                         <div class="info-libro">
-			    {% load humanize %}
+                            {% load humanize %}
                             <h3>{{ libro.titulo }}</h3>
                             <p><strong>Autor:</strong>
-			    	{% if libro.autores.all.first %}
-					{{ libro.autores.all.first.nombre }}
-				{% else %}
-					Autor desconocido
-					{% endif %}
-			    </p>
+                                {% if libro.autores.all.first %}
+                                    {{ libro.autores.all.first.nombre }}
+                                {% else %}
+                                    Autor desconocido
+                                {% endif %}
+                            </p>
                             <p><strong>Género:</strong> {{ libro.genero }}</p>
                             <p><strong>Stock:</strong> {{ libro.stock }}</p>
                             <p><strong>Precio:</strong> 
@@ -131,7 +142,6 @@
                             </p>
                         </div>
 
-                        <!-- 🔥 BOTÓN -->
                         {% if user.is_authenticated and user.rol == "CLIENTE" %}
                             {% if libro.stock > 0 %}
                                 <a href="{% url 'agregar_al_carrito' libro.id %}" class="btn-carrito">
@@ -141,21 +151,32 @@
                                 <p class="agotado">Agotado</p>
                             {% endif %}
                         {% elif not user.is_authenticated %}
-                                <a href="{% url 'login' %}"
-					style="display : block; background: #0055aa; color : white; text-align: center; padding: 10 px; border-radius: 5px; text-decoration: none; margin: 10px; padding: 6px">Inicia sesión para añadir al carrito
-				</a> 
+                            <a href="{% url 'login' %}" class="btn-login">
+                                Inicia sesión para añadir al carrito
+                            </a> 
                         {% endif %}
-		    </div>		
-		{% endfor %}
+
+                    </div> {% endfor %}
+            </div> </div> <hr>
+        
+        {% if libros.has_other_pages %}
+            <div style="display: flex; justify-content: center; margin: 30px 0; gap: 10px; align-items: center;">
+                {% if libros.has_previous %}
+                    <a href="?page=1" style="text-decoration: none; font-weight: bold; color: #0066cc;">&laquo; Primero</a>
+                    <a href="?page={{ libros.previous_page_number }}" style="text-decoration: none; font-weight: bold; color: #0066cc; margin-left: 10px;">Anterior</a>
+                {% endif %}
+
+                <span style="padding: 0 15px; color: #555;">
+                    Página <strong>{{ libros.number }}</strong> de {{ libros.paginator.num_pages }}
+                </span>
+
+                {% if libros.has_next %}
+                    <a href="?page={{ libros.next_page_number }}" style="text-decoration: none; font-weight: bold; color: #0066cc; margin-right: 10px;">Siguiente</a>
+                    <a href="?page={{ libros.paginator.num_pages }}" style="text-decoration: none; font-weight: bold; color: #0066cc;">Último &raquo;</a>
+                {% endif %}
             </div>
-        </div>
-
-        <hr>
-
-        <h3>Contenido destacado</h3>
-        <p>Próximamente: Recomendaciones 🔥</p>
-
+        {% endif %}
+        
     </main>
-
 </div>
 {% endblock %}

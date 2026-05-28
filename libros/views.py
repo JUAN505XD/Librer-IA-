@@ -31,9 +31,9 @@ def inicio(request):
     libros = Libro.objects.all().order_by('-id')
 
 
-    paginator = Paginator(libros,12)
+    paginator = Paginator(libros,2)
     numero_pagina= request.GET.get('page')
-    libros_paginados=paginador.get_page(numero_pagina)
+    libros_paginados=paginator.get_page(numero_pagina)
 
     return render(request, "inicio.html", {
         "libros": libros_paginados
