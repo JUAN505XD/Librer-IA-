@@ -159,24 +159,33 @@
                     </div> {% endfor %}
             </div> </div> <hr>
         
-        {% if libros.has_other_pages %}
-            <div style="display: flex; justify-content: center; margin: 30px 0; gap: 10px; align-items: center;">
-                {% if libros.has_previous %}
-                    <a href="?page=1" style="text-decoration: none; font-weight: bold; color: #0066cc;">&laquo; Primero</a>
-                    <a href="?page={{ libros.previous_page_number }}" style="text-decoration: none; font-weight: bold; color: #0066cc; margin-left: 10px;">Anterior</a>
-                {% endif %}
-
-                <span style="padding: 0 15px; color: #555;">
-                    Página <strong>{{ libros.number }}</strong> de {{ libros.paginator.num_pages }}
-                </span>
-
-                {% if libros.has_next %}
-                    <a href="?page={{ libros.next_page_number }}" style="text-decoration: none; font-weight: bold; color: #0066cc; margin-right: 10px;">Siguiente</a>
-                    <a href="?page={{ libros.paginator.num_pages }}" style="text-decoration: none; font-weight: bold; color: #0066cc;">Último &raquo;</a>
-                {% endif %}
-            </div>
-        {% endif %}
+         {% if libros.has_other_pages %}
+    <div style="display: flex; justify-content: center; margin: 30px 0; gap: 5px; align-items: center; font-family: sans-serif;">
         
+        {% if libros.has_previous %}
+            <a href="?page={{ libros.previous_page_number }}" style="text-decoration: none; font-weight: bold; color: #0066cc; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; margin-right: 5px;">&laquo;</a>
+        {% endif %}
+
+        {% for num in libros.paginator.get_elided_page_range|default:libros.paginator.page_range %}
+            {% if libros.number == num %}
+                <span style="padding: 8px 14px; background: #0066cc; color: white; border: 1px solid #0066cc; border-radius: 4px; font-weight: bold;">
+                    {{ num }}
+                </span>
+            {% elif num == libros.paginator.ELLIPSIS %}
+                <span style="padding: 8px 12px; color: #777;">{{ num }}</span>
+            {% else %}
+                <a href="?page={{ num }}" style="text-decoration: none; color: #0066cc; padding: 8px 14px; border: 1px solid #ddd; border-radius: 4px;">
+                    {{ num }}
+                </a>
+            {% endif %}
+        {% endfor %}
+
+        {% if libros.has_next %}
+            <a href="?page={{ libros.next_page_number }}" style="text-decoration: none; font-weight: bold; color: #0066cc; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; margin-left: 5px;">&raquo;</a>
+        {% endif %}
+
+    </div>
+{% endif %}       
     </main>
 </div>
 {% endblock %}
