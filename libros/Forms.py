@@ -1,6 +1,7 @@
 from django import forms
 from .models import Libro
-from datetime import date, timedelta
+from django_select2 import forms as s2forms
+from datetime import date
 
 class LibroForm(forms.ModelForm):
 
@@ -8,23 +9,27 @@ class LibroForm(forms.ModelForm):
         model = Libro
         fields = [
             "titulo",
-            "autor",
+            "autores",
             "genero",
             "numero_paginas",
             "editorial",
             "issn",
             "idioma",
-            "fecha_publicacion",
+            "año_publicacion",
             "estado",
             "precio"
         ]
 
         widgets = {
-            "fecha_publicacion": forms.DateInput(attrs={
-                "type": "date",
-                "max": (date.today() - timedelta(days=1)).isoformat()
-            }),
-        }
+            "año_publicacion": forms.NumberInput(attrs={
+                "min": 0,
+                "max": date.today().year,
+                "placeholder": "Ej: 2026"}),
+            "autores": s2forms.Select2MultipleWidget(attrs={
+                "style": "width: 100%",
+                "data-placeholder": "Selecciona uno o mas autores.."
+                }),
+            }
 
     # 🔹 TITULO
     def clean_titulo(self):
@@ -32,6 +37,9 @@ class LibroForm(forms.ModelForm):
 
         if not titulo or titulo.strip() == "":
             raise forms.ValidationError("El título no puede estar vacío")
+        
+        if len(set(titulo.strip().replace(" ", ""))) < 3:
+            raise forms.ValidationError("Titulo no valido")
 
         return titulo.strip()
 
@@ -39,10 +47,10 @@ class LibroForm(forms.ModelForm):
     def clean_editorial(self):
         editorial = self.cleaned_data.get("editorial")
 
-        if not editorial or editorial.strip() == "":
+        if not editorial: 
             raise forms.ValidationError("La editorial no puede estar vacía")
 
-        return editorial.strip()
+        return editorial
 
 
     # 🔹 ISSN
@@ -52,7 +60,7 @@ class LibroForm(forms.ModelForm):
         if not issn or issn.strip() == "":
             raise forms.ValidationError("El ISSN no puede estar vacío")
 
-        if Libro.objects.filter(issn=issn).exists():
+        if Libro.objects.filter(issn=issn).exclude(pk=self.instance.pk).exists():
             raise forms.ValidationError("Este ISSN ya está registrado")
 
         return issn.strip()
@@ -73,14 +81,16 @@ class LibroForm(forms.ModelForm):
 
         if precio is None or precio <= 0:
             raise forms.ValidationError("El precio debe ser mayor a 0")
+        if precio % 1000 != 0:
+            raise forms.ValidationError("El precio debe ser múltiplo de 1000")
 
         return precio
 
     # 🔹 FECHA
-    def clean_fecha_publicacion(self):
-        fecha = self.cleaned_data.get("fecha_publicacion")
+    def clean_año_publicacion(self):
+        año = self.cleaned_data.get("año_publicacion")
 
-        if fecha and fecha > (date.today() - timedelta(days=1)):
-            raise forms.ValidationError("La fecha no puede ser superior a ayer")
+        if año and año > (date.today().year):
+            raise forms.ValidationError("El año no debe ser mayor al actual")
 
-        return fecha
+        return año

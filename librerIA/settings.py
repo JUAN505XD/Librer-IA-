@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'libros',
     'carrito',
     'django_countries',
-]
+    'django_select2',]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

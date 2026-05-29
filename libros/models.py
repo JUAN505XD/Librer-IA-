@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 from django.conf import settings
 from django.core.validators import MaxValueValidator
+from datetime import date
 
 # Create your models here.
 class Genero(models.Model):
@@ -11,7 +12,6 @@ class Genero(models.Model):
 
     def __str__(self):
         return self.nombre
-
 
 class Autor(models.Model):
     nombre = models.CharField(max_length=100)
@@ -25,30 +25,36 @@ class Idioma(models.Model):
     def __str__(self):
         return self.nombre
     
+class Editorial(models.Model):
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
     
 class Libro(models.Model):
     titulo = models.CharField(max_length=200)
 
-    stock = models.PositiveIntegerField(default=10)
+    stock = models.PositiveIntegerField(default=50)
 
     ESTADO_CHOICES = [
         ('NUEVO', 'Nuevo'),
         ('USADO', 'Usado'),
     ]
 
-    autor = models.ForeignKey(
-        Autor,
-        on_delete=models.PROTECT
-    )
+    autores = models.ManyToManyField(Autor)
 
     genero = models.ForeignKey(
         Genero,
         on_delete=models.PROTECT
     )
 
-    numero_paginas = models.IntegerField(validators=[MaxValueValidator(2000)])
+    numero_paginas = models.PositiveIntegerField(validators=[MaxValueValidator(2000)])
 
-    editorial = models.CharField(max_length=150)
+    editorial = models.ForeignKey(
+            Editorial,
+            on_delete=models.PROTECT
+    )
+
     issn = models.CharField(max_length=50, unique=True)
 
     idioma = models.ForeignKey(
@@ -56,7 +62,7 @@ class Libro(models.Model):
         on_delete=models.PROTECT
     )
 
-    fecha_publicacion = models.DateField()
+    año_publicacion = models.PositiveIntegerField(validators=[MaxValueValidator(date.today().year)], default=date.today().year)
 
     estado = models.CharField(
         max_length=10,
@@ -72,4 +78,4 @@ class Libro(models.Model):
     def portada_url(self):
         if self.issn:
             clean_issn = str(self.issn).replace("-","").replace(" ", "")
-            return f"https://covers.openlibrary.org/b/isbn/{clean_issn}-M.jpg"
+            return f"https://covers.openlibrary.org/b/isbn/{clean_issn}-M.jpg?default=false"

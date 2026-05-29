@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.core.paginator import Paginator
 from carrito.models import Carrito
 from carrito.views import limpiar_items_expirados
 from .Forms import LibroForm
@@ -10,7 +11,9 @@ def crear_libro(request):
         form = LibroForm(request.POST)
 
         if form.is_valid():
-            form.save()
+            libro=form.save(commit=False)
+            libro.save()
+            form.save_m2m()
             return redirect("inicio")  # o a lista de libros
 
     else:
@@ -20,15 +23,20 @@ def crear_libro(request):
 
 
 def inicio(request):
-    libros = Libro.objects.all().order_by('-id')[:6]
-
     if request.user.is_authenticated:
         carrito = Carrito.objects.filter(usuario=request.user, estado='ACTIVO').first()
         if carrito:
             limpiar_items_expirados(carrito)
 
+    libros = Libro.objects.all().order_by('-id')
+
+
+    paginator = Paginator(libros,12)
+    numero_pagina= request.GET.get('page')
+    libros_paginados=paginator.get_page(numero_pagina)
+
     return render(request, "inicio.html", {
-        "libros": libros
+        "libros": libros_paginados
     })
 
 
