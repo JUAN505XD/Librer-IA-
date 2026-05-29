@@ -64,11 +64,11 @@ input, select {
 }
 
 .portada {
-	width: 100%;
-	height:220px;
-	object-fit: cover;
-	border-radius: 8px;
-	margin-bottom: 10px;
+    width: 100%;
+    height:220px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 10px;
 }
 
 @media (max-width: 768px) {
@@ -89,15 +89,12 @@ input, select {
         <p>Filtra por diferentes criterios</p>
     </div>
 
-    <!-- 🔎 FORMULARIO -->
     <form method="get">
 
-        <!-- BUSCADOR -->
         <input type="text" name="q" placeholder="Buscar por título..." value="{{ request.GET.q }}">
 
         <div class="filtros">
 
-            <!-- AUTOR -->
             <select name="autor">
                 <option value="">Autor</option>
                 {% for a in autores %}
@@ -107,7 +104,6 @@ input, select {
                 {% endfor %}
             </select>
 
-            <!-- GENERO -->
             <select name="genero">
                 <option value="">Género</option>
                 {% for g in generos %}
@@ -117,7 +113,6 @@ input, select {
                 {% endfor %}
             </select>
 
-            <!-- IDIOMA -->
             <select name="idioma">
                 <option value="">Idioma</option>
                 {% for i in idiomas %}
@@ -127,21 +122,17 @@ input, select {
                 {% endfor %}
             </select>
 
-            <!-- ESTADO -->
             <select name="estado">
                 <option value="">Estado</option>
                 <option value="NUEVO" {% if request.GET.estado == "NUEVO" %}selected{% endif %}>Nuevo</option>
                 <option value="USADO" {% if request.GET.estado == "USADO" %}selected{% endif %}>Usado</option>
             </select>
 
-            <!-- PRECIO -->
             <input type="number" name="precio_min" placeholder="Precio mínimo" value="{{ request.GET.precio_min }}">
             <input type="number" name="precio_max" placeholder="Precio máximo" value="{{ request.GET.precio_max }}">
 
-            <!-- AÑO -->
             <input type="number" name="anio" placeholder="Año" value="{{ request.GET.anio }}">
 
-            <!-- PÁGINAS -->
             <input type="number" name="paginas_min" placeholder="Páginas mínimas" value="{{ request.GET.paginas_min }}">
             <input type="number" name="paginas_max" placeholder="Páginas máximas" value="{{ request.GET.paginas_max }}">
 
@@ -153,32 +144,60 @@ input, select {
 
     <hr>
 
-    <!-- 📚 RESULTADOS -->
     <h3>Resultados</h3>
 
     <div class="resultados-grid">
         {% for libro in libros %}
             <div class="libro-card">
-		    <img src="{{ libro.portada_url }}"
-			 class="portada"
-			 onerror="this.src='{% static 'assets/portadas/default.jpg' %}';"
-			 >
+            <img src="{{ libro.portada_url }}"
+                 class="portada"
+                 onerror="this.onerror=null; this.src='{% static 'assets/portadas/default.jpg' %}';"
+                 alt="Portada de {{ libro.titulo }}"
+                 >
                 <h4>{{ libro.titulo }}</h4>
                 <p><strong>Autor:</strong>
-			{% if libro.autores.all.first %}
-				{{ libro.autores.all.first.nombre }}
-			{% else %}
-				Autor desconocido
-				{% endif %}
-		</p>
+            {% if libro.autores.all.first %}
+                {{ libro.autores.all.first.nombre }}
+            {% else %}
+                Autor desconocido
+            {% endif %}
+        </p>
                 <p><strong>Género:</strong> {{ libro.genero }}</p>
                 <p><strong>Idioma:</strong> {{ libro.idioma }}</p>
                 <p><strong>Precio:</strong> ${{ libro.precio }}</p>
             </div>
         {% empty %}
-            <p>No se encontraron libros.</p>
+            <p>No se encontraron libros con los filtros seleccionados.</p>
         {% endfor %}
     </div>
+
+    {% if libros.has_other_pages %}
+        <div style="display: flex; justify-content: center; margin: 40px 0; gap: 6px; align-items: center;">
+            
+            {% if libros.has_previous %}
+                <a href="?page={{ libros.previous_page_number }}&{{ filtros_url }}" style="text-decoration: none; font-weight: bold; color: #0066cc; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px;">&laquo;</a>
+            {% endif %}
+
+            {% for num in rango_paginas %}
+                {% if libros.number == num %}
+                    <span style="padding: 10px 16px; background: #0066cc; color: white; border: 1px solid #0066cc; border-radius: 6px; font-weight: bold;">
+                        {{ num }}
+                    </span>
+                {% elif num == libros.paginator.ELLIPSIS %}
+                    <span style="padding: 10px 14px; color: #777;">{{ num }}</span>
+                {% else %}
+                    <a href="?page={{ num }}&{{ filtros_url }}" style="text-decoration: none; color: #0066cc; padding: 10px 16px; border: 1px solid #ddd; border-radius: 6px;">
+                        {{ num }}
+                    </a>
+                {% endif %}
+            {% endfor %}
+
+            {% if libros.has_next %}
+                <a href="?page={{ libros.next_page_number }}&{{ filtros_url }}" style="text-decoration: none; font-weight: bold; color: #0066cc; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px;">&raquo;</a>
+            {% endif %}
+
+        </div>
+    {% endif %}
 
 </div>
 

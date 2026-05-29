@@ -50,10 +50,10 @@ def inicio(request):
 
 def buscar_libros(request):
 
-    libros = Libro.objects.all()
+    libros = Libro.objects.all().order_by('-id')
 
     # 🔎 BÚSQUEDA POR TEXTO
-    query = request.GET.get("q")
+    query = request.GET.get("q",'').strip()
     if query:
         libros = libros.filter(titulo__icontains=query)
 
@@ -97,9 +97,27 @@ def buscar_libros(request):
     if paginas_max:
         libros = libros.filter(numero_paginas__lte=paginas_max)
 
+    query_params = request.GET.copy()
+    if 'page' in query_params:
+        del query_params['page']
+    filtros_url = query_params.urlencode()
+
+    paginator = Paginator(libros, 12)
+    page_number = request.GET.get('page')
+    libros_paginados = paginator.get_page(page_number)
+
+    rango_paginas = paginator.get_elided_page_range(
+            number = libros_paginados.number,
+            on_each_side=2,
+            on_ends=1
+            )
+
     return render(request, "buscar.html", {
-        "libros": libros,
+        "libros": libros_paginados,
         "autores": Autor.objects.all(),
         "generos": Genero.objects.all(),
         "idiomas": Idioma.objects.all(),
+        "rango_paginas": rango_paginas,
+        "filtros_url": filtros_url,
+        "query": query
     })
