@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from carrito.models import Carrito
 from carrito.views import limpiar_items_expirados
@@ -121,3 +121,10 @@ def buscar_libros(request):
         "filtros_url": filtros_url,
         "query": query
     })
+
+def detalle_libro(request, libro_id):
+    libro = get_object_or_404(Libro,id=libro_id)
+
+    return render(request, "detalle_libro.html", {
+        "libro": libro
+        })
