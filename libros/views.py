@@ -35,8 +35,15 @@ def inicio(request):
     numero_pagina= request.GET.get('page')
     libros_paginados=paginator.get_page(numero_pagina)
 
+    rango_paginas = paginator.get_elided_page_range(
+            number=libros_paginados.number,
+            on_each_side=2,
+            on_ends=1
+            )
+
     return render(request, "inicio.html", {
-        "libros": libros_paginados
+        "libros": libros_paginados,
+        "rango_paginas": rango_paginas
     })
 
 
