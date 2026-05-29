@@ -60,7 +60,7 @@ def buscar_libros(request):
     # 🎯 FILTROS
     autor = request.GET.get("autor")
     if autor:
-        libros = libros.filter(autor_id=autor)
+        libros = libros.filter(autores__id=autor)
 
     genero = request.GET.get("genero")
     if genero:
