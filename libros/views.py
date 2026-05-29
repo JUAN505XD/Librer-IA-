@@ -86,7 +86,7 @@ def buscar_libros(request):
     # 📅 AÑO (desde fecha_publicacion)
     anio = request.GET.get("anio")
     if anio:
-        libros = libros.filter(fecha_publicacion__year=anio)
+        libros = libros.filter(año_publicacion=anio)
 
     # 📄 PÁGINAS
     paginas_min = request.GET.get("paginas_min")

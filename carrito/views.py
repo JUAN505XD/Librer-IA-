@@ -75,7 +75,7 @@ def pagar_carrito(request):
     carrito.save()
     
     messages.success(request, "¡Compra exitosa!")
-    return redirect('historial_compras')
+    return redirect('historial')
 
 @login_required
 def historial_compras(request):
@@ -108,7 +108,7 @@ def limpiar_items_expirados(carrito):
 
     with transaction.atomic():
         for item in carrito.items.all():
-            if ahora > item.creado_en + timedelta(minutes=10):
+            if ahora > item.creado_en + timedelta(minutes=1):
 
                 # 🔥 devolver stock
                 libro = item.libro
