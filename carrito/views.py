@@ -12,7 +12,7 @@ def agregar_al_carrito(request, libro_id):
     libro = get_object_or_404(Libro, id=libro_id)
 
     if libro.stock <= 0:
-        messages.error(request, f"El libro {libro.titulo} está agotado.")
+        messages.error(request, f"El libro '{libro.titulo}' está agotado.")
         return redirect('inicio')
 
     carrito, created = Carrito.objects.get_or_create(
@@ -20,12 +20,12 @@ def agregar_al_carrito(request, libro_id):
         estado='ACTIVO'
     )
 
-    # 🔥 limpiar items expirados antes de todo
+    # 🛡️ Limpiar expirados antes de evaluar totales
     limpiar_items_expirados(carrito)
 
     total_en_carrito = sum(item.cantidad for item in carrito.items.all())
     if total_en_carrito >= 5:
-        messages.warning(request, "Máximo 5 libros por carrito.")
+        messages.warning(request, "Máximo 5 libros en total por carrito.")
         return redirect('ver_carrito')
 
     item, item_created = ItemCarrito.objects.get_or_create(
@@ -53,13 +53,13 @@ def ver_carrito(request):
     carrito = Carrito.objects.filter(usuario=request.user, estado='ACTIVO').first()
 
     if carrito:
-        # 🔥 limpiar SOLO items expirados
+        # 🛡️ Limpiar items expirados
         limpiar_items_expirados(carrito)
 
-        # 🔥 si después de limpiar ya no hay items
+        # Si después de limpiar ya no quedan elementos
         if not carrito.items.exists():
             carrito = None
-            messages.info(request, "Tu carrito está vacío.")
+            messages.info(request, "Tu tiempo de reserva expiró y el carrito está vacío.")
 
     return render(request, 'ver_carrito.html', {'carrito': carrito})
 
@@ -67,14 +67,25 @@ def ver_carrito(request):
 def pagar_carrito(request):
     carrito = Carrito.objects.filter(usuario=request.user, estado='ACTIVO').first()
 
-    if not carrito or not carrito.items.exists():
+    if not carrito:
+        messages.error(request, "No tienes un carrito activo.")
         return redirect('ver_carrito')
 
-    carrito.estado = 'PAGADO'
-    carrito.fecha_pago = timezone.now()
-    carrito.save()
-    
-    messages.success(request, "¡Compra exitosa!")
+    # 🛡️ ¡EL FILTRO DE SEGURIDAD CLAVE!
+    # Corremos la limpieza JUSTO ANTES de procesar el pago por si el tiempo venció en pantalla
+    limpiar_items_expirados(carrito)
+
+    # Si tras la limpieza el carrito se quedó sin productos, detenemos la transacción
+    if not carrito.items.exists():
+        messages.error(request, "Tu reserva expiró por inactividad. No se pudo procesar el pago.")
+        return redirect('ver_carrito')
+
+    with transaction.atomic():
+        carrito.estado = 'PAGADO'
+        carrito.fecha_pago = timezone.now()
+        carrito.save()
+        
+    messages.success(request, "¡Compra exitosa! Gracias por tu confianza.")
     return redirect('historial')
 
 @login_required
@@ -93,12 +104,12 @@ def vaciar_carrito(request):
                 libro.stock += item.cantidad
                 libro.save()
 
-        carrito.estado = 'CANCELADO'
-        carrito.save()
+            carrito.estado = 'CANCELADO'
+            carrito.save()
 
-        messages.info(request, "Carrito vaciado correctamente.")
+        messages.info(request, "Carrito vaciado correctamente. Los libros volvieron al inventario.")
     else:
-        messages.error(request, "No hay carrito activo.")
+        messages.error(request, "No hay carrito activo para vaciar.")
 
     return redirect('inicio')
 
@@ -108,23 +119,31 @@ def limpiar_items_expirados(carrito):
 
     with transaction.atomic():
         for item in carrito.items.all():
+            # ⏱️ Mantengo 1 minuto para tus pruebas actuales
             if ahora > item.creado_en + timedelta(minutes=1):
-
-                # 🔥 devolver stock
+                
                 libro = item.libro
                 libro.stock += item.cantidad
                 libro.save()
 
-                # 🔥 eliminar item
                 item.delete()
 
 @login_required
 def sumar_item(request, item_id):
     item = get_object_or_404(ItemCarrito, id=item_id, carrito__usuario=request.user)
-    libro = item.libro
+    carrito = item.carrito
+    
+    # 🛡️ Validar que el ítem que intenta alterar no haya expirado justo antes del clic
+    limpiar_items_expirados(carrito)
+    
+    # Si el ítem ya no existe en la base de datos tras la limpieza:
+    if not ItemCarrito.objects.filter(id=item_id).exists():
+        messages.error(request, "El tiempo de reserva de este artículo caducó.")
+        return redirect('ver_carrito')
 
+    libro = item.libro
     if libro.stock <= 0:
-        messages.error(request, "No hay más stock disponible.")
+        messages.error(request, "No hay más stock disponible en bodega.")
         return redirect('ver_carrito')
 
     with transaction.atomic():
@@ -140,6 +159,15 @@ def sumar_item(request, item_id):
 @login_required
 def restar_item(request, item_id):
     item = get_object_or_404(ItemCarrito, id=item_id, carrito__usuario=request.user)
+    carrito = item.carrito
+    
+    # 🛡️ Limpieza previa por consistencia de tiempos
+    limpiar_items_expirados(carrito)
+    
+    if not ItemCarrito.objects.filter(id=item_id).exists():
+        messages.error(request, "El tiempo de reserva caducó.")
+        return redirect('ver_carrito')
+
     libro = item.libro
 
     with transaction.atomic():
@@ -150,6 +178,6 @@ def restar_item(request, item_id):
             item.cantidad -= 1
             item.save()
         else:
-            item.delete()  # 🔥 si queda en 1 → se elimina
+            item.delete()
 
     return redirect('ver_carrito')
