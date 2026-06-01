@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from carrito.models import Carrito
 from carrito.views import limpiar_items_expirados
@@ -81,6 +81,18 @@ def inicio(request):
     numero_pagina = request.GET.get('page')
     libros_paginados = paginator.get_page(numero_pagina)
 
+    rango_paginas = paginator.get_elided_page_range(
+            number=libros_paginados.number,
+            on_each_side=2,
+            on_ends=1
+            )
+
+    rango_paginas = paginator.get_elided_page_range(
+            number=libros_paginados.number,
+            on_each_side=2,
+            on_ends=1
+            )
+
     return render(request, "inicio.html", {
         "libros": libros_paginados,
         "mostrar_noticias": mostrar_noticias,
@@ -93,17 +105,17 @@ def inicio(request):
 
 def buscar_libros(request):
 
-    libros = Libro.objects.all()
+    libros = Libro.objects.all().order_by('-id')
 
     # 🔎 BÚSQUEDA POR TEXTO
-    query = request.GET.get("q")
+    query = request.GET.get("q",'').strip()
     if query:
         libros = libros.filter(autores__id=autor)
 
     # 🎯 FILTROS
     autor = request.GET.get("autor")
     if autor:
-        libros = libros.filter(autores__id=autor)
+        libros = libros.filter(autores_es__id=autor)
 
     genero = request.GET.get("genero")
     if genero:
@@ -140,9 +152,34 @@ def buscar_libros(request):
     if paginas_max:
         libros = libros.filter(numero_paginas__lte=paginas_max)
 
+    query_params = request.GET.copy()
+    if 'page' in query_params:
+        del query_params['page']
+    filtros_url = query_params.urlencode()
+
+    paginator = Paginator(libros, 12)
+    page_number = request.GET.get('page')
+    libros_paginados = paginator.get_page(page_number)
+
+    rango_paginas = paginator.get_elided_page_range(
+            number = libros_paginados.number,
+            on_each_side=2,
+            on_ends=1
+            )
+
     return render(request, "buscar.html", {
-        "libros": libros,
+        "libros": libros_paginados,
         "autores": Autor.objects.all(),
         "generos": Genero.objects.all(),
         "idiomas": Idioma.objects.all(),
+        "rango_paginas": rango_paginas,
+        "filtros_url": filtros_url,
+        "query": query
     })
+
+def detalle_libro(request, libro_id):
+    libro = get_object_or_404(Libro,id=libro_id)
+
+    return render(request, "detalle_libro.html", {
+        "libro": libro
+        })

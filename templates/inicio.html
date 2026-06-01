@@ -30,6 +30,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: space-between; /* Mantiene los botones al mismo nivel abajo */
 }
 
 .libro-card:hover {
@@ -186,76 +187,83 @@
             <div class="catalogo-grid">
                 {% for libro in libros %}
                     <div class="libro-card">
+                        
+                        <a href="{% url 'detalle_libro' libro.id %}" style="text-decoration: none; color: inherit; width: 100%;">
+                            <img 
+                                src="{{ libro.portada_url }}"
+                                class="portada"
+                                onerror="this.onerror=null; this.src='{% static 'assets/portadas/default.jpg' %}';"
+                                alt="Portada de {{ libro.titulo }}"
+                            >
 
-                        <img 
-                            src="{{ libro.portada_url }}"
-                            class="portada"
-                            onerror="this.src='{% static 'assets/portadas/default.jpg' %}';"
-                        >
-
-                        <div class="info-libro">
-                            {% load humanize %}
-                            <h3>{{ libro.titulo }}</h3>
-                            <p><strong>Autor:</strong>
-                                {% if libro.autores.all.first %}
-                                    {{ libro.autores.all.first.nombre }}
-                                {% else %}
-                                    Autor desconocido
+                            <div class="info-libro">
+                                {% load humanize %}
+                                <h3>{{ libro.titulo }}</h3>
+                                <p><strong>Autor:</strong>
+                                    {% if libro.autores.all.first %}
+                                        {{ libro.autores.all.first.nombre }}
+                                    {% else %}
+                                        Autor desconocido
+                                    {% endif %}
+                                </p>
+                                <p><strong>Género:</strong> {{ libro.genero }}</p>
+                                <p><strong>Stock:</strong> {{ libro.stock }}</p>
+                                <p><strong>Precio:</strong> 
+                                    <span style="color: #28a745; font-weight: bold;">
+                                        ${{ libro.precio|intcomma }}
+                                    </span>
+                                </p>
+                            </div>
+                        </a> <div style="width: 100%;">
+                            {% if user.is_authenticated and user.rol == "CLIENTE" %}
+                                {% if libro.stock > 0 %}
+                                    <a href="{% url 'agregar_al_carrito' libro.id %}" class="btn-carrito">
+                                        Añadir al carrito
+                                    </a>
+                                    {% else %}
+                                    <p class="agotado">Agotado</p>
                                 {% endif %}
-                            </p>
-                            <p><strong>Género:</strong> {{ libro.genero }}</p>
-                            <p><strong>Stock:</strong> {{ libro.stock }}</p>
-                            <p><strong>Precio:</strong> 
-                                <span style="color: #28a745; font-weight: bold;">
-                                    ${{ libro.precio|intcomma }}
-                                </span>
-                            </p>
+                            {% elif not user.is_authenticated %}
+                                <a href="{% url 'login' %}" class="btn-login">
+                                    Inicia sesión para añadir al carrito
+                                </a> 
+                            {% endif %}
                         </div>
 
-                        {% if user.is_authenticated and user.rol == "CLIENTE" %}
-                            {% if libro.stock > 0 %}
-                                <a href="{% url 'agregar_al_carrito' libro.id %}" class="btn-carrito">
-                                    Añadir al carrito
-                                </a>
-                            {% else %}
-                                <p class="agotado">Agotado</p>
-                            {% endif %}
-                        {% elif not user.is_authenticated %}
-                            <a href="{% url 'login' %}" class="btn-login">
-                                Inicia sesión para añadir al carrito
-                            </a> 
-                        {% endif %}
-
-                    </div> {% endfor %}
-            </div> </div> <hr>
+                    </div> 
+                {% endfor %}
+            </div> 
+        </div> 
         
-         {% if libros.has_other_pages %}
-    <div style="display: flex; justify-content: center; margin: 30px 0; gap: 5px; align-items: center; font-family: sans-serif;">
+        <hr>
         
-        {% if libros.has_previous %}
-            <a href="?page={{ libros.previous_page_number }}" style="text-decoration: none; font-weight: bold; color: #0066cc; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; margin-right: 5px;">&laquo;</a>
-        {% endif %}
+        {% if libros.has_other_pages %}
+            <div style="display: flex; justify-content: center; margin: 30px 0; gap: 5px; align-items: center; font-family: sans-serif;">
+                
+                {% if libros.has_previous %}
+                    <a href="?page={{ libros.previous_page_number }}" style="text-decoration: none; font-weight: bold; color: #0066cc; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; margin-right: 5px;">&laquo;</a>
+                {% endif %}
 
-        {% for num in libros.paginator.get_elided_page_range|default:libros.paginator.page_range %}
-            {% if libros.number == num %}
-                <span style="padding: 8px 14px; background: #0066cc; color: white; border: 1px solid #0066cc; border-radius: 4px; font-weight: bold;">
-                    {{ num }}
-                </span>
-            {% elif num == libros.paginator.ELLIPSIS %}
-                <span style="padding: 8px 12px; color: #777;">{{ num }}</span>
-            {% else %}
-                <a href="?page={{ num }}" style="text-decoration: none; color: #0066cc; padding: 8px 14px; border: 1px solid #ddd; border-radius: 4px;">
-                    {{ num }}
-                </a>
-            {% endif %}
-        {% endfor %}
+                {% for num in rango_paginas %}
+                    {% if libros.number == num %}
+                        <span style="padding: 8px 14px; background: #0066cc; color: white; border: 1px solid #0066cc; border-radius: 4px; font-weight: bold;">
+                            {{ num }}
+                        </span>
+                    {% elif num == libros.paginator.ELLIPSIS %}
+                        <span style="padding: 8px 12px; color: #777;">{{ num }}</span>
+                    {% else %}
+                        <a href="?page={{ num }}" style="text-decoration: none; color: #0066cc; padding: 8px 14px; border: 1px solid #ddd; border-radius: 4px;">
+                            {{ num }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
 
-        {% if libros.has_next %}
-            <a href="?page={{ libros.next_page_number }}" style="text-decoration: none; font-weight: bold; color: #0066cc; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; margin-left: 5px;">&raquo;</a>
-        {% endif %}
+                {% if libros.has_next %}
+                    <a href="?page={{ libros.next_page_number }}" style="text-decoration: none; font-weight: bold; color: #0066cc; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; margin-left: 5px;">&raquo;</a>
+                {% endif %}
 
-    </div>
-{% endif %}       
+            </div>
+        {% endif %}       
     </main>
 </div>
 {% endblock %}
