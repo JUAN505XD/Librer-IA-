@@ -198,7 +198,12 @@ class LoginForm(forms.Form):
 class PreferenciasForm(forms.ModelForm):
     class Meta:
         model = Preferencias
-        fields = ["generos", "autores"]
+        fields = [
+            "generos",
+            "autores",
+            "recibir_noticias"
+        ]
+
         widgets = {
             "generos": forms.CheckboxSelectMultiple(),
             "autores": forms.CheckboxSelectMultiple(),

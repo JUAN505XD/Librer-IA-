@@ -130,3 +130,8 @@ class Preferencias(models.Model):
 
     generos = models.ManyToManyField(Genero, blank=True)
     autores = models.ManyToManyField(Autor, blank=True)
+
+    recibir_noticias = models.BooleanField(
+        default=False,
+        verbose_name="Recibir noticias y novedades"
+    )
