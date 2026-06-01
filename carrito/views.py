@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db import transaction
 from django.utils import timezone
+from django.http import JsonResponse
 from libros.models import Libro
 from .models import Carrito, ItemCarrito
 
@@ -15,7 +16,8 @@ def agregar_al_carrito(request, libro_id):
     libro = get_object_or_404(Libro, id=libro_id)
 
     if libro.stock <= 0:
-        messages.error(request, f"El libro '{libro.titulo}' está agotado.")
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'error', 'message': f"El libro '{libro.titulo}' está agotado."})
         return redirect('inicio')
 
     carrito, created = Carrito.objects.get_or_create(
@@ -32,7 +34,8 @@ def agregar_al_carrito(request, libro_id):
 
     total_en_carrito = sum(item.cantidad for item in carrito.items.all())
     if total_en_carrito >= 5:
-        messages.warning(request, "Máximo 5 libros en total por carrito.")
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'warning', 'message': "Máximo 5 libros en total por carrito."})
         return redirect('ver_carrito')
 
     item, item_created = ItemCarrito.objects.get_or_create(
@@ -42,7 +45,8 @@ def agregar_al_carrito(request, libro_id):
     )
 
     if item.cantidad >= 3:
-        messages.warning(request, "Máximo 3 copias del mismo libro.")
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'warning', 'message': "Máximo 3 copias del mismo libro."})
         return redirect('ver_carrito')
 
     with transaction.atomic():
@@ -57,6 +61,14 @@ def agregar_al_carrito(request, libro_id):
         # Esto le regala al usuario tiempo extra para TODO su carrito.
         carrito.fecha_pago = timezone.now()  # Usamos un campo de fecha disponible o el que guarde la interacción
         carrito.save()
+    
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        nuevo_total = sum(i.cantidad for i in carrito.items.all())
+        return JsonResponse({
+            'status': 'success',
+            'message': f"Agregado: {libro.titulo}",
+            'nuevo_total': nuevo_total
+            })
 
     messages.success(request, f"Agregado: {libro.titulo}")
     return redirect('ver_carrito')
