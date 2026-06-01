@@ -263,5 +263,26 @@ main {
     © 2026 Librer_IA
 </div>
 
+{% if segundos_restantes_global > 0 %}
+<script>
+    (function() {
+        let tiempoRestanteGlobal = {{ segundos_restantes_global }};
+
+        const cronometroGlobal = setInterval(function() {
+            tiempoRestanteGlobal--;
+
+            if (tiempoRestanteGlobal <= 0) {
+                clearInterval(cronometroGlobal);
+                
+                // 🚨 Alerta universal: Saltará esté donde esté el usuario
+                alert("⚠️ ¡Tu tiempo de reserva ha expirado! Los libros de tu carrito han sido devueltos al stock disponible por inactividad.");
+                
+                // Redireccionamos al inicio o recargamos la página actual para actualizar el inventario visualmente
+                window.location.href = "{% url 'inicio' %}";
+            }
+        }, 1000);
+    })();
+</script>
+{% endif %}
 </body>
 </html>

@@ -7,6 +7,9 @@ from django.utils import timezone
 from libros.models import Libro
 from .models import Carrito, ItemCarrito
 
+# ⏱️ CONFIGURACIÓN UNIVERSAL: Cambia a 1440 cuando pases a producción (24 horas)
+MINUTOS_EXPIRACION = 1  
+
 @login_required
 def agregar_al_carrito(request, libro_id):
     libro = get_object_or_404(Libro, id=libro_id)
@@ -20,8 +23,12 @@ def agregar_al_carrito(request, libro_id):
         estado='ACTIVO'
     )
 
-    # 🛡️ Limpiar expirados antes de evaluar totales
+    # 🛡️ Ejecutar limpieza previa antes de validar topes
     limpiar_items_expirados(carrito)
+
+    # Si el carrito se auto-eliminó por vencimiento justo antes, lo recreamos
+    if carrito.id and not Carrito.objects.filter(id=carrito.id).exists():
+        carrito = Carrito.objects.create(usuario=request.user, estado='ACTIVO')
 
     total_en_carrito = sum(item.cantidad for item in carrito.items.all())
     if total_en_carrito >= 5:
@@ -44,6 +51,12 @@ def agregar_al_carrito(request, libro_id):
 
         item.cantidad += 1
         item.save()
+        
+        # 🔥 RENOVAR EL TEMPORIZADOR UNIVERSAL:
+        # Cada vez que agregamos un libro, actualizamos la fecha del carrito a "ahora mismo"
+        # Esto le regala al usuario tiempo extra para TODO su carrito.
+        carrito.fecha_pago = timezone.now()  # Usamos un campo de fecha disponible o el que guarde la interacción
+        carrito.save()
 
     messages.success(request, f"Agregado: {libro.titulo}")
     return redirect('ver_carrito')
@@ -51,17 +64,34 @@ def agregar_al_carrito(request, libro_id):
 @login_required
 def ver_carrito(request):
     carrito = Carrito.objects.filter(usuario=request.user, estado='ACTIVO').first()
+    segundos_restantes_global = 0
 
     if carrito:
-        # 🛡️ Limpiar items expirados
         limpiar_items_expirados(carrito)
+        
+        # Volvemos a verificar si sobrevivió a la limpieza
+        carrito = Carrito.objects.filter(usuario=request.user, estado='ACTIVO').first()
+        
+        if carrito and carrito.items.exists():
+            # 🔄 Si no tiene una fecha base de interacción inicial, se la asignamos
+            if not carrito.fecha_pago:
+                carrito.fecha_pago = carrito.items.first().creado_en
+                carrito.save()
 
-        # Si después de limpiar ya no quedan elementos
-        if not carrito.items.exists():
+            ahora = timezone.now()
+            # El tiempo límite universal se calcula desde la última interacción general del carrito
+            limite_tiempo = carrito.fecha_pago + timedelta(minutes=MINUTOS_EXPIRACION)
+            segundos_restantes_global = int((limite_tiempo - ahora).total_seconds())
+            
+            if segundos_restantes_global < 0:
+                segundos_restantes_global = 0
+        else:
             carrito = None
-            messages.info(request, "Tu tiempo de reserva expiró y el carrito está vacío.")
 
-    return render(request, 'ver_carrito.html', {'carrito': carrito})
+    return render(request, 'ver_carrito.html', {
+        'carrito': carrito,
+        'segundos_restantes_global': segundos_restantes_global
+    })
 
 @login_required
 def pagar_carrito(request):
@@ -71,18 +101,15 @@ def pagar_carrito(request):
         messages.error(request, "No tienes un carrito activo.")
         return redirect('ver_carrito')
 
-    # 🛡️ ¡EL FILTRO DE SEGURIDAD CLAVE!
-    # Corremos la limpieza JUSTO ANTES de procesar el pago por si el tiempo venció en pantalla
     limpiar_items_expirados(carrito)
 
-    # Si tras la limpieza el carrito se quedó sin productos, detenemos la transacción
     if not carrito.items.exists():
-        messages.error(request, "Tu reserva expiró por inactividad. No se pudo procesar el pago.")
+        messages.error(request, "Tu tiempo de reserva universal expiró. El carrito fue liberado.")
         return redirect('ver_carrito')
 
     with transaction.atomic():
         carrito.estado = 'PAGADO'
-        carrito.fecha_pago = timezone.now()
+        carrito.fecha_pago = timezone.now() # Fecha definitiva de compra
         carrito.save()
         
     messages.success(request, "¡Compra exitosa! Gracias por tu confianza.")
@@ -107,7 +134,7 @@ def vaciar_carrito(request):
             carrito.estado = 'CANCELADO'
             carrito.save()
 
-        messages.info(request, "Carrito vaciado correctamente. Los libros volvieron al inventario.")
+        messages.info(request, "Carrito vaciado correctamente.")
     else:
         messages.error(request, "No hay carrito activo para vaciar.")
 
@@ -115,35 +142,43 @@ def vaciar_carrito(request):
 
 
 def limpiar_items_expirados(carrito):
+    if not carrito.items.exists():
+        return
+
+    # Si no tiene fecha de última interacción, usamos la de su primer artículo
+    if not carrito.fecha_pago:
+        carrito.fecha_pago = carrito.items.first().creado_en
+        carrito.save()
+
     ahora = timezone.now()
 
-    with transaction.atomic():
-        for item in carrito.items.all():
-            # ⏱️ Mantengo 1 minuto para tus pruebas actuales
-            if ahora > item.creado_en + timedelta(minutes=1):
-                
+    # ⏱️ VALIDACIÓN UNIVERSAL: Compara el carrito completo
+    if ahora > carrito.fecha_pago + timedelta(minutes=MINUTOS_EXPIRACION):
+        with transaction.atomic():
+            for item in carrito.items.all():
                 libro = item.libro
                 libro.stock += item.cantidad
                 libro.save()
-
                 item.delete()
+            
+            # Cambiamos el estado para romper el ciclo activo
+            carrito.estado = 'CANCELADO'
+            carrito.save()
 
 @login_required
 def sumar_item(request, item_id):
     item = get_object_or_404(ItemCarrito, id=item_id, carrito__usuario=request.user)
     carrito = item.carrito
     
-    # 🛡️ Validar que el ítem que intenta alterar no haya expirado justo antes del clic
     limpiar_items_expirados(carrito)
     
-    # Si el ítem ya no existe en la base de datos tras la limpieza:
     if not ItemCarrito.objects.filter(id=item_id).exists():
-        messages.error(request, "El tiempo de reserva de este artículo caducó.")
+        messages.error(request, "La reserva de este artículo caducó.")
         return redirect('ver_carrito')
 
     libro = item.libro
     if libro.stock <= 0:
-        messages.error(request, "No hay más stock disponible en bodega.")
+        messages.error(request, "No hay más stock disponible.")
         return redirect('ver_carrito')
 
     with transaction.atomic():
@@ -152,6 +187,10 @@ def sumar_item(request, item_id):
 
         item.cantidad += 1
         item.save()
+        
+        # 🔄 Renovación del tiempo al modificar cantidades
+        carrito.fecha_pago = timezone.now()
+        carrito.save()
 
     return redirect('ver_carrito')
 
@@ -161,11 +200,10 @@ def restar_item(request, item_id):
     item = get_object_or_404(ItemCarrito, id=item_id, carrito__usuario=request.user)
     carrito = item.carrito
     
-    # 🛡️ Limpieza previa por consistencia de tiempos
     limpiar_items_expirados(carrito)
     
     if not ItemCarrito.objects.filter(id=item_id).exists():
-        messages.error(request, "El tiempo de reserva caducó.")
+        messages.error(request, "La reserva caducó.")
         return redirect('ver_carrito')
 
     libro = item.libro
@@ -179,5 +217,9 @@ def restar_item(request, item_id):
             item.save()
         else:
             item.delete()
+            
+        # 🔄 Renovación del tiempo al modificar cantidades
+        carrito.fecha_pago = timezone.now()
+        carrito.save()
 
     return redirect('ver_carrito')

@@ -17,6 +17,10 @@
         <br>
 
         {% if carrito and carrito.items.all %}
+            
+            <div id="banner-timer" style="background: #fff3cd; color: #856404; padding: 12px; border-radius: 6px; margin-bottom: 20px; text-align: center; font-weight: bold; border: 1px solid #ffeeba;">
+                ⏳ Tu carrito vencerá en: <span id="reloj-cuenta-regresiva" style="color: #dc3545; font-size: 1.15em;">--:--:--</span>
+            </div>
 
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
 
@@ -37,7 +41,6 @@
                             {{ item.libro.titulo }}
                         </td>
 
-                        <!-- 🔥 CONTROLES +/- -->
                         <td style="padding: 10px; text-align: center;">
 
                             <a href="{% url 'restar_item' item.id %}"
@@ -103,7 +106,44 @@
 
             </div>
 
-        {% else %}
+             <script>
+    let segundosRestantes = parseInt("{{ segundos_restantes_global }}", 10) || 0;
+    const displayReloj = document.getElementById('reloj-cuenta-regresiva');
+
+    if (displayReloj) {
+        if (segundosRestantes <= 0) {
+            displayReloj.textContent = "00:00:00";
+        } else {
+            function renderizarTiempo() {
+                let horas = Math.floor(segundosRestantes / 3600);
+                let minutos = Math.floor((segundosRestantes % 3600) / 60);
+                let segundos = segundosRestantes % 60;
+
+                // ✨ CORREGIDO: Todas las variables unificadas en español
+                horas = horas < 10 ? '0' + horas : horas;
+                minutos = minutos < 10 ? '0' + minutos : minutos;
+                segundos = segundos < 10 ? '0' + segundos : segundos;
+
+                displayReloj.textContent = `${horas}:${minutos}:${segundos}`;
+            }
+
+            // Primera ejecución inmediata para quitar el --:--:--
+            renderizarTiempo();
+
+            // Iniciar el segundero
+            const intervaloId = setInterval(function() {
+                segundosRestantes--;
+                if (segundosRestantes >= 0) {
+                    renderizarTiempo();
+                } else {
+                    clearInterval(intervaloId);
+                    displayReloj.textContent = "00:00:00";
+                }
+            }, 1000);
+        }
+    }
+</script> 
+{% else %}
             <div style="text-align: center; padding: 40px;">
                 <p>El carrito está vacío.</p>
                 <a href="{% url 'inicio' %}" style="color: #0066cc; text-decoration: underline;">Ir al catálogo</a>
