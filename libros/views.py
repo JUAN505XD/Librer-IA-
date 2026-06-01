@@ -4,6 +4,8 @@ from carrito.models import Carrito
 from carrito.views import limpiar_items_expirados
 from .Forms import LibroForm
 from libros.models import Libro, Autor, Genero, Idioma
+from users.models import Preferencias
+from django.db.models import Q
 
 def crear_libro(request):
 
@@ -23,22 +25,70 @@ def crear_libro(request):
 
 
 def inicio(request):
+
+    mostrar_noticias = False
+
+    nuevos_lanzamientos = []
+    libros_autores = []
+    libros_generos = []
+
     if request.user.is_authenticated:
-        carrito = Carrito.objects.filter(usuario=request.user, estado='ACTIVO').first()
+
+        carrito = Carrito.objects.filter(
+            usuario=request.user,
+            estado='ACTIVO'
+        ).first()
+
         if carrito:
             limpiar_items_expirados(carrito)
 
+        preferencias = Preferencias.objects.filter(
+            usuario=request.user
+        ).first()
+
+        if preferencias:
+
+            mostrar_noticias = preferencias.recibir_noticias
+
+            # 📚 Últimos libros registrados
+            nuevos_lanzamientos = Libro.objects.order_by('-id')[:3]
+
+            # ✍️ Libros de autores favoritos
+            autores = preferencias.autores.all()
+
+            if autores.exists():
+                libros_autores = (
+                    Libro.objects
+                    .filter(autores__in=autores)
+                    .distinct()
+                    .order_by('-id')[:3]
+                )
+
+            # 📖 Libros de géneros favoritos
+            generos = preferencias.generos.all()
+
+            if generos.exists():
+                libros_generos = (
+                    Libro.objects
+                    .filter(genero__in=generos)
+                    .distinct()
+                    .order_by('-id')[:3]
+                )
+
     libros = Libro.objects.all().order_by('-id')
 
-
-    paginator = Paginator(libros,12)
-    numero_pagina= request.GET.get('page')
-    libros_paginados=paginator.get_page(numero_pagina)
+    paginator = Paginator(libros, 12)
+    numero_pagina = request.GET.get('page')
+    libros_paginados = paginator.get_page(numero_pagina)
 
     return render(request, "inicio.html", {
-        "libros": libros_paginados
-    })
+        "libros": libros_paginados,
+        "mostrar_noticias": mostrar_noticias,
 
+        "nuevos_lanzamientos": nuevos_lanzamientos,
+        "libros_autores": libros_autores,
+        "libros_generos": libros_generos,
+    })
 
 
 def buscar_libros(request):
@@ -48,12 +98,12 @@ def buscar_libros(request):
     # 🔎 BÚSQUEDA POR TEXTO
     query = request.GET.get("q")
     if query:
-        libros = libros.filter(titulo__icontains=query)
+        libros = libros.filter(autores__id=autor)
 
     # 🎯 FILTROS
     autor = request.GET.get("autor")
     if autor:
-        libros = libros.filter(autor_id=autor)
+        libros = libros.filter(autores__id=autor)
 
     genero = request.GET.get("genero")
     if genero:

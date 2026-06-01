@@ -4,6 +4,56 @@
 {% block content %}
 
 <style>
+
+.preferencias-doble {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 25px;
+}
+
+.preferencias-doble .seccion {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.preferencias-doble ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.preferencias-doble li {
+    margin-bottom: 6px;
+}
+
+@media (max-width: 768px) {
+    .preferencias-doble {
+        flex-direction: column;
+    }
+}
+.opciones-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px 15px;
+}
+
+.opciones-grid label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+@media (max-width: 768px) {
+    .opciones-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .opciones-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .preferencias-container {
     background: white;
     border-radius: 15px;
@@ -76,17 +126,34 @@ select {
     <form method="post">
         {% csrf_token %}
 
-        <!-- 📚 GÉNEROS -->
-        <div class="seccion">
-            <h4>Géneros favoritos</h4>
-            {{ form.generos }}
-        </div>
+       <div class="preferencias-doble">
 
-        <!-- ✍️ AUTORES -->
-        <div class="seccion">
-            <h4>Autores favoritos</h4>
-            {{ form.autores }}
-        </div>
+    <div class="seccion">
+        <h4>Géneros favoritos</h4>
+        {{ form.generos }}
+    </div>
+
+    <div class="seccion">
+        <h4>Autores favoritos</h4>
+        {{ form.autores }}
+    </div>
+
+</div>
+
+        <!-- 📰 NOTICIAS -->
+<div class="seccion">
+    <h4>Noticias y novedades</h4>
+
+    <label style="
+        display:flex;
+        align-items:center;
+        gap:10px;
+        cursor:pointer;
+    ">
+        {{ form.recibir_noticias }}
+        Deseo recibir noticias literarias y novedades de Librer_IA
+    </label>
+</div>
 
         <!-- BOTONES -->
         <button type="submit" class="btn-guardar">
