@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import authenticate, login, logout
-from .Forms import EditarAdminForm, EditarclienteForm, RegistroAdminForm, RegistroClienteForm, LoginForm, PreferenciasForm, CustomPasswordChangeForm
-from .models import Administrador, Administrador, Preferencias, Persona, Cliente, Usuario, Usuario
+from .Forms import EditarAdminForm, EditarclienteForm, RegistroAdminForm, RegistroClienteForm, LoginForm, PreferenciasForm, CustomPasswordChangeForm, TarjetaForm
+from .models import Administrador, Administrador, Preferencias, Persona, Cliente, Usuario, Usuario, Tarjeta
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
@@ -308,3 +308,37 @@ def eliminar_cuenta(request):
         return redirect("inicio")
 
     return render(request, "eliminar_cuenta.html")
+
+@login_required
+def registrar_tarjeta(request):
+
+    if request.user.rol != "CLIENTE":
+        return redirect("inicio")
+
+    if request.method == "POST":
+
+        form = TarjetaForm(request.POST)
+
+        if form.is_valid():
+
+            tarjeta = form.save(commit=False)
+            tarjeta.usuario = request.user
+            tarjeta.save()
+
+            return redirect("ver_carrito")
+
+    else:
+        form = TarjetaForm()
+
+    return render(request, "registrar_tarjeta.html", {
+        "form": form
+    })
+
+@login_required
+def ver_tarjetas(request):
+
+    tarjetas = Tarjeta.objects.filter(usuario=request.user)
+
+    return render(request, "ver_tarjetas.html", {
+        "tarjetas": tarjetas
+    })

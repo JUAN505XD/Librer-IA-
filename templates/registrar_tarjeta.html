@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+
+.container {
+    background: white;
+    border-radius: 15px;
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.col {
+    flex: 1;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.btn {
+    background: #0066cc;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    width: 100%;
+    cursor: pointer;
+}
+
+.error-box {
+    background: #ffe6e6;
+    color: #cc0000;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 5px;
+    font-size: 14px;
+    text-align: center;
+    font-weight: bold;
+}
+
+</style>
+
+<div class="container">
+
+    <h2 style="text-align:center;">Registrar Tarjeta</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- NUMERO -->
+        <div class="row">
+            <div class="col">
+                <label>Número de tarjeta</label>
+                {{ form.numero }}
+                {% if form.numero.errors %}
+                    <div class="error-box">{{ form.numero.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- TITULAR -->
+        <div class="row">
+            <div class="col">
+                <label>Titular</label>
+                {{ form.titular }}
+                {% if form.titular.errors %}
+                    <div class="error-box">{{ form.titular.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- FECHA REAL TIPO TARJETA -->
+        <div class="row">
+
+            <div class="col">
+                <label>Mes</label>
+                {{ form.mes_vencimiento }}
+                {% if form.mes_vencimiento.errors %}
+                    <div class="error-box">{{ form.mes_vencimiento.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="col">
+                <label>Año</label>
+                {{ form.año_vencimiento }}
+                {% if form.año_vencimiento.errors %}
+                    <div class="error-box">{{ form.año_vencimiento.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- CVV -->
+        <div class="row">
+            <div class="col">
+                <label>CVV</label>
+                {{ form.cvv }}
+                {% if form.cvv.errors %}
+                    <div class="error-box">{{ form.cvv.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+        <div class="col">
+            <label>Saldo inicial</label>
+            {{ form.saldo }}
+            {% if form.saldo.errors %}
+                <div class="error-box">{{ form.saldo.errors.0 }}</div>
+            {% endif %}
+        </div>
+        </div>
+
+        <button type="submit" class="btn">
+            Guardar Tarjeta
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Mis Tarjetas{% endblock %}
+
+{% block content %}
+<div class="main-container">
+
+    <aside>
+        <h2>Mis tarjetas</h2>
+        <a href="{% url 'agregar_tarjeta' %}" style="color:#0066cc;">
+            + Agregar nueva tarjeta
+        </a>
+    </aside>
+
+    <main>
+
+        <h2>Tarjetas registradas</h2>
+
+        {% if tarjetas %}
+
+            {% for t in tarjetas %}
+                <div style="border:1px solid #ddd;padding:15px;margin-bottom:15px;border-radius:8px;background:white;">
+
+                    <h3>{{ t.titular }}</h3>
+                    <p><strong>Número:</strong> **** **** **** {{ t.numero|slice:"-4:" }}</p>
+                    <p><strong>Vence:</strong> {{ t.fecha_vencimiento }}</p>
+                    <p><strong>Saldo:</strong> ${{ t.saldo }}</p>
+
+                    {% if t.activa %}
+                        <span style="color:green;">Activa</span>
+                    {% else %}
+                        <span style="color:red;">Inactiva</span>
+                    {% endif %}
+
+                </div>
+            {% endfor %}
+
+        {% else %}
+            <p>No tienes tarjetas registradas.</p>
+        {% endif %}
+
+    </main>
+
+</div>
+{% endblock %}

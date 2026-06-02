@@ -13,4 +13,6 @@ urlpatterns = [
     path("crear-admin/", views.crear_admin, name="crear_admin"),
     path("eliminar-admin/", views.eliminar_admin, name="eliminar_admin"),
     path("eliminar-cuenta/", views.eliminar_cuenta, name="eliminar_cuenta"),
+    path("tarjetas/", views.ver_tarjetas, name="ver_tarjetas"),
+    path("tarjetas/agregar/", views.registrar_tarjeta, name="registrar_tarjeta"),
 ]

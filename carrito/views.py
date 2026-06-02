@@ -1,4 +1,5 @@
 from datetime import timedelta
+from decimal import Decimal
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -6,6 +7,7 @@ from django.db import transaction
 from django.utils import timezone
 from libros.models import Libro
 from .models import Carrito, ItemCarrito
+from users.models import Tarjeta
 
 @login_required
 def agregar_al_carrito(request, libro_id):
@@ -65,17 +67,48 @@ def ver_carrito(request):
 
 @login_required
 def pagar_carrito(request):
+
     carrito = Carrito.objects.filter(usuario=request.user, estado='ACTIVO').first()
 
     if not carrito or not carrito.items.exists():
+        messages.error(request, "No tienes productos en el carrito.")
         return redirect('ver_carrito')
 
-    carrito.estado = 'PAGADO'
-    carrito.fecha_pago = timezone.now()
-    carrito.save()
-    
-    messages.success(request, "¡Compra exitosa!")
-    return redirect('historial_compras')
+    tarjetas = Tarjeta.objects.filter(usuario=request.user, activa=True)
+
+    if request.method == "POST":
+
+        tarjeta_id = request.POST.get("tarjeta_id")
+        tarjeta = get_object_or_404(Tarjeta, id=tarjeta_id, usuario=request.user)
+
+        # 🔥 asegurar tipo Decimal
+        total = Decimal(str(carrito.get_total()))
+
+        # 🔥 VALIDACIÓN DE SALDO
+        if tarjeta.saldo < total:
+            messages.error(request, "Saldo insuficiente en la tarjeta.")
+            return redirect('ver_carrito')
+
+        with transaction.atomic():
+            if tarjeta.saldo - total < 0:
+                raise ValueError("Saldo negativo no permitido")
+
+            # 🔥 DESCONTAR SALDO
+            tarjeta.saldo = tarjeta.saldo - total
+            tarjeta.save()
+
+            # marcar carrito como pagado
+            carrito.estado = 'PAGADO'
+            carrito.fecha_pago = timezone.now()
+            carrito.save()
+
+        messages.success(request, "¡Compra realizada con éxito!")
+        return redirect('historial')
+
+    return render(request, "pagar_carrito.html", {
+        "carrito": carrito,
+        "tarjetas": tarjetas
+    })
 
 @login_required
 def historial_compras(request):
