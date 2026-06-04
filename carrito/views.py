@@ -169,10 +169,6 @@ def restar_item(request, item_id):
     
     limpiar_items_expirados(carrito)
     
-    if not ItemCarrito.objects.filter(id=item_id).exists():
-        messages.error(request, "La reserva caducó.")
-        return redirect('ver_carrito')
-
     libro = item.libro
 
     with transaction.atomic():
