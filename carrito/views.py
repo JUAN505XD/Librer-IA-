@@ -27,11 +27,7 @@ def agregar_al_carrito(request, libro_id):
 
     # 🛡️ Ejecutar limpieza previa antes de validar topes
     limpiar_items_expirados(carrito)
-
-    # Si el carrito se auto-eliminó por vencimiento justo antes, lo recreamos
-    if carrito.id and not Carrito.objects.filter(id=carrito.id).exists():
-        carrito = Carrito.objects.create(usuario=request.user, estado='ACTIVO')
-
+   
     total_en_carrito = sum(item.cantidad for item in carrito.items.all())
     if total_en_carrito >= 5:
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
