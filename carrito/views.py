@@ -59,7 +59,7 @@ def agregar_al_carrito(request, libro_id):
         # 🔥 RENOVAR EL TEMPORIZADOR UNIVERSAL:
         # Cada vez que agregamos un libro, actualizamos la fecha del carrito a "ahora mismo"
         # Esto le regala al usuario tiempo extra para TODO su carrito.
-        carrito.fecha_pago = timezone.now()  # Usamos un campo de fecha disponible o el que guarde la interacción
+        carrito.actualizado_en = timezone.now()  # Usamos un campo de fecha disponible o el que guarde la interacción
         carrito.save()
     
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -86,13 +86,13 @@ def ver_carrito(request):
         
         if carrito and carrito.items.exists():
             # 🔄 Si no tiene una fecha base de interacción inicial, se la asignamos
-            if not carrito.fecha_pago:
-                carrito.fecha_pago = carrito.items.first().creado_en
+            if not carrito.actualizado_en:
+                carrito.actualizado_en = carrito.items.first().creado_en
                 carrito.save()
 
             ahora = timezone.now()
             # El tiempo límite universal se calcula desde la última interacción general del carrito
-            limite_tiempo = carrito.fecha_pago + timedelta(minutes=MINUTOS_EXPIRACION)
+            limite_tiempo = carrito.actualizado_en + timedelta(minutes=MINUTOS_EXPIRACION)
             segundos_restantes_global = int((limite_tiempo - ahora).total_seconds())
             
             if segundos_restantes_global < 0:
@@ -158,14 +158,14 @@ def limpiar_items_expirados(carrito):
         return
 
     # Si no tiene fecha de última interacción, usamos la de su primer artículo
-    if not carrito.fecha_pago:
-        carrito.fecha_pago = carrito.items.first().creado_en
+    if not carrito.actualizado_en:
+        carrito.actualizado_en = carrito.items.first().creado_en
         carrito.save()
 
     ahora = timezone.now()
 
     # ⏱️ VALIDACIÓN UNIVERSAL: Compara el carrito completo
-    if ahora > carrito.fecha_pago + timedelta(minutes=MINUTOS_EXPIRACION):
+    if ahora > carrito.actualizado_en + timedelta(minutes=MINUTOS_EXPIRACION):
         with transaction.atomic():
             for item in carrito.items.all():
                 libro = item.libro
@@ -201,7 +201,7 @@ def sumar_item(request, item_id):
         item.save()
         
         # 🔄 Renovación del tiempo al modificar cantidades
-        carrito.fecha_pago = timezone.now()
+        carrito.actualizado_en = timezone.now()
         carrito.save()
 
     return redirect('ver_carrito')
@@ -231,7 +231,7 @@ def restar_item(request, item_id):
             item.delete()
             
         # 🔄 Renovación del tiempo al modificar cantidades
-        carrito.fecha_pago = timezone.now()
+        carrito.actualizado_en = timezone.now()
         carrito.save()
 
     return redirect('ver_carrito')
