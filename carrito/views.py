@@ -55,7 +55,6 @@ def agregar_al_carrito(request, libro_id):
         # 🔥 RENOVAR EL TEMPORIZADOR UNIVERSAL:
         # Cada vez que agregamos un libro, actualizamos la fecha del carrito a "ahora mismo"
         # Esto le regala al usuario tiempo extra para TODO su carrito.
-        carrito.actualizado_en = timezone.now()  # Usamos un campo de fecha disponible o el que guarde la interacción
         carrito.save()
     
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -192,7 +191,6 @@ def sumar_item(request, item_id):
         item.save()
         
         # 🔄 Renovación del tiempo al modificar cantidades
-        carrito.actualizado_en = timezone.now()
         carrito.save()
 
     return redirect('ver_carrito')
@@ -222,7 +220,6 @@ def restar_item(request, item_id):
             item.delete()
             
         # 🔄 Renovación del tiempo al modificar cantidades
-        carrito.actualizado_en = timezone.now()
         carrito.save()
 
     return redirect('ver_carrito')
