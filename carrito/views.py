@@ -80,12 +80,8 @@ def ver_carrito(request):
         carrito = Carrito.objects.filter(usuario=request.user, estado='ACTIVO').first()
         
         if carrito and carrito.items.exists():
-            # 🔄 Si no tiene una fecha base de interacción inicial, se la asignamos
-            if not carrito.actualizado_en:
-                carrito.actualizado_en = carrito.items.first().creado_en
-                carrito.save()
-
             ahora = timezone.now()
+
             # El tiempo límite universal se calcula desde la última interacción general del carrito
             limite_tiempo = carrito.actualizado_en + timedelta(minutes=MINUTOS_EXPIRACION)
             segundos_restantes_global = int((limite_tiempo - ahora).total_seconds())
