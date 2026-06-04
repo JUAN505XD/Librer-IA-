@@ -153,11 +153,6 @@ def limpiar_items_expirados(carrito):
     if not carrito.items.exists():
         return
 
-    # Si no tiene fecha de última interacción, usamos la de su primer artículo
-    if not carrito.actualizado_en:
-        carrito.actualizado_en = carrito.items.first().creado_en
-        carrito.save()
-
     ahora = timezone.now()
 
     # ⏱️ VALIDACIÓN UNIVERSAL: Compara el carrito completo
