@@ -16,9 +16,9 @@ def tiempo_carrito(request):
             
             # Volvemos a verificar si el carrito sobrevivió a la limpieza
             if carrito.id and Carrito.objects.filter(id=carrito.id, estado='ACTIVO').exists():
-                if carrito.items.exists() and carrito.fecha_pago:
+                if carrito.items.exists() and carrito.actualizado_en:
                     ahora = timezone.now()
-                    limite_tiempo = carrito.fecha_pago + timedelta(minutes=MINUTOS_EXPIRACION)
+                    limite_tiempo = carrito.actualizado_en + timedelta(minutes=MINUTOS_EXPIRACION)
                     segundos = int((limite_tiempo - ahora).total_seconds())
                     return {'segundos_restantes_global': max(0, segundos)}
                     
