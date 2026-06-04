@@ -27,22 +27,24 @@ def agregar_al_carrito(request, libro_id):
 
     # 🛡️ Ejecutar limpieza previa antes de validar topes
     limpiar_items_expirados(carrito)
-   
-    total_en_carrito = sum(item.cantidad for item in carrito.items.all())
-    if total_en_carrito >= 5:
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({'status': 'warning', 'message': "Máximo 5 libros en total por carrito."})
-        return redirect('ver_carrito')
-
+    
     item, item_created = ItemCarrito.objects.get_or_create(
         carrito=carrito,
         libro=libro,
         defaults={'precio_unitario': libro.precio, 'cantidad': 0}
     )
 
+    libros_diferentes = carrito.items.count()
+
+    if item_created and libros_diferentes  > 5:
+        item.delete()
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'warning', 'message': "Máximo 5 libros diferentes"})
+        return redirect('ver_carrito')
+
     if item.cantidad >= 3:
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({'status': 'warning', 'message': "Máximo 3 copias del mismo libro."})
+            return JsonResponse({'status': 'warning', 'message': "No se pueden agregar más de 3 copias por libro"})
         return redirect('ver_carrito')
 
     with transaction.atomic():
@@ -52,9 +54,6 @@ def agregar_al_carrito(request, libro_id):
         item.cantidad += 1
         item.save()
         
-        # 🔥 RENOVAR EL TEMPORIZADOR UNIVERSAL:
-        # Cada vez que agregamos un libro, actualizamos la fecha del carrito a "ahora mismo"
-        # Esto le regala al usuario tiempo extra para TODO su carrito.
         carrito.save()
     
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
