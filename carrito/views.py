@@ -70,29 +70,14 @@ def agregar_al_carrito(request, libro_id):
 @login_required
 def ver_carrito(request):
     carrito = Carrito.objects.filter(usuario=request.user, estado='ACTIVO').first()
-    segundos_restantes_global = 0
 
     if carrito:
         limpiar_items_expirados(carrito)
-        
-        # Volvemos a verificar si sobrevivió a la limpieza
-        carrito = Carrito.objects.filter(usuario=request.user, estado='ACTIVO').first()
-        
-        if carrito and carrito.items.exists():
-            ahora = timezone.now()
 
-            # El tiempo límite universal se calcula desde la última interacción general del carrito
-            limite_tiempo = carrito.actualizado_en + timedelta(minutes=MINUTOS_EXPIRACION)
-            segundos_restantes_global = int((limite_tiempo - ahora).total_seconds())
-            
-            if segundos_restantes_global < 0:
-                segundos_restantes_global = 0
-        else:
-            carrito = None
+        carrito = Carrito.objects.filter(usuario=request.user, estado='ACTIVO').first()
 
     return render(request, 'ver_carrito.html', {
         'carrito': carrito,
-        'segundos_restantes_global': segundos_restantes_global
     })
 
 @login_required
@@ -140,7 +125,7 @@ def vaciar_carrito(request):
     else:
         messages.error(request, "No hay carrito activo para vaciar.")
 
-    return redirect('inicio')
+    return redirect('ver_carrito')
 
 
 def limpiar_items_expirados(carrito):
