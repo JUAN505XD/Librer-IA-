@@ -163,35 +163,6 @@ def limpiar_items_expirados(carrito):
             carrito.save()
 
 @login_required
-def sumar_item(request, item_id):
-    item = get_object_or_404(ItemCarrito, id=item_id, carrito__usuario=request.user)
-    carrito = item.carrito
-    
-    limpiar_items_expirados(carrito)
-    
-    if not ItemCarrito.objects.filter(id=item_id).exists():
-        messages.error(request, "La reserva de este artículo caducó.")
-        return redirect('ver_carrito')
-
-    libro = item.libro
-    if libro.stock <= 0:
-        messages.error(request, "No hay más stock disponible.")
-        return redirect('ver_carrito')
-
-    with transaction.atomic():
-        libro.stock -= 1
-        libro.save()
-
-        item.cantidad += 1
-        item.save()
-        
-        # 🔄 Renovación del tiempo al modificar cantidades
-        carrito.save()
-
-    return redirect('ver_carrito')
-
-
-@login_required
 def restar_item(request, item_id):
     item = get_object_or_404(ItemCarrito, id=item_id, carrito__usuario=request.user)
     carrito = item.carrito
