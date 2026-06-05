@@ -144,6 +144,34 @@ main {
     font-size: 18px;
     font-weight: bold;
 }
+
+#toast-container {
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	z-index: 9999;
+}
+
+.toast {
+	background: white;
+	padding: 15px;
+	margin-bottom: 10px;
+	border-radius: 8px;
+	box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+
+.toast.success {
+	border-left: 5px solid green;
+}
+
+.toast.warning {
+	border-left: 5px solid orange;
+}
+
+.toast.error {
+	border-left: 5px solid red;
+}
+
 </style>
 
 </head>
@@ -260,6 +288,28 @@ main {
     © 2026 Librer_IA
 </div>
 
+<div id="toast-container"></div>
+
+<script>
+	function mostrarToast(mensaje,tipo = "success"){
+		const toast = document.createElement('div');
+
+		toast.classList.add('toast');
+		toast.classList.add(tipo);
+
+		toast.textContent = mensaje;
+
+
+		document.getElementById('toast-container').appendChild(toast);
+
+		setTimeout(() => {
+			toast.remove();
+		}, 3000);
+	}
+
+
+</script>
+
 {% if segundos_restantes_global > 0 %}
 <script>
     (function() {
@@ -270,9 +320,14 @@ main {
 
             if (tiempoRestanteGlobal <= 0) {
                 clearInterval(cronometroGlobal);
-                alert("⚠️ ¡Tu tiempo de reserva ha expirado! Los libros de tu carrito han sido devueltos al stock disponible por inactividad.");
-                window.location.href = "{% url 'inicio' %}";
-            }
+		mostrarToast(
+			"Tu reserva ha expirado",
+			"warning"
+		);
+		setTimeout(() => {
+			window.location.href = "{% url 'inicio' %}";
+		},3000);
+             }
         }, 1000);
     })();
 </script>
@@ -348,6 +403,8 @@ main {
                     return response.json();
                 })
                 .then(data => {
+
+                    mostrarToast(data.message,data.status);
                     if (data.status === 'success') {
                         // 1. Actualizar el globo del botón flotante
                         if (badge) {
@@ -363,11 +420,13 @@ main {
                             }
                         }
                         
-                        console.log(data.message);
                     }
                 })
                 .catch(error => {
-                    alert(error.message || "Hubo un problema al añadir el libro.");
+			mostrarToast(
+				error.message || "Ocurrió un error inesperado",
+				"error"
+				);
                 });
             });
         });
