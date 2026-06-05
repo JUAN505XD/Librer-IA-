@@ -135,3 +135,51 @@ class Preferencias(models.Model):
         default=False,
         verbose_name="Recibir noticias y novedades"
     )
+
+# =========================
+# TARJETAS DE CRÉDITO
+# =========================
+
+class Tarjeta(models.Model):
+
+    usuario = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+        related_name="tarjetas"
+    )
+
+    numero = models.CharField(
+        max_length=19,
+        unique=True
+    )
+
+    titular = models.CharField(
+        max_length=100
+    )
+
+    mes_vencimiento = models.PositiveSmallIntegerField()
+    año_vencimiento = models.PositiveSmallIntegerField()
+
+    cvv = models.CharField(
+        max_length=3
+    )
+
+    saldo = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0
+    )
+
+    activa = models.BooleanField(
+        default=True
+    )
+
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return f"{self.numero[-4:]}"
+
+    def numero_mostrado(self):
+        return f"**** **** **** {self.numero[-4:]}"

@@ -9,4 +9,5 @@ urlpatterns = [
     path('historial/', views.historial_compras, name='historial'),
     path('carrito/sumar/<int:item_id>/', views.sumar_item, name='sumar_item'),
     path('carrito/restar/<int:item_id>/', views.restar_item, name='restar_item'),
+    path('seguimiento/<int:carrito_id>/', views.seguimiento_pedido, name='seguimiento_pedido'),
 ]
