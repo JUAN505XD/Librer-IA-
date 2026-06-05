@@ -2,6 +2,7 @@ from django import forms
 from .models import Libro
 from django_select2 import forms as s2forms
 from datetime import date
+import re
 
 class LibroForm(forms.ModelForm):
 
@@ -94,3 +95,30 @@ class LibroForm(forms.ModelForm):
             raise forms.ValidationError("El año no debe ser mayor al actual")
 
         return año
+    
+    
+
+def validar_nombre_fuerte(nombre: str, tipo: str):
+
+    if not nombre:
+        raise ValueError(f"El {tipo} no puede estar vacío")
+
+    nombre = nombre.strip()
+
+    if len(nombre) < 3:
+        raise ValueError(f"El {tipo} es demasiado corto")
+
+    if nombre.isspace():
+        raise ValueError(f"El {tipo} no puede ser solo espacios")
+
+    # ❌ solo letras repetidas (aaaa, bbbb, etc.)
+    if re.fullmatch(r"(.)\1{2,}", nombre.replace(" ", "")):
+        raise ValueError(f"El {tipo} no es válido")
+
+    # ❌ exceso de repetición de palabras (aaa aaa)
+    palabras = nombre.lower().split()
+    if len(palabras) > 1:
+        if all(p == palabras[0] for p in palabras):
+            raise ValueError(f"El {tipo} no es válido")
+
+    return nombre

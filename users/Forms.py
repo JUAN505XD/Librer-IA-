@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm
-from .models import Usuario, Persona, Cliente, Preferencias, Administrador
+from .models import Usuario, Persona, Cliente, Preferencias, Administrador, Tarjeta
 from django_countries.fields import CountryField
 from datetime import date
 from email_validator import validate_email, EmailNotValidError
@@ -198,7 +198,12 @@ class LoginForm(forms.Form):
 class PreferenciasForm(forms.ModelForm):
     class Meta:
         model = Preferencias
-        fields = ["generos", "autores"]
+        fields = [
+            "generos",
+            "autores",
+            "recibir_noticias"
+        ]
+
         widgets = {
             "generos": forms.CheckboxSelectMultiple(),
             "autores": forms.CheckboxSelectMultiple(),
@@ -279,3 +284,138 @@ class CustomPasswordChangeForm(PasswordChangeForm):
 
         return p2
 # esto es para el nuevo commit de juan
+class TarjetaForm(forms.ModelForm):
+
+    class Meta:
+        model = Tarjeta
+        fields = [
+            "numero",
+            "titular",
+            "mes_vencimiento",
+            "año_vencimiento",
+            "cvv",
+            "saldo"
+        ]
+
+        widgets = {
+            "numero": forms.TextInput(attrs={
+                "placeholder": "1234567812345678",
+                "maxlength": "16"
+            }),
+            "mes_vencimiento": forms.NumberInput(attrs={
+                "placeholder": "MM"
+            }),
+            "año_vencimiento": forms.NumberInput(attrs={
+                "min": date.today().year,
+                "placeholder": "YYYY"
+            }),
+
+            "titular": forms.TextInput(attrs={
+                "placeholder": "Nombre del titular"
+            }),
+
+            "cvv": forms.PasswordInput(attrs={
+                "maxlength": "3"
+            }),
+            "saldo": forms.NumberInput(attrs={
+                "placeholder": "0.00"
+            })
+        }
+
+    def clean_numero(self):
+        numero = self.cleaned_data["numero"]
+
+        if not numero.isdigit():
+            raise forms.ValidationError(
+                "La tarjeta solo puede contener números"
+            )
+
+        if len(numero) != 16:
+            raise forms.ValidationError(
+                "La tarjeta debe tener 16 dígitos"
+            )
+
+        if Tarjeta.objects.filter(numero=numero).exists():
+            raise forms.ValidationError(
+                "Esta tarjeta ya está registrada"
+            )
+
+        return numero
+
+    def clean_cvv(self):
+        cvv = self.cleaned_data["cvv"]
+
+        if not cvv.isdigit():
+            raise forms.ValidationError(
+                "CVV inválido"
+            )
+
+        if len(cvv) != 3:
+            raise forms.ValidationError(
+                "El CVV debe tener 3 dígitos"
+            )
+
+        return cvv
+
+    from datetime import date
+
+     # 🔥 MES
+    def clean_mes_vencimiento(self):
+        mes = self.cleaned_data.get("mes_vencimiento")
+
+        if mes < 1 or mes > 12:
+            raise forms.ValidationError("El mes debe estar entre 1 y 12")
+
+        return mes
+
+    # 🔥 AÑO
+    def clean_año_vencimiento(self):
+        año = self.cleaned_data.get("año_vencimiento")
+
+        año_actual = date.today().year
+
+        if año < año_actual:
+            raise forms.ValidationError("La tarjeta está vencida")
+
+        return año
+
+    # 🔥 VALIDACIÓN COMPLETA (IMPORTANTE)
+    def clean(self):
+        cleaned_data = super().clean()
+
+        mes = cleaned_data.get("mes_vencimiento")
+        año = cleaned_data.get("año_vencimiento")
+
+        if mes and año:
+            hoy = date.today()
+
+            if año == hoy.year and mes < hoy.month:
+                raise forms.ValidationError("La tarjeta ya expiró")
+
+        return cleaned_data
+
+    def clean_titular(self):
+        titular = self.cleaned_data["titular"].strip()
+
+        if len(titular) < 5:
+            raise forms.ValidationError(
+                "Nombre del titular inválido"
+            )
+
+        return titular
+    
+    def clean_saldo(self):
+        saldo = self.cleaned_data.get("saldo")
+
+        if saldo is None:
+            raise forms.ValidationError("El saldo es obligatorio")
+
+        if saldo < 50000:
+            raise forms.ValidationError("El saldo mínimo es 50.000")
+
+        if saldo > 10_000_000:
+            raise forms.ValidationError("El saldo máximo permitido es 10 millones")
+
+        return saldo
+    
+    

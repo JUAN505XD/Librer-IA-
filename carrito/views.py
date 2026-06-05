@@ -1,4 +1,5 @@
 from datetime import timedelta
+from decimal import Decimal
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -7,6 +8,7 @@ from django.utils import timezone
 from django.http import JsonResponse
 from libros.models import Libro
 from .models import Carrito, ItemCarrito
+from users.models import Tarjeta
 
 # ⏱️ CONFIGURACIÓN UNIVERSAL: Cambia a 1440 cuando pases a producción (24 horas)
 SEGUNDOS_EXPIRACION = 50
@@ -82,25 +84,52 @@ def ver_carrito(request):
 
 @login_required
 def pagar_carrito(request):
+
     carrito = Carrito.objects.filter(usuario=request.user, estado='ACTIVO').first()
 
-    if not carrito:
-        messages.error(request, "No tienes un carrito activo.")
+    if not carrito or not carrito.items.exists():
+        messages.error(request, "No tienes productos en el carrito.")
         return redirect('ver_carrito')
 
-    limpiar_items_expirados(carrito)
+    tarjetas = Tarjeta.objects.filter(usuario=request.user, activa=True)
 
-    if not carrito.items.exists():
-        messages.error(request, "Tu tiempo de reserva universal expiró. El carrito fue liberado.")
-        return redirect('ver_carrito')
+    if request.method == "POST":
 
-    with transaction.atomic():
-        carrito.estado = 'PAGADO'
-        carrito.fecha_pago = timezone.now() # Fecha definitiva de compra
-        carrito.save()
-        
-    messages.success(request, "¡Compra exitosa! Gracias por tu confianza.")
-    return redirect('historial')
+        tarjeta_id = request.POST.get("tarjeta_id")
+        tarjeta = get_object_or_404(Tarjeta, id=tarjeta_id, usuario=request.user)
+
+        # 🔥 asegurar tipo Decimal
+        total = Decimal(str(carrito.get_total()))
+
+        # 🔥 VALIDACIÓN DE SALDO
+        if tarjeta.saldo < total:
+            messages.error(request, "Saldo insuficiente en la tarjeta.")
+            return redirect('ver_carrito')
+
+        with transaction.atomic():
+            if tarjeta.saldo - total < 0:
+                raise ValueError("Saldo negativo no permitido")
+
+            # 🔥 DESCONTAR SALDO
+            tarjeta.saldo = tarjeta.saldo - total
+            tarjeta.save()
+
+            # marcar carrito como pagado
+            carrito.estado = 'PAGADO'
+            carrito.fecha_pago = timezone.now()
+            carrito.save()
+
+        messages.success(request, "¡Compra realizada con éxito!")
+
+        return redirect(
+            'seguimiento_pedido',
+            carrito_id=carrito.id
+        )
+
+    return render(request, "pagar_carrito.html", {
+        "carrito": carrito,
+        "tarjetas": tarjetas
+    })
 
 @login_required
 def historial_compras(request):
@@ -170,3 +199,51 @@ def restar_item(request, item_id):
         carrito.save()
 
     return redirect('ver_carrito')
+
+@login_required
+def seguimiento_pedido(request, carrito_id):
+
+    compra = get_object_or_404(
+        Carrito,
+        id=carrito_id,
+        usuario=request.user,
+        estado="PAGADO"
+    )
+
+    minutos = (
+        timezone.now() - compra.fecha_pago
+    ).total_seconds() / 60
+
+    if minutos < 1:
+        estado = "📦 Preparando pedido"
+        progreso = 25
+        paso = 1
+
+    elif minutos < 2:
+        estado = "🚚 Pedido despachado"
+        progreso = 50
+        paso = 2
+
+    elif minutos < 3:
+        estado = "🛣️ En camino"
+        progreso = 75
+        paso = 3
+
+    else:
+        estado = "✅ Entregado"
+        progreso = 100
+        paso = 4
+
+    fecha_entrega = compra.fecha_pago + timedelta(minutes=3)
+
+    return render(
+        request,
+        "seguimiento_pedido.html",
+        {
+            "compra": compra,
+            "estado": estado,
+            "progreso": progreso,
+            "paso": paso,
+            "fecha_entrega": fecha_entrega,
+        }
+    )

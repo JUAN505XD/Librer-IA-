@@ -91,6 +91,41 @@
     text-align: center;
 }
 
+.noticia-libro {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.noticia-portada {
+    width: 60px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.noticia-info {
+    flex: 1;
+}
+
+.noticia-info h5 {
+    margin: 0;
+    color: #004080;
+    font-size: 14px;
+}
+
+.noticia-info p {
+    margin: 2px 0;
+    font-size: 12px;
+}
+
+.noticia-link {
+    text-decoration: none;
+    color: inherit;
+}
+
 @media (max-width: 768px) {
     .catalogo-grid {
         grid-template-columns: repeat(1, 1fr);
@@ -101,11 +136,165 @@
 <div class="main-container">
 
     <aside>
-        <h2>Novedades</h2>
-        <img src="{% static 'assets/imagenes/nicolas.jpg' %}" width="100%" style="margin-bottom:10px; border-radius:5px;">
-        <img src="{% static 'assets/imagenes/Logo.png' %}" width="100%" style="border-radius:5px;">
-        <p style="text-align:center; margin-top:5px;">Promociones del mes</p>
-    </aside>
+
+    {% if mostrar_noticias %}
+
+        <h2>📰 Noticias Literarias</h2>
+
+<!-- NUEVOS LANZAMIENTOS -->
+<div style="background:white;padding:10px;border-radius:8px;margin-bottom:15px;">
+
+    <h4 style="color:#004080;">Nuevos lanzamientos</h4>
+
+    {% for libro in nuevos_lanzamientos %}
+
+<a href="{% url 'detalle_libro' libro.id %}" class="noticia-link">
+
+    <div class="noticia-libro">
+
+        <img
+            src="{{ libro.portada_url }}"
+            class="noticia-portada"
+            onerror="this.onerror=null; this.src='{% static 'assets/portadas/default.jpg' %}';"
+        >
+
+        <div class="noticia-info">
+
+            <h5>{{ libro.titulo }}</h5>
+
+            <p>
+                {% if libro.autores.all.first %}
+                    {{ libro.autores.all.first.nombre }}
+                {% endif %}
+            </p>
+
+            <p style="color:#28a745;font-weight:bold;">
+                ${{ libro.precio }}
+            </p>
+
+        </div>
+
+    </div>
+
+</a>
+
+{% empty %}
+<p>No hay novedades.</p>
+{% endfor %}
+
+</div>
+
+
+<!-- AUTORES -->
+<div style="background:white;padding:10px;border-radius:8px;margin-bottom:15px;">
+
+    <h4 style="color:#004080;">Autores destacados</h4>
+
+    {% for libro in libros_autores %}
+
+<a href="{% url 'detalle_libro' libro.id %}" class="noticia-link">
+
+    <div class="noticia-libro">
+
+        <img
+            src="{{ libro.portada_url }}"
+            class="noticia-portada"
+            onerror="this.onerror=null; this.src='{% static 'assets/portadas/default.jpg' %}';"
+        >
+
+        <div class="noticia-info">
+
+            <h5>{{ libro.titulo }}</h5>
+
+            <p>
+                {% if libro.autores.all.first %}
+                    {{ libro.autores.all.first.nombre }}
+                {% endif %}
+            </p>
+
+            <p style="color:#28a745;font-weight:bold;">
+                ${{ libro.precio }}
+            </p>
+
+        </div>
+
+    </div>
+
+</a>
+
+{% empty %}
+<p>Selecciona autores favoritos para recibir recomendaciones.</p>
+{% endfor %}
+
+</div>
+
+
+<!-- GENEROS -->
+<div style="background:white;padding:10px;border-radius:8px;">
+
+    <h4 style="color:#004080;">Géneros recomendados</h4>
+
+    {% for libro in libros_generos %}
+
+<a href="{% url 'detalle_libro' libro.id %}" class="noticia-link">
+
+    <div class="noticia-libro">
+
+        <img
+            src="{{ libro.portada_url }}"
+            class="noticia-portada"
+            onerror="this.onerror=null; this.src='{% static 'assets/portadas/default.jpg' %}';"
+        >
+
+        <div class="noticia-info">
+
+            <h5>{{ libro.titulo }}</h5>
+
+            <p>
+                {% if libro.autores.all.first %}
+                    {{ libro.autores.all.first.nombre }}
+                {% endif %}
+            </p>
+
+            <p style="color:#28a745;font-weight:bold;">
+                ${{ libro.precio }}
+            </p>
+
+        </div>
+
+    </div>
+
+</a>
+
+{% empty %}
+<p>Selecciona géneros favoritos para recibir recomendaciones.</p>
+{% endfor %}
+
+</div>
+
+    {% else %}
+
+        <h2>📚 Destacados</h2>
+
+        <img
+            src="{% static 'assets/imagenes/nicolas.jpg' %}"
+            width="100%"
+            style="margin-bottom:10px; border-radius:5px;"
+        >
+
+        <img
+            src="{% static 'assets/imagenes/Logo.png' %}"
+            width="100%"
+            style="border-radius:5px;"
+        >
+
+        <p style="text-align:center; margin-top:5px;">
+            Explora nuestro catálogo y encuentra tu próxima lectura.
+        </p>
+
+    {% endif %}
+
+</aside>
 
     <main>
         <h2>Bienvenido a Librer_IA online</h2>

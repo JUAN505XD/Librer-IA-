@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+{% block title %}Mis Tarjetas{% endblock %}
+
+{% block content %}
+
+<style>
+
+.container{
+    max-width:800px;
+    margin:40px auto;
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
+}
+
+.tarjeta{
+    border:1px solid #ddd;
+    border-radius:10px;
+    padding:15px;
+    margin-bottom:15px;
+    background:#fafafa;
+}
+
+.btn{
+    display:inline-block;
+    padding:10px 15px;
+    border-radius:6px;
+    text-decoration:none;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+
+.btn-agregar{
+    background:#0066cc;
+}
+
+.btn-eliminar{
+    background:#dc3545;
+}
+
+.btn-volver{
+    background:#28a745;
+}
+
+.actions{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+}
+
+/* ===== MODAL ===== */
+
+.modal{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,.55);
+    z-index:1000;
+}
+
+.modal-content{
+    background:white;
+    width:420px;
+    max-width:90%;
+    margin:150px auto;
+    padding:25px;
+    border-radius:15px;
+    text-align:center;
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+}
+
+.modal-content h3{
+    margin-bottom:15px;
+    color:#dc3545;
+}
+
+.modal-actions{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top:20px;
+}
+
+.btn-cancelar{
+   background:#0066cc;
+}
+
+.btn-confirmar{
+    background:#dc3545;
+}
+
+</style>
+
+<div class="container">
+
+    <h2>Mis Tarjetas</h2>
+
+    <br>
+
+    {% if tarjetas %}
+
+        {% for tarjeta in tarjetas %}
+
+            <div class="tarjeta">
+
+                <h3>{{ tarjeta.titular }}</h3>
+
+                <p>
+                    **** **** **** {{ tarjeta.numero|slice:"-4:" }}
+                </p>
+
+                <p>
+                    Vence:
+                    {{ tarjeta.mes_vencimiento }}/{{ tarjeta.año_vencimiento }}
+                </p>
+
+                <p>
+                    Saldo:
+                    ${{ tarjeta.saldo }}
+                </p>
+
+                <form method="POST"
+                      action="{% url 'eliminar_tarjeta' tarjeta.id %}"
+                      class="form-eliminar">
+
+                    {% csrf_token %}
+
+                    <button
+                        type="button"
+                        class="btn btn-eliminar"
+                        onclick="abrirConfirmacion(this)">
+                        Eliminar tarjeta
+                    </button>
+
+                </form>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>No tienes tarjetas registradas.</p>
+
+    {% endif %}
+
+    <div class="actions">
+
+        <a href="{% url 'registrar_tarjeta' %}"
+           class="btn btn-agregar">
+            Agregar tarjeta
+        </a>
+
+        <a href="{% url 'pagar_carrito' %}"
+           class="btn btn-volver">
+            Volver al pago
+        </a>
+
+    </div>
+
+</div>
+
+<!-- MODAL DE CONFIRMACIÓN -->
+
+<div id="modalEliminar" class="modal">
+
+    <div class="modal-content">
+
+        <h3>Eliminar tarjeta</h3>
+
+        <p>
+            ¿Estás seguro de que deseas eliminar esta tarjeta?
+        </p>
+
+        <div class="modal-actions">
+
+            <button
+                type="button"
+                class="btn btn-cancelar"
+                onclick="cerrarConfirmacion()">
+                Cancelar
+            </button>
+
+            <button
+                type="button"
+                class="btn btn-confirmar"
+                onclick="confirmarEliminacion()">
+                Eliminar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+let formularioActual = null;
+
+function abrirConfirmacion(boton){
+    formularioActual = boton.closest("form");
+    document.getElementById("modalEliminar").style.display = "block";
+}
+
+function cerrarConfirmacion(){
+    document.getElementById("modalEliminar").style.display = "none";
+    formularioActual = null;
+}
+
+function confirmarEliminacion(){
+    if(formularioActual){
+        formularioActual.submit();
+    }
+}
+
+window.onclick = function(event){
+    const modal = document.getElementById("modalEliminar");
+
+    if(event.target === modal){
+        cerrarConfirmacion();
+    }
+}
+
+</script>
+
+{% endblock %}
