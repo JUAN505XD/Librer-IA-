@@ -31,11 +31,11 @@ body {
 }
 
 .welcome-text {
-	display: flex;
-	font-size: 1.0rem;
-	color: #003366;
-	align-items: center;
-	gap: 15px;
+    display: flex;
+    font-size: 1.0rem;
+    color: #003366;
+    align-items: center;
+    gap: 15px;
 }
 
 .logo img {
@@ -144,32 +144,84 @@ main {
     font-size: 18px;
     font-weight: bold;
 }
+
+#toast-container {
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	z-index: 9999;
+}
+
+.toast {
+	background: white;
+	color: #333;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-weight: 600;
+	padding: 15px;
+	margin-bottom: 10px;
+	border-radius: 8px;
+	box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+	min-width: 280px;
+	max-width: 400px;
+
+	transition: opacity 0.5s ease;
+	animation: aparecer 0.3s ease;
+}
+
+.toast.success {
+	border-left: 14px solid green;
+}
+
+.toast.warning {
+	border-left: 14px solid orange;
+}
+
+.toast.error {
+	border-left: 14px solid red;
+}
+
+@keyframes aparecer {
+	from {
+		opacity: 0;
+		transform: translateX(50px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateX(0px);
+	}
+}
+
+
 </style>
 
 </head>
 
 <body>
 
-<!-- HEADER -->
 <header class="main-header">
 
     <div class="logo">
+	    <a href ="{% url 'inicio' %}">
         <img src="{% static 'assets/imagenes/Logo12.png' %}">
+	    </a>
     </div>
 
     <div class="welcome-text">
-	    <h4>
-        Bienvenido a Librer_IA,
-	    </h4>
-	<strong>
-		{% if user.is_authenticated %}
-		<h5>
-		    {{ user.username }}
-		</h5>
-		{% else %}
-			Invitado
-		{% endif %}
-	</strong>
+        <h4>
+            Bienvenido a Librer_IA,
+        </h4>
+    <strong>
+        {% if user.is_authenticated %}
+        <h5>
+            {{ user.username }}
+        </h5>
+        {% else %}
+            Invitado
+        {% endif %}
+    </strong>
 
     </div>
 
@@ -204,7 +256,6 @@ main {
 {% if user.is_authenticated %}
 <div class="menu">
 
-    <!-- IZQUIERDA -->
     <ul>
         {% if user.rol == "ADMIN" %}
             <li><a href="#">Dashboard Admin</a></li>
@@ -224,7 +275,6 @@ main {
         {% endif %}
     </ul>
 
-    <!-- DERECHA 🔍 -->
     <ul>
         <div style="flex:1; text-align:center;">
 
@@ -252,16 +302,172 @@ main {
 </div>
 {% endif %}
 
-<!-- CONTENIDO -->
 <div class="content">
     {% block content %}
     {% endblock %}
 </div>
 
-<!-- FOOTER -->
 <div class="footer">
     © 2026 Librer_IA
 </div>
 
+<div id="toast-container"></div>
+
+<script>
+	function mostrarToast(mensaje,tipo = "success"){
+		const toast = document.createElement('div');
+
+		toast.classList.add('toast');
+		toast.classList.add(tipo);
+
+		let icono = '';
+
+		if (tipo == 'success')
+			icono = '✅';
+
+		else if (tipo == 'warning')
+			icono = '⚠️';
+
+		else if (tipo == 'error')
+			icono = '❌';
+
+		toast.textContent = `${icono} ${mensaje}`;
+
+
+		document.getElementById('toast-container').appendChild(toast);
+
+		setTimeout(() => {
+			toast.style.opacity = '0';
+
+			setTimeout(() => {
+				toast.remove();
+			}, 500);
+
+		}, 2500);
+	}
+
+
+</script>
+
+{% if segundos_restantes_global > 0 %}
+<script>
+    (function() {
+        let tiempoRestanteGlobal = {{ segundos_restantes_global }};
+
+        const cronometroGlobal = setInterval(function() {
+            tiempoRestanteGlobal--;
+
+            if (tiempoRestanteGlobal <= 0) {
+                clearInterval(cronometroGlobal);
+		mostrarToast(
+			"Tu reserva ha expirado",
+			"warning"
+		);
+             }
+        }, 1000);
+    })();
+</script>
+{% endif %}
+
+{% if request.user.is_authenticated and user.rol == "CLIENTE" %}
+<a href="{% url 'ver_carrito' %}" id="carrito-flotante" style="
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #0066cc;
+    color: white;
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    text-decoration: none;
+    z-index: 999;
+    transition: transform 0.2s ease;
+" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+    
+    <span style="font-size: 28px;">🛒</span>
+    
+    <span id="badge-contador" style="
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: #dc3545;
+        color: white;
+        font-size: 13px;
+        font-weight: bold;
+        border-radius: 50%;
+        padding: 4px 8px;
+        min-width: 15px;
+        text-align: center;
+        border: 2px solid white;
+        /* Inicialmente oculto si viene vacío o indefinido */
+        {% if not cantidad_carrito %}
+        display:none;
+        {% endif %}
+    ">
+	    {{ cantidad_carrito }}
+    </span>
+</a>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const botonesAgregar = document.querySelectorAll('.btn-agregar');
+        const badge = document.getElementById('badge-contador');
+
+        botonesAgregar.forEach(boton => {
+            boton.addEventListener('click', function(e) {
+                e.preventDefault(); 
+                
+                const url = this.getAttribute('href');
+                const libroId = this.getAttribute('data-libro-id');
+                const stockElement = document.getElementById(`stock-count-${libroId}`);
+
+                // Realizar petición asíncrona a Django
+                fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw err; });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+
+                    mostrarToast(data.message,data.status);
+                    if (data.status === 'success') {
+                        // 1. Actualizar el globo del botón flotante
+                        if (badge) {
+                            badge.textContent = data.nuevo_total;
+                            badge.style.display = 'block';
+                        }
+                        
+                        // 2. Restar el stock visual en caliente en la tarjeta del libro
+                        if (stockElement) {
+                            let stockActual = parseInt(stockElement.textContent, 10);
+                            if (stockActual > 0) {
+                                stockElement.textContent = stockActual - 1;
+                            }
+                        }
+                        
+                    }
+                })
+                .catch(error => {
+			mostrarToast(
+				error.message || "Ocurrió un error inesperado",
+				"error"
+				);
+                });
+            });
+        });
+    });
+</script>
+{% endif %}
 </body>
 </html>

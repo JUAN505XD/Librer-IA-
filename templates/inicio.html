@@ -298,7 +298,7 @@
 
     <main>
         <h2>Bienvenido a Librer_IA online</h2>
-        <p>Descubre una amplia variedad de libros y novedades literarias.</p>
+        <p>Descubre una amplia variedad de libros and novedades literarias.</p>
 
         <div class="catalogo-container">
             <h2 class="catalogo-titulo">Libros Recientes</h2>
@@ -326,20 +326,24 @@
                                     {% endif %}
                                 </p>
                                 <p><strong>Género:</strong> {{ libro.genero }}</p>
-                                <p><strong>Stock:</strong> {{ libro.stock }}</p>
+                                
+                                <p><strong>Stock:</strong> <span id="stock-count-{{ libro.id }}">{{ libro.stock }}</span></p>
+                                
                                 <p><strong>Precio:</strong> 
                                     <span style="color: #28a745; font-weight: bold;">
                                         ${{ libro.precio|intcomma }}
                                     </span>
                                 </p>
                             </div>
-                        </a> <div style="width: 100%;">
+                        </a> 
+                        
+                        <div style="width: 100%;">
                             {% if user.is_authenticated and user.rol == "CLIENTE" %}
                                 {% if libro.stock > 0 %}
-                                    <a href="{% url 'agregar_al_carrito' libro.id %}" class="btn-carrito">
+                                    <a href="{% url 'agregar_al_carrito' libro.id %}" class="btn-carrito btn-agregar" data-libro-id="{{ libro.id }}">
                                         Añadir al carrito
                                     </a>
-                                    {% else %}
+                                {% else %}
                                     <p class="agotado">Agotado</p>
                                 {% endif %}
                             {% elif not user.is_authenticated %}

@@ -5,16 +5,21 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db import transaction
 from django.utils import timezone
+from django.http import JsonResponse
 from libros.models import Libro
 from .models import Carrito, ItemCarrito
 from users.models import Tarjeta
+
+# ⏱️ CONFIGURACIÓN UNIVERSAL: Cambia a 1440 cuando pases a producción (24 horas)
+SEGUNDOS_EXPIRACION = 50
 
 @login_required
 def agregar_al_carrito(request, libro_id):
     libro = get_object_or_404(Libro, id=libro_id)
 
     if libro.stock <= 0:
-        messages.error(request, f"El libro {libro.titulo} está agotado.")
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'error', 'message': f"El libro '{libro.titulo}' está agotado."})
         return redirect('inicio')
 
     carrito, created = Carrito.objects.get_or_create(
@@ -22,22 +27,26 @@ def agregar_al_carrito(request, libro_id):
         estado='ACTIVO'
     )
 
-    # 🔥 limpiar items expirados antes de todo
+    # 🛡️ Ejecutar limpieza previa antes de validar topes
     limpiar_items_expirados(carrito)
-
-    total_en_carrito = sum(item.cantidad for item in carrito.items.all())
-    if total_en_carrito >= 5:
-        messages.warning(request, "Máximo 5 libros por carrito.")
-        return redirect('ver_carrito')
-
+    
     item, item_created = ItemCarrito.objects.get_or_create(
         carrito=carrito,
         libro=libro,
         defaults={'precio_unitario': libro.precio, 'cantidad': 0}
     )
 
+    libros_diferentes = carrito.items.count()
+
+    if item_created and libros_diferentes  > 5:
+        item.delete()
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'warning', 'message': "Máximo 5 libros diferentes"})
+        return redirect('ver_carrito')
+
     if item.cantidad >= 3:
-        messages.warning(request, "Máximo 3 copias del mismo libro.")
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'warning', 'message': "No se pueden agregar más de 3 copias por libro"})
         return redirect('ver_carrito')
 
     with transaction.atomic():
@@ -46,6 +55,16 @@ def agregar_al_carrito(request, libro_id):
 
         item.cantidad += 1
         item.save()
+        
+        carrito.save()
+    
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        nuevo_total = sum(i.cantidad for i in carrito.items.all())
+        return JsonResponse({
+            'status': 'success',
+            'message': f"Agregado: {libro.titulo}",
+            'nuevo_total': nuevo_total
+            })
 
     messages.success(request, f"Agregado: {libro.titulo}")
     return redirect('ver_carrito')
@@ -55,15 +74,13 @@ def ver_carrito(request):
     carrito = Carrito.objects.filter(usuario=request.user, estado='ACTIVO').first()
 
     if carrito:
-        # 🔥 limpiar SOLO items expirados
         limpiar_items_expirados(carrito)
 
-        # 🔥 si después de limpiar ya no hay items
-        if not carrito.items.exists():
-            carrito = None
-            messages.info(request, "Tu carrito está vacío.")
+        carrito = Carrito.objects.filter(usuario=request.user, estado='ACTIVO').first()
 
-    return render(request, 'ver_carrito.html', {'carrito': carrito})
+    return render(request, 'ver_carrito.html', {
+        'carrito': carrito,
+    })
 
 @login_required
 def pagar_carrito(request):
@@ -130,53 +147,42 @@ def vaciar_carrito(request):
                 libro.stock += item.cantidad
                 libro.save()
 
-        carrito.estado = 'CANCELADO'
-        carrito.save()
+            carrito.estado = 'CANCELADO'
+            carrito.save()
 
         messages.info(request, "Carrito vaciado correctamente.")
     else:
-        messages.error(request, "No hay carrito activo.")
-
-    return redirect('inicio')
-
-
-def limpiar_items_expirados(carrito):
-    ahora = timezone.now()
-
-    with transaction.atomic():
-        for item in carrito.items.all():
-            if ahora > item.creado_en + timedelta(minutes=10):
-
-                # 🔥 devolver stock
-                libro = item.libro
-                libro.stock += item.cantidad
-                libro.save()
-
-                # 🔥 eliminar item
-                item.delete()
-
-@login_required
-def sumar_item(request, item_id):
-    item = get_object_or_404(ItemCarrito, id=item_id, carrito__usuario=request.user)
-    libro = item.libro
-
-    if libro.stock <= 0:
-        messages.error(request, "No hay más stock disponible.")
-        return redirect('ver_carrito')
-
-    with transaction.atomic():
-        libro.stock -= 1
-        libro.save()
-
-        item.cantidad += 1
-        item.save()
+        messages.error(request, "No hay carrito activo para vaciar.")
 
     return redirect('ver_carrito')
 
 
+def limpiar_items_expirados(carrito):
+    if not carrito.items.exists():
+        return
+
+    ahora = timezone.now()
+
+    # ⏱️ VALIDACIÓN UNIVERSAL: Compara el carrito completo
+    if ahora > carrito.actualizado_en + timedelta(seconds=SEGUNDOS_EXPIRACION):
+        with transaction.atomic():
+            for item in carrito.items.all():
+                libro = item.libro
+                libro.stock += item.cantidad
+                libro.save()
+                item.delete()
+            
+            # Cambiamos el estado para romper el ciclo activo
+            carrito.estado = 'CANCELADO'
+            carrito.save()
+
 @login_required
 def restar_item(request, item_id):
     item = get_object_or_404(ItemCarrito, id=item_id, carrito__usuario=request.user)
+    carrito = item.carrito
+    
+    limpiar_items_expirados(carrito)
+    
     libro = item.libro
 
     with transaction.atomic():
@@ -187,7 +193,10 @@ def restar_item(request, item_id):
             item.cantidad -= 1
             item.save()
         else:
-            item.delete()  # 🔥 si queda en 1 → se elimina
+            item.delete()
+            
+        # 🔄 Renovación del tiempo al modificar cantidades
+        carrito.save()
 
     return redirect('ver_carrito')
 
