@@ -363,6 +363,12 @@ main {
 			"Tu reserva ha expirado",
 			"warning"
 		);
+		const badge = document.getElementById('badge-contador');
+
+		if (badge) {
+			badge.textContent = '';
+			badge.style.display = 'none';
+		}
              }
         }, 1000);
     })();
