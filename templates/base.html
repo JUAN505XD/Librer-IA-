@@ -154,23 +154,46 @@ main {
 
 .toast {
 	background: white;
+	color: #333;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-weight: 600;
 	padding: 15px;
 	margin-bottom: 10px;
 	border-radius: 8px;
 	box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+	min-width: 280px;
+	max-width: 400px;
+
+	transition: opacity 0.5s ease;
+	animation: aparecer 0.3s ease;
 }
 
 .toast.success {
-	border-left: 5px solid green;
+	border-left: 14px solid green;
 }
 
 .toast.warning {
-	border-left: 5px solid orange;
+	border-left: 14px solid orange;
 }
 
 .toast.error {
-	border-left: 5px solid red;
+	border-left: 14px solid red;
 }
+
+@keyframes aparecer {
+	from {
+		opacity: 0;
+		transform: translateX(50px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateX(0px);
+	}
+}
+
 
 </style>
 
@@ -297,14 +320,30 @@ main {
 		toast.classList.add('toast');
 		toast.classList.add(tipo);
 
-		toast.textContent = mensaje;
+		let icono = '';
+
+		if (tipo == 'success')
+			icono = '✅';
+
+		else if (tipo == 'warning')
+			icono = '⚠️';
+
+		else if (tipo == 'error')
+			icono = '❌';
+
+		toast.textContent = `${icono} ${mensaje}`;
 
 
 		document.getElementById('toast-container').appendChild(toast);
 
 		setTimeout(() => {
-			toast.remove();
-		}, 3000);
+			toast.style.opacity = '0';
+
+			setTimeout(() => {
+				toast.remove();
+			}, 500);
+
+		}, 2500);
 	}
 
 
@@ -324,9 +363,6 @@ main {
 			"Tu reserva ha expirado",
 			"warning"
 		);
-		setTimeout(() => {
-			window.location.href = "{% url 'inicio' %}";
-		},3000);
              }
         }, 1000);
     })();

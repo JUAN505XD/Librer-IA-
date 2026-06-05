@@ -9,7 +9,7 @@ from libros.models import Libro
 from .models import Carrito, ItemCarrito
 
 # ⏱️ CONFIGURACIÓN UNIVERSAL: Cambia a 1440 cuando pases a producción (24 horas)
-MINUTOS_EXPIRACION = 1  
+SEGUNDOS_EXPIRACION = 50
 
 @login_required
 def agregar_al_carrito(request, libro_id):
@@ -135,7 +135,7 @@ def limpiar_items_expirados(carrito):
     ahora = timezone.now()
 
     # ⏱️ VALIDACIÓN UNIVERSAL: Compara el carrito completo
-    if ahora > carrito.actualizado_en + timedelta(minutes=MINUTOS_EXPIRACION):
+    if ahora > carrito.actualizado_en + timedelta(seconds=SEGUNDOS_EXPIRACION):
         with transaction.atomic():
             for item in carrito.items.all():
                 libro = item.libro
