@@ -23,17 +23,26 @@
 }
 
 .btn{
-    display:inline-block;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
     padding:10px 15px;
     border-radius:6px;
     text-decoration:none;
     color:white;
     border:none;
     cursor:pointer;
+    min-width:140px;
+    height:38px;
+    box-sizing:border-box;
 }
 
 .btn-registrar{
     background:#0066cc;
+}
+
+.btn-recargar{
+    background:#28a745;
 }
 
 .btn-eliminar{
@@ -47,7 +56,8 @@
 .actions{
     display:flex;
     gap:10px;
-    margin-top:20px;
+    margin-top:15px;
+    align-items:center;
 }
 
 /* ===== MODAL ===== */
@@ -124,20 +134,32 @@
                     ${{ tarjeta.saldo }}
                 </p>
 
-                <form method="POST"
-                      action="{% url 'eliminar_tarjeta' tarjeta.id %}"
-                      class="form-eliminar">
+                <!-- ACCIONES POR TARJETA -->
+                <div class="actions">
 
-                    {% csrf_token %}
+                    <!-- RECARGAR SALDO -->
+                    <a href="{% url 'recargar_tarjeta' tarjeta.id %}"
+                       class="btn btn-recargar">
+                        Recargar saldo
+                    </a>
 
-                    <button
-                        type="button"
-                        class="btn btn-eliminar"
-                        onclick="abrirConfirmacion(this)">
-                        Eliminar tarjeta
-                    </button>
+                    <!-- ELIMINAR -->
+                    <form method="POST"
+                          action="{% url 'eliminar_tarjeta' tarjeta.id %}"
+                          class="form-eliminar">
 
-                </form>
+                        {% csrf_token %}
+
+                        <button
+                            type="button"
+                            class="btn btn-eliminar"
+                            onclick="abrirConfirmacion(this)">
+                            Eliminar tarjeta
+                        </button>
+
+                    </form>
+
+                </div>
 
             </div>
 

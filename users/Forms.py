@@ -418,4 +418,25 @@ class TarjetaForm(forms.ModelForm):
 
         return saldo
     
-    
+class RecargarSaldoForm(forms.Form):
+    monto = forms.DecimalField()
+
+    def clean_monto(self):
+        monto = self.cleaned_data.get("monto")
+
+        if monto is None:
+            raise forms.ValidationError("El monto es obligatorio")
+
+        if monto <= 0:
+            raise forms.ValidationError("El monto debe ser mayor a 0")
+
+        if monto < 50000:
+            raise forms.ValidationError("El monto mínimo es 50.000")
+
+        if monto % 1000 != 0:
+            raise forms.ValidationError("Debe ser múltiplo de 1000")
+
+        if monto > 10_000_000:
+            raise forms.ValidationError("Monto demasiado alto")
+
+        return monto

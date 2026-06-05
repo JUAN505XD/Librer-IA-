@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import authenticate, login, logout
-from .Forms import EditarAdminForm, EditarclienteForm, RegistroAdminForm, RegistroClienteForm, LoginForm, PreferenciasForm, CustomPasswordChangeForm, TarjetaForm
+from .Forms import EditarAdminForm, EditarclienteForm, RegistroAdminForm, RegistroClienteForm, LoginForm, PreferenciasForm, CustomPasswordChangeForm, TarjetaForm,RecargarSaldoForm
 from .models import Administrador, Administrador, Preferencias, Persona, Cliente, Usuario, Usuario, Tarjeta
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
@@ -378,3 +378,33 @@ def eliminar_tarjeta(request, tarjeta_id):
         return redirect("ver_tarjetas")
 
     return redirect("ver_tarjetas")
+
+@login_required
+def recargar_tarjeta(request, tarjeta_id):
+
+    tarjeta = get_object_or_404(
+        Tarjeta,
+        id=tarjeta_id,
+        usuario=request.user
+    )
+
+    if request.method == "POST":
+
+        form = RecargarSaldoForm(request.POST)
+
+        if form.is_valid():
+
+            monto = form.cleaned_data["monto"]
+
+            tarjeta.saldo += monto
+            tarjeta.save()
+
+            return redirect("ver_tarjetas")
+
+    else:
+        form = RecargarSaldoForm()
+
+    return render(request, "recargar_tarjeta.html", {
+        "form": form,
+        "tarjeta": tarjeta
+    })

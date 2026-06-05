@@ -17,4 +17,5 @@ urlpatterns = [
     path("tarjetas/agregar/", views.registrar_tarjeta, name="registrar_tarjeta"),
     path("tarjetas/mis-tarjetas/", views.mis_tarjetas, name="mis_tarjetas"),
     path("tarjetas/eliminar/<int:tarjeta_id>/", views.eliminar_tarjeta, name="eliminar_tarjeta"),
+    path("tarjetas/recargar/<int:tarjeta_id>/", views.recargar_tarjeta, name="recargar_tarjeta"),
 ]

@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Recargar Tarjeta{% endblock %}
+
+{% block content %}
+
+<style>
+
+.container{
+    max-width:800px;
+    margin:40px auto;
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.15);
+}
+
+.tarjeta{
+    border:1px solid #ddd;
+    border-radius:10px;
+    padding:15px;
+    margin-bottom:15px;
+    background:#fafafa;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:10px 15px;
+    border-radius:6px;
+    text-decoration:none;
+    color:white;
+    border:none;
+    cursor:pointer;
+    min-width:140px;
+    height:38px;
+    box-sizing:border-box;
+}
+
+.btn-recargar{
+    background:#28a745;
+}
+
+.btn-volver{
+    background:#0066cc;
+}
+
+.actions{
+    display:flex;
+    gap:10px;
+    margin-top:15px;
+    align-items:center;
+}
+
+.error-box {
+    background: #ffe6e6;
+    color: #cc0000;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 5px;
+    font-size: 14px;
+    text-align: center;
+    font-weight: bold;
+}
+
+</style>
+
+<div class="container">
+
+    <h2 style="text-align:center;">Recargar Tarjeta</h2>
+
+    <div class="tarjeta">
+
+        <h3>{{ tarjeta.titular }}</h3>
+
+        <p>
+            **** **** **** {{ tarjeta.numero|slice:"-4:" }}
+        </p>
+
+        <p>
+            Vence: {{ tarjeta.mes_vencimiento }}/{{ tarjeta.año_vencimiento }}
+        </p>
+
+        <p>
+            Saldo actual: ${{ tarjeta.saldo }}
+        </p>
+
+        <hr>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <label>Monto a recargar</label>
+            {{ form.monto }}
+
+            <!-- ERRORES DEL CAMPO -->
+            {% for error in form.monto.errors %}
+                <div class="error-box">
+                    {{ error }}
+                </div>
+            {% endfor %}
+
+            <!-- ERRORES GENERALES DEL FORMULARIO -->
+            {% for error in form.non_field_errors %}
+                <div class="error-box">
+                    {{ error }}
+                </div>
+            {% endfor %}
+
+            <div class="actions">
+
+                <button type="submit" class="btn btn-recargar">
+                    Recargar saldo
+                </button>
+
+                <a href="{% url 'ver_tarjetas' %}" class="btn btn-volver">
+                    Volver
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
