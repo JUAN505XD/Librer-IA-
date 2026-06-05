@@ -313,8 +313,12 @@ main {
         text-align: center;
         border: 2px solid white;
         /* Inicialmente oculto si viene vacío o indefinido */
-        display: none;
-    ">0</span>
+        {% if not cantidad_carrito %}
+        display:none;
+        {% endif %}
+    ">
+	    {{ cantidad_carrito }}
+    </span>
 </a>
 
 <script>
