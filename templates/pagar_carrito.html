@@ -5,84 +5,91 @@
 
 <div class="main-container">
 
-    <!-- ASIDE (igual que carrito) -->
-    <aside>
-        <h2>Resumen de compra</h2>
+```
+<!-- ASIDE -->
+<aside>
+    <h2>Resumen de compra</h2>
 
-        <p><strong>Artículos:</strong> {{ carrito.items.count }}</p>
+    <p><strong>Artículos:</strong> {{ carrito.items.count }}</p>
 
-        <hr>
+    <hr>
 
-        <p><strong>Total a pagar:</strong></p>
-        <h2 style="color:#0066cc;">${{ carrito.get_total }}</h2>
+    <p><strong>Total a pagar:</strong></p>
+    <h2 style="color:#0066cc;">${{ carrito.get_total }}</h2>
 
-        <hr>
+    <hr>
 
-        <p style="font-size:14px;color:#666;">
-            Selecciona una tarjeta para completar el pago.
-        </p>
-    </aside>
+    <p style="font-size:14px;color:#666;">
+        Selecciona una tarjeta para completar el pago.
+    </p>
+</aside>
 
-    <!-- MAIN -->
-    <main>
+<!-- MAIN -->
+<main>
 
-        <h2>Confirmar compra</h2>
-        <br>
+    <h2>Confirmar compra</h2>
+    <br>
 
-        <!-- TABLA IGUAL QUE CARRITO -->
-        <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+    <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
 
-            <thead style="background:#e6e6e6;">
-                <tr>
-                    <th style="padding:10px;text-align:left;">Libro</th>
-                    <th style="padding:10px;">Cantidad</th>
-                    <th style="padding:10px;">Precio</th>
-                    <th style="padding:10px;">Subtotal</th>
-                </tr>
-            </thead>
+        <thead style="background:#e6e6e6;">
+            <tr>
+                <th style="padding:10px;text-align:left;">Libro</th>
+                <th style="padding:10px;">Cantidad</th>
+                <th style="padding:10px;">Precio</th>
+                <th style="padding:10px;">Subtotal</th>
+            </tr>
+        </thead>
 
-            <tbody>
-                {% for item in carrito.items.all %}
-                <tr style="border-bottom:1px solid #ddd;">
-                    <td style="padding:10px;">{{ item.libro.titulo }}</td>
-                    <td style="padding:10px;text-align:center;">{{ item.cantidad }}</td>
-                    <td style="padding:10px;text-align:center;">${{ item.precio_unitario }}</td>
-                    <td style="padding:10px;text-align:center;">${{ item.get_subtotal }}</td>
-                </tr>
-                {% endfor %}
+        <tbody>
+            {% for item in carrito.items.all %}
+            <tr style="border-bottom:1px solid #ddd;">
+                <td style="padding:10px;">{{ item.libro.titulo }}</td>
+                <td style="padding:10px;text-align:center;">{{ item.cantidad }}</td>
+                <td style="padding:10px;text-align:center;">${{ item.precio_unitario }}</td>
+                <td style="padding:10px;text-align:center;">${{ item.get_subtotal }}</td>
+            </tr>
+            {% endfor %}
 
-                <tr style="background:#f9f9f9;font-weight:bold;">
-                    <td colspan="3" style="padding:15px;text-align:right;">
-                        Total:
-                    </td>
-                    <td style="padding:15px;text-align:center;color:#0066cc;">
-                        ${{ carrito.get_total }}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+            <tr style="background:#f9f9f9;font-weight:bold;">
+                <td colspan="3" style="padding:15px;text-align:right;">
+                    Total:
+                </td>
+                <td style="padding:15px;text-align:center;color:#0066cc;">
+                    ${{ carrito.get_total }}
+                </td>
+            </tr>
+        </tbody>
 
-        <!-- TARJETAS -->
-        <h3>Selecciona una tarjeta</h3>
+    </table>
 
-        <form method="POST">
-            {% csrf_token %}
+    <h3>Selecciona una tarjeta</h3>
 
-            {% if tarjetas %}
-                {% for tarjeta in tarjetas %}
+    <form method="POST">
+        {% csrf_token %}
+
+        {% if tarjetas %}
+
+            {% for tarjeta in tarjetas %}
+
+                <div class="tarjeta-container">
+
                     <label style="
                         display:block;
                         padding:10px;
-                        margin-bottom:10px;
+                        margin-bottom:5px;
                         border:1px solid #ddd;
                         border-radius:8px;
                         cursor:pointer;
                         background:white;
                     ">
-                        <input type="radio"
-                               name="tarjeta_id"
-                               value="{{ tarjeta.id }}"
-                               class="tarjeta-radio">
+
+                        <input
+                            type="radio"
+                            name="tarjeta_id"
+                            value="{{ tarjeta.id }}"
+                            class="tarjeta-radio"
+                            data-saldo="{{ tarjeta.saldo }}">
 
                         <strong>{{ tarjeta.titular }}</strong><br>
 
@@ -92,53 +99,128 @@
 
                         <br>
 
-                        <small>Saldo: ${{ tarjeta.saldo }}</small>
+                        <small>
+                            Saldo: ${{ tarjeta.saldo }}
+                        </small>
+
                     </label>
-                {% endfor %}
-            {% else %}
-                <p>No tienes tarjetas registradas.</p>
-            {% endif %}
-                <a href="{% url 'registrar_tarjeta' %}" style="color:#0066cc;">
-                    Agregar tarjeta
-                </a>
-           
 
-            <br>
+                    <div class="saldo-error"
+                         style="
+                            display:none;
+                            background:#ffe6e6;
+                            color:#cc0000;
+                            padding:10px;
+                            border-radius:8px;
+                            margin-bottom:10px;
+                            font-size:14px;
+                            text-align:center;
+                            font-weight:bold;
+                         ">
+                        Saldo insuficiente
+                    </div>
 
-            <!-- BOTÓN -->
-            <button type="submit"
-                    id="btn-pagar"
-                    disabled
-                    style="
-                        background:#ccc;
-                        color:white;
-                        padding:12px 20px;
-                        border:none;
-                        border-radius:6px;
-                        width:100%;
-                        font-weight:bold;
-                        margin-top:15px;
-                    ">
-                Pagar ahora
-            </button>
+                </div>
 
-        </form>
+            {% endfor %}
 
-    </main>
+        {% else %}
+
+            <p>No tienes tarjetas registradas.</p>
+
+        {% endif %}
+
+        <div style="margin-top:15px;">
+
+            <a href="{% url 'ver_tarjetas' %}"
+               style="
+                    display:inline-block;
+                    background:#0066cc;
+                    color:white;
+                    padding:10px 15px;
+                    border-radius:6px;
+                    text-decoration:none;
+               ">
+                Administrar tarjetas
+            </a>
+
+        </div>
+
+        <br>
+
+        <button type="submit"
+                id="btn-pagar"
+                disabled
+                style="
+                    background:#ccc;
+                    color:white;
+                    padding:12px 20px;
+                    border:none;
+                    border-radius:6px;
+                    width:100%;
+                    font-weight:bold;
+                    margin-top:15px;
+                ">
+            Pagar ahora
+        </button>
+
+    </form>
+
+</main>
+```
 
 </div>
 
 <script>
+
 const radios = document.querySelectorAll(".tarjeta-radio");
 const btn = document.getElementById("btn-pagar");
 
-radios.forEach(r => {
-    r.addEventListener("change", () => {
-        btn.disabled = false;
-        btn.style.background = "#28a745";
-        btn.style.cursor = "pointer";
+const total = Number("{{ carrito.get_total }}".replace(/,/g, ""));
+
+console.log("TOTAL DEL CARRITO:", total);
+
+radios.forEach(radio => {
+
+    radio.addEventListener("change", () => {
+
+        document.querySelectorAll(".saldo-error").forEach(error => {
+            error.style.display = "none";
+        });
+
+        const saldo = Number(
+            radio.dataset.saldo.replace(/,/g, "")
+        );
+
+        console.log("------------");
+        console.log("Tarjeta ID:", radio.value);
+        console.log("Saldo:", saldo);
+        console.log("Total:", total);
+        console.log("¿Saldo insuficiente?", saldo < total);
+
+        const errorBox = radio
+            .closest(".tarjeta-container")
+            .querySelector(".saldo-error");
+
+        if (saldo < total) {
+
+            errorBox.style.display = "block";
+
+            btn.disabled = true;
+            btn.style.background = "#ccc";
+            
+
+        } else {
+
+            btn.disabled = false;
+            btn.style.background = "#28a745";
+           
+        }
+
     });
+
 });
+
 </script>
 
 {% endblock %}

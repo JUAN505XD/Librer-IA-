@@ -15,4 +15,6 @@ urlpatterns = [
     path("eliminar-cuenta/", views.eliminar_cuenta, name="eliminar_cuenta"),
     path("tarjetas/", views.ver_tarjetas, name="ver_tarjetas"),
     path("tarjetas/agregar/", views.registrar_tarjeta, name="registrar_tarjeta"),
+    path("tarjetas/mis-tarjetas/", views.mis_tarjetas, name="mis_tarjetas"),
+    path("tarjetas/eliminar/<int:tarjeta_id>/", views.eliminar_tarjeta, name="eliminar_tarjeta"),
 ]

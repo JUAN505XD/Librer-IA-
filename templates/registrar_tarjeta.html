@@ -81,7 +81,7 @@ input, select {
             </div>
         </div>
 
-        <!-- FECHA REAL TIPO TARJETA -->
+        <!-- FECHA DE VENCIMIENTO -->
         <div class="row">
 
             <div class="col">
@@ -112,15 +112,26 @@ input, select {
                 {% endif %}
             </div>
         </div>
+
+        <!-- SALDO -->
         <div class="row">
-        <div class="col">
-            <label>Saldo inicial</label>
-            {{ form.saldo }}
-            {% if form.saldo.errors %}
-                <div class="error-box">{{ form.saldo.errors.0 }}</div>
-            {% endif %}
+            <div class="col">
+                <label>Saldo inicial</label>
+                {{ form.saldo }}
+                {% if form.saldo.errors %}
+                    <div class="error-box">{{ form.saldo.errors.0 }}</div>
+                {% endif %}
+            </div>
         </div>
-        </div>
+
+        <!-- ERRORES GENERALES DEL FORMULARIO -->
+        {% if form.non_field_errors %}
+            <div class="error-box" style="margin-bottom:15px;">
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
 
         <button type="submit" class="btn">
             Guardar Tarjeta

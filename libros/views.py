@@ -2,10 +2,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from carrito.models import Carrito
 from carrito.views import limpiar_items_expirados
-from .Forms import LibroForm
-from libros.models import Libro, Autor, Genero, Idioma
+from .Forms import LibroForm, validar_nombre_fuerte
+from libros.models import Libro, Autor, Genero, Idioma, Editorial
 from users.models import Preferencias
 from django.db.models import Q
+from django.contrib import messages
+
 
 def crear_libro(request):
 
@@ -179,3 +181,69 @@ def detalle_libro(request, libro_id):
     return render(request, "detalle_libro.html", {
         "libro": libro
         })
+
+def crear_autor(request):
+
+    error = None
+
+    if request.method == "POST":
+        nombre = request.POST.get("nombre")
+
+        try:
+            nombre_limpio = validar_nombre_fuerte(nombre, "autor")
+
+            if Autor.objects.filter(nombre__iexact=nombre_limpio).exists():
+                error = "Este autor ya está registrado"
+            else:
+                Autor.objects.create(nombre=nombre_limpio)
+                return redirect("crear_libro")
+
+        except ValueError as e:
+            error = str(e)
+
+    return render(request, "crear_autor.html", {"error": error})
+
+def crear_genero(request):
+
+    error = None
+
+    if request.method == "POST":
+        nombre = request.POST.get("nombre")
+
+        try:
+            nombre_limpio = validar_nombre_fuerte(nombre, "género")
+
+            if Genero.objects.filter(nombre__iexact=nombre_limpio).exists():
+                error = "Este género ya está registrado"
+            else:
+                Genero.objects.create(nombre=nombre_limpio)
+                return redirect("crear_libro")
+
+        except ValueError as e:
+            error = str(e)
+
+    return render(request, "crear_genero.html", {"error": error})
+
+def crear_editorial(request):
+
+    error = None
+
+    if request.method == "POST":
+        nombre = request.POST.get("nombre")
+
+        try:
+            nombre_limpio = validar_nombre_fuerte(nombre, "editorial")
+
+            if Editorial.objects.filter(nombre__iexact=nombre_limpio).exists():
+                error = "Esta editorial ya está registrada"
+            else:
+                Editorial.objects.create(nombre=nombre_limpio)
+                return redirect("crear_libro")
+
+        except ValueError as e:
+            error = str(e)
+
+    return render(request, "crear_editorial.html", {"error": error})
+
+
+

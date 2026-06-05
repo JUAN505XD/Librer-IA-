@@ -337,8 +337,44 @@ def registrar_tarjeta(request):
 @login_required
 def ver_tarjetas(request):
 
-    tarjetas = Tarjeta.objects.filter(usuario=request.user)
+    tarjetas = Tarjeta.objects.filter(
+        usuario=request.user
+    ).order_by("-fecha_creacion")
 
-    return render(request, "ver_tarjetas.html", {
-        "tarjetas": tarjetas
-    })
+    return render(
+        request,
+        "ver_tarjetas.html",
+        {
+            "tarjetas": tarjetas
+        }
+    )
+
+@login_required
+def mis_tarjetas(request):
+
+    tarjetas = Tarjeta.objects.filter(
+        usuario=request.user
+    ).order_by("-fecha_creacion")
+
+    return render(
+        request,
+        "mis_tarjetas.html",
+        {
+            "tarjetas": tarjetas
+        }
+    )
+
+@login_required
+def eliminar_tarjeta(request, tarjeta_id):
+
+    tarjeta = get_object_or_404(
+        Tarjeta,
+        id=tarjeta_id,
+        usuario=request.user
+    )
+
+    if request.method == "POST":
+        tarjeta.delete()
+        return redirect("ver_tarjetas")
+
+    return redirect("ver_tarjetas")

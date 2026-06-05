@@ -103,7 +103,11 @@ def pagar_carrito(request):
             carrito.save()
 
         messages.success(request, "¡Compra realizada con éxito!")
-        return redirect('historial')
+
+        return redirect(
+            'seguimiento_pedido',
+            carrito_id=carrito.id
+        )
 
     return render(request, "pagar_carrito.html", {
         "carrito": carrito,
@@ -186,3 +190,51 @@ def restar_item(request, item_id):
             item.delete()  # 🔥 si queda en 1 → se elimina
 
     return redirect('ver_carrito')
+
+@login_required
+def seguimiento_pedido(request, carrito_id):
+
+    compra = get_object_or_404(
+        Carrito,
+        id=carrito_id,
+        usuario=request.user,
+        estado="PAGADO"
+    )
+
+    minutos = (
+        timezone.now() - compra.fecha_pago
+    ).total_seconds() / 60
+
+    if minutos < 1:
+        estado = "📦 Preparando pedido"
+        progreso = 25
+        paso = 1
+
+    elif minutos < 2:
+        estado = "🚚 Pedido despachado"
+        progreso = 50
+        paso = 2
+
+    elif minutos < 3:
+        estado = "🛣️ En camino"
+        progreso = 75
+        paso = 3
+
+    else:
+        estado = "✅ Entregado"
+        progreso = 100
+        paso = 4
+
+    fecha_entrega = compra.fecha_pago + timedelta(minutes=3)
+
+    return render(
+        request,
+        "seguimiento_pedido.html",
+        {
+            "compra": compra,
+            "estado": estado,
+            "progreso": progreso,
+            "paso": paso,
+            "fecha_entrega": fecha_entrega,
+        }
+    )

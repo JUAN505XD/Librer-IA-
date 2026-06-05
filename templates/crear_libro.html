@@ -91,7 +91,11 @@ input, select {
                 {% if form.autores.errors %}
                     <div class="error-box">{{ form.autores.errors.0 }}</div>
                 {% endif %}
+                 <a href="{% url 'crear_autor' %}" style="font-size:12px;color:#0066cc;">
+                 ➕ Crear nuevo autor
+                </a>
             </div>
+           
 
             <div class="col">
                 <label>Género</label>
@@ -99,8 +103,12 @@ input, select {
                 {% if form.genero.errors %}
                     <div class="error-box">{{ form.genero.errors.0 }}</div>
                 {% endif %}
+                 <a href="{% url 'crear_genero' %}" style="font-size:12px;color:#0066cc;">
+                 ➕ Crear nuevo género
+                </a>
             </div>
         </div>
+
 
         <!-- EDITORIAL Y PAGINAS -->
         <div class="row">
@@ -110,6 +118,9 @@ input, select {
                 {% if form.editorial.errors %}
                     <div class="error-box">{{ form.editorial.errors.0 }}</div>
                 {% endif %}
+                <a href="{% url 'crear_editorial' %}" style="font-size:12px;color:#0066cc;">
+                 ➕ Crear nueva editorial
+                </a>
             </div>
 
             <div class="col">
