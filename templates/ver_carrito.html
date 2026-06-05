@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Mi Carrito{% endblock %}
 
 {% block content %}
@@ -36,11 +37,20 @@
                 <tbody>
                     {% for item in carrito.items.all %}
                     <tr style="border-bottom: 1px solid #ddd;">
-
                         <td style="padding: 10px;">
-                            {{ item.libro.titulo }}
-                        </td>
+		            <div style="display:flex; gap:15px;align-items:center;">
+                                <img style="width:70px;height:100px;object-fit:cover;" 
+			             src="{{ item.libro.portada_url }}"
+			             onerror="this.onerror=null; this.src='{% static 'assets/portadas/default.jpg' %}';"
+			        >
+			        <div>
+				    <strong>{{ item.libro.titulo }}</strong>
+			        </div>
+			    </div>
 
+
+                        </td>
+			
                         <td style="padding: 10px; text-align: center;">
 
                             <a href="{% url 'restar_item' item.id %}"
