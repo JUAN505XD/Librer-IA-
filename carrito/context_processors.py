@@ -15,8 +15,8 @@ def tiempo_carrito(request):
             limpiar_items_expirados(carrito)
             
             # Volvemos a verificar si el carrito sobrevivió a la limpieza
-            if carrito.id and Carrito.objects.filter(id=carrito.id, estado='ACTIVO').exists():
-                if carrito.items.exists() and carrito.actualizado_en:
+            if Carrito.objects.filter(id=carrito.id, estado='ACTIVO').exists():
+                if carrito.items.exists():
                     ahora = timezone.now()
                     limite_tiempo = carrito.actualizado_en + timedelta(minutes=MINUTOS_EXPIRACION)
                     segundos = int((limite_tiempo - ahora).total_seconds())
