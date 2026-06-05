@@ -17,9 +17,10 @@ def tiempo_carrito(request):
             # Volvemos a verificar si el carrito sobrevivió a la limpieza
             if Carrito.objects.filter(id=carrito.id, estado='ACTIVO').exists():
                 if carrito.items.exists():
+                    cantidad_carrito = sum(item.cantidad for item in carrito.items.all())
                     ahora = timezone.now()
                     limite_tiempo = carrito.actualizado_en + timedelta(minutes=MINUTOS_EXPIRACION)
                     segundos = int((limite_tiempo - ahora).total_seconds())
-                    return {'segundos_restantes_global': max(0, segundos)}
+                    return {'segundos_restantes_global': max(0, segundos), 'cantidad_carrito': cantidad_carrito,}
                     
     return {'segundos_restantes_global': 0}
