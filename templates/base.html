@@ -302,6 +302,33 @@ main {
 </div>
 {% endif %}
 
+{% if segundos_restantes_global > 0 %}
+<script>
+    (function() {
+        window.tiempoRestanteGlobal = {{ segundos_restantes_global }};
+
+        const cronometroGlobal = setInterval(function() {
+
+            window.tiempoRestanteGlobal--;
+
+            if (window.tiempoRestanteGlobal <= 0) {
+                clearInterval(cronometroGlobal);
+		mostrarToast(
+			"Tu reserva ha expirado",
+			"warning"
+		);
+		const badge = document.getElementById('badge-contador');
+
+		if (badge) {
+			badge.textContent = '';
+			badge.style.display = 'none';
+		}
+             }
+        }, 1000);
+    })();
+</script>
+{% endif %}
+
 <div class="content">
     {% block content %}
     {% endblock %}
@@ -349,31 +376,6 @@ main {
 
 </script>
 
-{% if segundos_restantes_global > 0 %}
-<script>
-    (function() {
-        let tiempoRestanteGlobal = {{ segundos_restantes_global }};
-
-        const cronometroGlobal = setInterval(function() {
-            tiempoRestanteGlobal--;
-
-            if (tiempoRestanteGlobal <= 0) {
-                clearInterval(cronometroGlobal);
-		mostrarToast(
-			"Tu reserva ha expirado",
-			"warning"
-		);
-		const badge = document.getElementById('badge-contador');
-
-		if (badge) {
-			badge.textContent = '';
-			badge.style.display = 'none';
-		}
-             }
-        }, 1000);
-    })();
-</script>
-{% endif %}
 
 {% if request.user.is_authenticated and user.rol == "CLIENTE" %}
 <a href="{% url 'ver_carrito' %}" id="carrito-flotante" style="

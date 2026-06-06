@@ -117,40 +117,33 @@
             </div>
 
              <script>
-    let segundosRestantes = parseInt("{{ segundos_restantes_global }}", 10) || 0;
     const displayReloj = document.getElementById('reloj-cuenta-regresiva');
 
     if (displayReloj) {
-        if (segundosRestantes <= 0) {
-            displayReloj.textContent = "00:00:00";
-        } else {
-            function renderizarTiempo() {
-                let horas = Math.floor(segundosRestantes / 3600);
-                let minutos = Math.floor((segundosRestantes % 3600) / 60);
-                let segundos = segundosRestantes % 60;
+	    function renderizarReloj() {
 
-                // ✨ CORREGIDO: Todas las variables unificadas en español
-                horas = horas < 10 ? '0' + horas : horas;
-                minutos = minutos < 10 ? '0' + minutos : minutos;
-                segundos = segundos < 10 ? '0' + segundos : segundos;
+		    const restante = window.tiempoRestanteGlobal;
 
-                displayReloj.textContent = `${horas}:${minutos}:${segundos}`;
-            }
+		    if (restante <= 0) {
+			    displayReloj.textContent = "00:00:00";
+			    clearInterval(intervaloReloj);
+			    return;
+		    }
 
-            // Primera ejecución inmediata para quitar el --:--:--
-            renderizarTiempo();
+		    let horas = Math.floor(restante / 3600);
+		    let minutos = Math.floor((restante % 3600) / 60);
+		    let segundos = restante % 60;
 
-            // Iniciar el segundero
-            const intervaloId = setInterval(function() {
-                segundosRestantes--;
-                if (segundosRestantes >= 0) {
-                    renderizarTiempo();
-                } else {
-                    clearInterval(intervaloId);
-                    displayReloj.textContent = "00:00:00";
-                }
-            }, 1000);
-        }
+		    horas = horas < 10 ? '0' + horas : horas;
+		    minutos = minutos < 10 ? '0' + minutos : minutos;
+		    segundos = segundos < 10 ? '0' + segundos : segundos;
+
+		    displayReloj.textContent = `${horas}:${minutos}:${segundos}`;
+	    }
+
+	    renderizarReloj();
+
+	    const intervaloReloj = setInterval(renderizarReloj, 1000)
     }
 </script> 
 {% else %}
