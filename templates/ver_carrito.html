@@ -7,22 +7,28 @@
 <div class="main-container">
 
     <aside>
-        <h2>Resumen</h2>
-        <p>Total de artículos: {{ carrito.items.count|default:"0" }} / 5</p>
-        <hr>
-        <p><strong>Total a pagar:</strong></p>
-        <h2 style="color: #0066cc;">${{ carrito.get_total|default:"0.00" }}</h2>
     </aside>
 
     <main>
         <h2>Tu Carrito de Compras</h2>
+	<p>Total de artículos: {{ carrito.items.count|default:"0" }} / 5</p>
         <br>
 
-<div id="carritoVacio" style="display:none; text-align: center; padding: 40px;">
-    <p>El carrito está vacío.</p>
-    <a href="{% url 'inicio' %}" style="color: #0066cc; text-decoration: underline;">Ir al catálogo</a>
-</div>
+    <div id="carritoExpirado" style="display:none; text-align: center; padding: 40px;">
+	<div style="font-size:90px;">⏰</div>
+	<h2>La reserva expiró</h2>
+        <p>Los libros fueron devueltos al stock.</p>
+	<p>¡Continúa explorando libros!</p>
+	<br>
+        <a href="{% url 'inicio' %}" style="background:#0066cc; color:white; text-decoration:none; padding: 8px; border-radius: 3px;">Ir al catálogo</a>
+    </div>
 
+    <div id="carritoVacio" style="display: none; text-align:center; padding: 40px;">
+	    <div style="font-size:50px;">🛒</div>
+	    <p>El carrito está vacío</p>
+	    <br>
+	    <a href="{% url 'inicio' %}" style="background:#0066cc; color:white; text-decoration:none; padding: 8px; border-radius: 3px;">Ir al catálogo</a>
+    </div>
 
         {% if carrito %}
             
@@ -138,7 +144,7 @@
 			    tablaLibros = document.querySelector('table');
 			    contador = document.getElementById('banner-timer');
 			    botones = document.getElementById('botonesCarrito');
-			    carrito = document.getElementById('carritoVacio');
+			    carrito = document.getElementById('carritoExpirado');
 
 			    tablaLibros.style.display = 'none';
 			    contador.style.display = 'none';
@@ -170,6 +176,7 @@
 		carroVacio = document.getElementById('carritoVacio');
 		carroVacio.style.display = 'block';
                     {% endif %}
+	</script>
 
     </main>
 
