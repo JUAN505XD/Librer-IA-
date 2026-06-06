@@ -3,6 +3,7 @@
 {% block title %}Mi Carrito{% endblock %}
 
 {% block content %}
+
 <div class="main-container">
 
     <aside>
@@ -16,6 +17,12 @@
     <main>
         <h2>Tu Carrito de Compras</h2>
         <br>
+
+<div id="carritoVacio" style="display:none; text-align: center; padding: 40px;">
+    <p>El carrito está vacío.</p>
+    <a href="{% url 'inicio' %}" style="color: #0066cc; text-decoration: underline;">Ir al catálogo</a>
+</div>
+
 
         {% if carrito %}
             
@@ -102,7 +109,7 @@
 
             </table>
 
-            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <div id="botonesCarrito" style="display: flex; gap: 10px; justify-content: flex-end;">
 
                 <a href="{% url 'vaciar_carrito' %}"
                    style="background: #cc0000; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">
@@ -127,6 +134,18 @@
 		    if (restante <= 0) {
 			    displayReloj.textContent = "00:00:00";
 			    clearInterval(intervaloReloj);
+
+			    tablaLibros = document.querySelector('table');
+			    contador = document.getElementById('banner-timer');
+			    botones = document.getElementById('botonesCarrito');
+			    carrito = document.getElementById('carritoVacio');
+
+			    tablaLibros.style.display = 'none';
+			    contador.style.display = 'none';
+			    botones.style.display = 'none';
+			    carrito.style.display = 'block';
+			    
+
 			    return;
 		    }
 
@@ -147,11 +166,10 @@
     }
 </script> 
 {% else %}
-            <div style="text-align: center; padding: 40px;">
-                <p>El carrito está vacío.</p>
-                <a href="{% url 'inicio' %}" style="color: #0066cc; text-decoration: underline;">Ir al catálogo</a>
-            </div>
-        {% endif %}
+	<script>
+		carroVacio = document.getElementById('carritoVacio');
+		carroVacio.style.display = 'block';
+                    {% endif %}
 
     </main>
 
