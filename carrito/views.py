@@ -191,7 +191,7 @@ def restar_item(request, item_id):
     
     libro = item.libro
 
-    if carrito.items.count() == 1:
+    if carrito.items.count() == 1 and item.cantidad == 1:
         return redirect('vaciar_carrito')
 
     with transaction.atomic():
