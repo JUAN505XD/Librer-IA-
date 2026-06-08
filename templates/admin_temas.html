@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Panel de Soporte{% endblock %}
+
+{% block content %}
+
+<style>
+
+.container{
+    background:white;
+    border-radius:15px;
+    max-width:1000px;
+    margin:40px auto;
+    padding:30px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.2);
+}
+
+.tema-card{
+    border:1px solid #ddd;
+    border-radius:10px;
+    padding:20px;
+    margin-bottom:15px;
+    background:#f9f9f9;
+    transition:.2s;
+}
+
+.tema-card:hover{
+    transform:translateY(-2px);
+    box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+
+.row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+}
+
+.badge{
+    padding:6px 12px;
+    border-radius:6px;
+    color:white;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.abierto{
+    background:#28a745;
+}
+
+.cerrado{
+    background:#dc3545;
+}
+
+.btn{
+    display:inline-block;
+    margin-top:10px;
+    background:#0066cc;
+    color:white;
+    text-decoration:none;
+    padding:10px 18px;
+    border-radius:8px;
+    font-weight:bold;
+}
+
+.btn:hover{
+    opacity:.9;
+}
+
+.info{
+    color:#555;
+    margin-bottom:5px;
+}
+
+.titulo{
+    color:#003366;
+    margin-bottom:10px;
+}
+
+</style>
+
+<div class="container">
+
+    <h2 style="text-align:center;">
+        Consultas de Soporte
+    </h2>
+
+    <br>
+
+    {% if temas %}
+
+        {% for tema in temas %}
+
+            <div class="tema-card">
+
+                <div class="row">
+
+                    <h3 class="titulo">
+                        {{ tema.titulo }}
+                    </h3>
+
+                    <span class="badge
+                        {% if tema.estado == 'ABIERTO' %}
+                            abierto
+                        {% else %}
+                            cerrado
+                        {% endif %}
+                    ">
+                        {{ tema.estado }}
+                    </span>
+
+                </div>
+
+                <div class="info">
+                    <strong>Usuario:</strong>
+                    {{ tema.usuario.username }}
+                </div>
+
+                <div class="info">
+                    <strong>Fecha:</strong>
+                    {{ tema.fecha_creacion|date:"d/m/Y H:i" }}
+                </div>
+
+                <a
+                    href="{% url 'ver_tema' tema.id %}"
+                    class="btn"
+                >
+                    Ver conversación
+                </a>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div style="
+            text-align:center;
+            padding:50px;
+            color:#777;
+        ">
+            No hay consultas registradas.
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

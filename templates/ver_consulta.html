@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}{{ tema.titulo }}{% endblock %}
+
+{% block content %}
+
+<style>
+
+.container{
+    max-width:900px;
+    margin:40px auto;
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
+}
+
+.mensaje{
+    margin-bottom:15px;
+    padding:15px;
+    border-radius:10px;
+    background:#f5f5f5;
+}
+
+.admin{
+    border-left:5px solid #0066cc;
+}
+
+.usuario{
+    border-left:5px solid #28a745;
+}
+
+.fecha{
+    color:#777;
+    font-size:12px;
+}
+
+textarea{
+    width:100%;
+    min-height:120px;
+    padding:10px;
+    border:1px solid #ddd;
+    border-radius:8px;
+}
+
+.btn{
+    margin-top:10px;
+    background:#0066cc;
+    color:white;
+    border:none;
+    padding:10px 20px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.estado{
+    font-weight:bold;
+}
+
+</style>
+
+<div class="container">
+
+    <h2>{{ tema.titulo }}</h2>
+
+    <br>
+
+    <p>
+        Estado:
+        <span class="estado">
+            {{ tema.estado }}
+        </span>
+    </p>
+
+    <hr>
+    <br>
+
+    {% for mensaje in tema.mensajes.all %}
+
+        <div class="mensaje {% if mensaje.autor.rol == 'CLIENTE' %}usuario{% else %}admin{% endif %}">
+
+            <strong>
+                {{ mensaje.autor.username }}
+            </strong>
+
+            <div class="fecha">
+                {{ mensaje.fecha|date:"d/m/Y H:i" }}
+            </div>
+
+            <br>
+
+            {{ mensaje.mensaje|linebreaks }}
+
+        </div>
+
+    {% empty %}
+
+        <p>No hay mensajes todavía.</p>
+
+    {% endfor %}
+
+    {% if tema.estado == "ABIERTO" %}
+
+    <hr>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <textarea
+            name="mensaje"
+            required
+            placeholder="Escribe tu respuesta..."
+        ></textarea>
+
+        <button class="btn" type="submit">
+            Enviar mensaje
+        </button>
+    </form>
+{% if tema.estado == "ABIERTO" %}
+
+    <a href="{% url 'cerrar_tema' tema.id %}"
+       style="
+            background:#dc3545;
+            color:white;
+            padding:10px 18px;
+            text-decoration:none;
+            border-radius:8px;
+            font-weight:bold;
+            display:inline-block;
+            margin-top:10px;
+       ">
+        Cerrar consulta
+    </a>
+
+{% endif %}
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -3,6 +3,7 @@ from django.conf import settings
 from libros.models import Libro
 from django.utils import timezone
 from datetime import timedelta
+from users.models import Tarjeta
 
 class Carrito(models.Model):
     ESTADOS = [
@@ -16,6 +17,13 @@ class Carrito(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     actualizado_en = models.DateTimeField(auto_now=True) # <--- Tracks the 24h action window
     fecha_pago = models.DateTimeField(null=True, blank=True)
+
+    tarjeta_pago = models.ForeignKey(
+        Tarjeta,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
 
     def es_antiguo(self):
         # Checks if 24 hours have passed since the last update
