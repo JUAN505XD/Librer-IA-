@@ -195,12 +195,9 @@
         <div style="margin-top: 15px;">
             {% if user.is_authenticated and user.rol == "CLIENTE" %}
                 {% if libro.stock > 0 %}
-                    <form action="{% url 'agregar_al_carrito' libro.id %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit" class="btn-agregar-carrito">
+                    <a href="{% url 'agregar_al_carrito' libro.id %}" class="btn-agregar-carrito">
                             📥 Añadir al Carrito
-                        </button>
-                    </form>
+                    </a>
                 {% else %}
                     <span class="agotado-tag">❌ Este libro se encuentra temporalmente agotado</span>
                 {% endif %}

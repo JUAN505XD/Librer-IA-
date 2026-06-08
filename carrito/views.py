@@ -29,7 +29,13 @@ def agregar_al_carrito(request, libro_id):
 
     # 🛡️ Ejecutar limpieza previa antes de validar topes
     limpiar_items_expirados(carrito)
-    
+
+    if carrito.estado != 'ACTIVO':
+        carrito = Carrito.objects.create(
+                usuario=request.user,
+                estado='ACTIVO'
+                )
+
     item, item_created = ItemCarrito.objects.get_or_create(
         carrito=carrito,
         libro=libro,
@@ -185,7 +191,7 @@ def restar_item(request, item_id):
     
     libro = item.libro
 
-    if carrito.items.count() == 1:
+    if carrito.items.count() == 1 and item.cantidad == 1:
         return redirect('vaciar_carrito')
 
     with transaction.atomic():
