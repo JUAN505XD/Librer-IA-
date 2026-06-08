@@ -13,10 +13,8 @@ class Devolucion(models.Model):
 
     MOTIVOS = [
         ("DEFECTUOSO", "Libro defectuoso o dañado"),
-        ("EQUIVOCADO", "Recibí un libro incorrecto"),
-        ("INCOMPLETO", "Libro incompleto"),
-        ("ARREPENTIMIENTO", "Ya no deseo el producto"),
-        ("OTRO", "Otro motivo"),
+        ("TiempoSuperior", "Tiempo de entrega superior al esperado"),
+        ("ARREPENTIMIENTO", "El libro no lleno mis expectativas"),
     ]
 
     compra = models.ForeignKey(
@@ -60,3 +58,6 @@ class DevolucionItem(models.Model):
 
     def __str__(self):
         return f"{self.item.libro.titulo}"
+    def subtotal(self):
+        return self.item.precio_unitario * self.cantidad
+    

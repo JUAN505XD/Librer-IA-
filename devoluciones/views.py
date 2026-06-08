@@ -109,7 +109,10 @@ def aprobar_devolucion(request, devolucion_id):
                 item = devolucion_item.item
 
                 # dinero
-                total_devolver += item.get_subtotal()
+                total_devolver += (
+                    item.precio_unitario
+                    * devolucion_item.cantidad
+                )
 
                 # stock
                 libro = item.libro
@@ -146,6 +149,7 @@ def aprobar_devolucion(request, devolucion_id):
     )
 
     return redirect("lista_devoluciones")
+
 @login_required
 def rechazar_devolucion(request, devolucion_id):
 
@@ -176,6 +180,34 @@ def solicitar_devolucion_item(request, item_id):
         motivo = request.POST.get("motivo")
         descripcion = request.POST.get("descripcion")
 
+        try:
+            cantidad = int(
+                request.POST.get("cantidad")
+            )
+        except (TypeError, ValueError):
+
+            messages.error(
+                request,
+                "Cantidad inválida."
+            )
+
+            return redirect(
+                "solicitar_devolucion_item",
+                item_id=item.id
+            )
+
+        if cantidad < 1 or cantidad > item.cantidad:
+
+            messages.error(
+                request,
+                "La cantidad seleccionada no es válida."
+            )
+
+            return redirect(
+                "solicitar_devolucion_item",
+                item_id=item.id
+            )
+
         devolucion = Devolucion.objects.create(
             compra=item.carrito,
             usuario=request.user,
@@ -186,15 +218,23 @@ def solicitar_devolucion_item(request, item_id):
         DevolucionItem.objects.create(
             devolucion=devolucion,
             item=item,
-            cantidad=item.cantidad
+            cantidad=cantidad
         )
 
-        messages.success(request, "Solicitud enviada correctamente")
+        messages.success(
+            request,
+            "Solicitud enviada correctamente."
+        )
+
         return redirect("historial")
 
-    return render(request, "solicitar_devolucion_item.html", {
-        "item": item
-    })
+    return render(
+        request,
+        "solicitar_devolucion_item.html",
+        {
+            "item": item
+        }
+    )
 
 @login_required
 def mis_devoluciones(request):

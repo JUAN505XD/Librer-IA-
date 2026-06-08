@@ -162,29 +162,43 @@
         <br><br>
 
         {% for devolucion_item in d.items.all %}
-            <div class="item-libro">
+    <div class="item-libro">
 
-                <div>
-                    {{ devolucion_item.item.libro.titulo }}
-                    <br>
-                    <small>{{ devolucion_item.item.libro.autor }}</small>
-                </div>
+        <div>
+            {{ devolucion_item.item.libro.titulo }}
+            <br>
+            <small>{{ devolucion_item.item.libro.autor }}</small>
+        </div>
 
-                <div>
-                    x{{ devolucion_item.cantidad }}
-                </div>
+        <div>
+            x{{ devolucion_item.cantidad }}
+        </div>
 
-                <div>
-                    ${{ devolucion_item.item.get_subtotal }}
-                </div>
+        <div>
+            $
+            {{ devolucion_item.subtotal }}
+        </div>
 
-            </div>
-        {% endfor %}
+    </div>
+{% endfor %}
 
         <div class="total">
-            Total a devolver:
-            ${% for devolucion_item in d.items.all %}{{ devolucion_item.item.get_subtotal }}{% endfor %}
-        </div>
+
+    Total a devolver:
+
+    $
+
+    {% for devolucion_item in d.items.all %}
+
+        {{ devolucion_item.subtotal }}
+
+        {% if not forloop.last %}
+            +
+        {% endif %}
+
+    {% endfor %}
+
+</div>
 
     {% else %}
 

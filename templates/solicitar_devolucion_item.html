@@ -104,16 +104,29 @@ textarea {
         <!-- MOTIVO -->
         <div class="row">
             <div class="col">
+                <label>
+    Cantidad a devolver
+</label>
+
+<select name="cantidad" required>
+
+    {% for i in ""|ljust:item.cantidad %}
+
+        <option value="{{ forloop.counter }}">
+            {{ forloop.counter }}
+        </option>
+
+    {% endfor %}
+
+</select>
 
                 <label>Motivo de la devolución</label>
 
                 <select name="motivo" required>
                     <option value="">Selecciona un motivo</option>
                     <option value="DEFECTUOSO">Libro defectuoso o dañado</option>
-                    <option value="EQUIVOCADO">Recibí un libro incorrecto</option>
-                    <option value="INCOMPLETO">Libro incompleto</option>
-                    <option value="ARREPENTIMIENTO">Ya no lo quiero</option>
-                    <option value="OTRO">Otro motivo</option>
+                    <option value="TiempoSuperior">Tiempo de entrega superior al esperado</option>
+                    <option value="ARREPENTIMIENTO">El libro no lleno mis expectativas</option>
                 </select>
 
             </div>

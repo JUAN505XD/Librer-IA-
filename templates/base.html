@@ -261,11 +261,13 @@ main {
             <li><a href="#">Dashboard Admin</a></li>
             <li><a href="{% url 'lista_devoluciones' %}">Gestionar Devoluciones</a></li>
             <li><a href="{% url 'crear_libro' %}">Registrar Libro</a></li>
+            <li><a href="{% url 'lista_temas_admin' %}">Foro Soporte</a></li>
 
         {% elif user.rol == "CLIENTE" %}
 	    <li><a href="{% url 'historial' %}">Historial de compras </a></li>
         <li><a href="{% url 'mis_devoluciones' %}">Mis devoluciones</a></li>
         <li><a href="{% url 'ver_tarjetas' %}">Tarjetas</a></li>
+        <li><a href="{% url 'mis_temas' %}">Mis consultas</a></li>
 
         {% elif user.rol == "ROOT" %}
             <li><a href="{% url 'crear_admin' %}">Crear Administrador</a></li>
