@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.db import transaction
 from django.utils import timezone
 from django.http import JsonResponse
+from devoluciones.models import Devolucion, DevolucionItem
 from libros.models import Libro
 from .models import Carrito, ItemCarrito
 from users.models import Tarjeta
@@ -117,6 +118,10 @@ def pagar_carrito(request):
             # marcar carrito como pagado
             carrito.estado = 'PAGADO'
             carrito.fecha_pago = timezone.now()
+
+            # 🔥 guardar tarjeta utilizada
+            carrito.tarjeta_pago = tarjeta
+
             carrito.save()
 
         messages.success(request, "¡Compra realizada con éxito!")
@@ -133,9 +138,54 @@ def pagar_carrito(request):
 
 @login_required
 def historial_compras(request):
-    compras = Carrito.objects.filter(usuario=request.user, estado='PAGADO').order_by('-fecha_pago')
-    return render(request, 'historial.html', {'compras': compras})
 
+    compras = Carrito.objects.filter(
+        usuario=request.user,
+        estado='PAGADO'
+    ).order_by('-fecha_pago')
+
+    # SOLO devoluciones completas
+    carritos_con_devolucion_total = set(
+        Devolucion.objects.filter(
+            usuario=request.user,
+            items__isnull=True
+        ).values_list(
+            'compra_id',
+            flat=True
+        )
+    )
+
+    # ITEMS con devolución parcial
+    items_con_devolucion = set(
+        DevolucionItem.objects.filter(
+            item__carrito__usuario=request.user
+        ).values_list(
+            'item_id',
+            flat=True
+        )
+    )
+
+    # CARRITOS que tienen cualquier devolución
+    # (total o parcial)
+    carritos_con_cualquier_devolucion = set(
+        Devolucion.objects.filter(
+            usuario=request.user
+        ).values_list(
+            'compra_id',
+            flat=True
+        )
+    )
+
+    return render(
+        request,
+        'historial.html',
+        {
+            'compras': compras,
+            'carritos_con_devolucion_total': carritos_con_devolucion_total,
+            'items_con_devolucion': items_con_devolucion,
+            'carritos_con_cualquier_devolucion': carritos_con_cualquier_devolucion,
+        }
+    )
 @login_required
 def vaciar_carrito(request):
     carrito = Carrito.objects.filter(usuario=request.user, estado='ACTIVO').first()

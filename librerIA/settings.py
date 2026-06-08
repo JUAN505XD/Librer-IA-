@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'users',
     'libros',
     'carrito',
+    'devoluciones',
     'django_countries',
     'django_select2',]
 

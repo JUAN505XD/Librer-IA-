@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+{% block title %}Mis devoluciones{% endblock %}
+
+{% block content %}
+
+<style>
+
+.container {
+    background: white;
+    border-radius: 15px;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.devolucion {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: #f9f9f9;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.col {
+    flex: 1;
+}
+
+.badge {
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+}
+
+.pendiente {
+    background: orange;
+}
+
+.aprobada {
+    background: green;
+}
+
+.rechazada {
+    background: red;
+}
+
+.detalle-compra {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+    border: 1px solid #eee;
+}
+
+.item-libro {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+}
+
+.total {
+    text-align: right;
+    font-weight: bold;
+    margin-top: 10px;
+    color: #28a745;
+}
+
+.info-respuesta {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    background: #f5f5f5;
+}
+
+</style>
+
+<div class="container">
+
+    <h2 style="text-align:center;">
+        Mis solicitudes de devolución
+    </h2>
+
+    <br>
+
+    {% if devoluciones %}
+
+        {% for d in devoluciones %}
+
+        <div class="devolucion">
+
+            <div class="row">
+
+                <div class="col">
+                    <strong>Solicitud #{{ d.id }}</strong>
+                </div>
+
+                <div class="col" style="text-align:right;">
+
+                    <span class="badge
+                        {% if d.estado == 'PENDIENTE' %}pendiente{% endif %}
+                        {% if d.estado == 'APROBADA' %}aprobada{% endif %}
+                        {% if d.estado == 'RECHAZADA' %}rechazada{% endif %}
+                    ">
+                        {{ d.estado }}
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col">
+                    Compra #{{ d.compra.id }}
+                </div>
+
+                <div class="col" style="text-align:right;">
+                    {{ d.fecha_solicitud|date:"d/m/Y H:i" }}
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col">
+                    Motivo:
+                    {{ d.get_motivo_display }}
+                </div>
+
+            </div>
+
+            {% if d.descripcion %}
+            <div class="row">
+
+                <div class="col">
+                    <small>{{ d.descripcion }}</small>
+                </div>
+
+            </div>
+            {% endif %}
+
+            <div class="detalle-compra">
+
+                <strong>📦 Productos afectados</strong>
+
+                <br><br>
+
+                {% if d.items.exists %}
+
+                    {% for devolucion_item in d.items.all %}
+
+                        <div class="item-libro">
+
+                            <div>
+                                {{ devolucion_item.item.libro.titulo }}
+                            </div>
+
+                            <div>
+                                x{{ devolucion_item.cantidad }}
+                            </div>
+
+                            <div>
+                                ${{ devolucion_item.item.get_subtotal }}
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    {% for item in d.compra.items.all %}
+
+                        <div class="item-libro">
+
+                            <div>
+                                {{ item.libro.titulo }}
+                            </div>
+
+                            <div>
+                                x{{ item.cantidad }}
+                            </div>
+
+                            <div>
+                                ${{ item.get_subtotal }}
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                {% endif %}
+
+                <div class="total">
+
+                    {% if d.items.exists %}
+                        Devolución parcial
+                    {% else %}
+                        Devolución completa
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% if d.fecha_respuesta %}
+
+            <div class="info-respuesta">
+
+                <strong>Fecha de respuesta:</strong>
+                {{ d.fecha_respuesta|date:"d/m/Y H:i" }}
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p style="text-align:center;color:#666;">
+            No has realizado solicitudes de devolución.
+        </p>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -259,11 +259,12 @@ main {
     <ul>
         {% if user.rol == "ADMIN" %}
             <li><a href="#">Dashboard Admin</a></li>
-            <li><a href="#">Gestionar Usuarios</a></li>
+            <li><a href="{% url 'lista_devoluciones' %}">Gestionar Devoluciones</a></li>
             <li><a href="{% url 'crear_libro' %}">Registrar Libro</a></li>
 
         {% elif user.rol == "CLIENTE" %}
 	    <li><a href="{% url 'historial' %}">Historial de compras </a></li>
+        <li><a href="{% url 'mis_devoluciones' %}">Mis devoluciones</a></li>
         <li><a href="{% url 'ver_tarjetas' %}">Tarjetas</a></li>
 
         {% elif user.rol == "ROOT" %}
@@ -467,5 +468,23 @@ main {
     });
 </script>
 {% endif %}
+
+{% if messages %}
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+
+    {% for message in messages %}
+
+        mostrarToast(
+            "{{ message|escapejs }}",
+            "{% if message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}success{% endif %}"
+        );
+
+    {% endfor %}
+
+});
+</script>
+{% endif %}
+
 </body>
 </html>

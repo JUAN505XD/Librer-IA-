@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}Solicitar devolución{% endblock %}
+
+{% block content %}
+
+<style>
+
+.container {
+    background: white;
+    border-radius: 15px;
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.col {
+    flex: 1;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.btn {
+    background: #dc3545;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    width: 100%;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-volver {
+    background: #0066cc;
+    text-align: center;
+    display: block;
+    margin-top: 10px;
+    text-decoration: none;
+    padding: 12px;
+    border-radius: 8px;
+    color: white;
+}
+
+.error-box {
+    background: #ffe6e6;
+    color: #cc0000;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 5px;
+    font-size: 14px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.libro-box {
+    background: #f9f9f9;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #eee;
+}
+
+</style>
+
+<div class="container">
+
+    <h2 style="text-align:center;">Solicitar devolución</h2>
+
+    <br>
+
+    <!-- 🔥 INFO DEL LIBRO -->
+    <div class="libro-box">
+
+        <strong>Libro:</strong> {{ item.libro.titulo }} <br>
+        <small>{{ item.libro.autor }}</small>
+
+        <br><br>
+
+        <strong>Cantidad:</strong> {{ item.cantidad }} <br>
+        <strong>Subtotal:</strong> ${{ item.get_subtotal }}
+
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- MOTIVO -->
+        <div class="row">
+            <div class="col">
+
+                <label>Motivo de la devolución</label>
+
+                <select name="motivo" required>
+                    <option value="">Selecciona un motivo</option>
+                    <option value="DEFECTUOSO">Libro defectuoso o dañado</option>
+                    <option value="EQUIVOCADO">Recibí un libro incorrecto</option>
+                    <option value="INCOMPLETO">Libro incompleto</option>
+                    <option value="ARREPENTIMIENTO">Ya no lo quiero</option>
+                    <option value="OTRO">Otro motivo</option>
+                </select>
+
+            </div>
+        </div>
+
+        <!-- DESCRIPCIÓN -->
+        <div class="row">
+            <div class="col">
+
+                <label>Descripción (opcional)</label>
+
+                <textarea name="descripcion" placeholder="Explica el problema..."></textarea>
+
+            </div>
+        </div>
+
+        <!-- ERRORES -->
+        {% if form.errors %}
+            <div class="error-box">
+                Revisa los datos ingresados
+            </div>
+        {% endif %}
+
+        <!-- BOTÓN -->
+        <button type="submit" class="btn">
+            Enviar solicitud de devolución
+        </button>
+
+        <a href="{% url 'historial' %}" class="btn-volver">
+            Volver al historial
+        </a>
+
+    </form>
+
+</div>
+
+{% endblock %}

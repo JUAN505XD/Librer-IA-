@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+{% block title %}Lista de devoluciones{% endblock %}
+
+{% block content %}
+
+<style>
+
+.container {
+    background: white;
+    border-radius: 15px;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.devolucion {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: #f9f9f9;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.col {
+    flex: 1;
+}
+
+.badge {
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+}
+
+.pendiente { background: orange; }
+.aprobada { background: green; }
+.rechazada { background: red; }
+
+.btn {
+    background: #0066cc;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-approve { background: #28a745; }
+.btn-reject { background: #dc3545; }
+
+.acciones {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.detalle-compra {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+    border: 1px solid #eee;
+}
+
+.item-libro {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+}
+
+.total {
+    text-align: right;
+    font-weight: bold;
+    margin-top: 10px;
+    color: #28a745;
+}
+
+</style>
+
+<div class="container">
+
+    <h2 style="text-align:center;">Solicitudes de devolución</h2>
+
+    <br>
+
+    {% if devoluciones %}
+
+        {% for d in devoluciones %}
+        <div class="devolucion">
+
+            <div class="row">
+                <div class="col">
+                    <strong>Compra #{{ d.compra.id }}</strong>
+                </div>
+
+                <div class="col" style="text-align:right;">
+                    <span class="badge 
+                        {% if d.estado == 'PENDIENTE' %}pendiente{% endif %}
+                        {% if d.estado == 'APROBADA' %}aprobada{% endif %}
+                        {% if d.estado == 'RECHAZADA' %}rechazada{% endif %}
+                    ">
+                        {{ d.estado }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    Usuario: {{ d.usuario.username }}
+                </div>
+                <div class="col" style="text-align:right;">
+                    {{ d.fecha_solicitud|date:"d/m/Y H:i" }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    Motivo: {{ d.get_motivo_display }}
+                </div>
+            </div>
+
+            {% if d.descripcion %}
+            <div class="row">
+                <div class="col">
+                    <small>{{ d.descripcion }}</small>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- 🔥 DETALLE DE COMPRA -->
+<div class="detalle-compra">
+
+    {% if d.items.exists %}
+
+        <div style="margin-bottom:10px;">
+            <span style="
+                background:#17a2b8;
+                color:white;
+                padding:5px 10px;
+                border-radius:5px;
+                font-size:12px;
+                font-weight:bold;
+            ">
+                DEVOLUCIÓN PARCIAL
+            </span>
+        </div>
+
+        <strong>📦 Libros solicitados para devolución</strong>
+        <br><br>
+
+        {% for devolucion_item in d.items.all %}
+            <div class="item-libro">
+
+                <div>
+                    {{ devolucion_item.item.libro.titulo }}
+                    <br>
+                    <small>{{ devolucion_item.item.libro.autor }}</small>
+                </div>
+
+                <div>
+                    x{{ devolucion_item.cantidad }}
+                </div>
+
+                <div>
+                    ${{ devolucion_item.item.get_subtotal }}
+                </div>
+
+            </div>
+        {% endfor %}
+
+        <div class="total">
+            Total a devolver:
+            ${% for devolucion_item in d.items.all %}{{ devolucion_item.item.get_subtotal }}{% endfor %}
+        </div>
+
+    {% else %}
+
+        <div style="margin-bottom:10px;">
+            <span style="
+                background:#dc3545;
+                color:white;
+                padding:5px 10px;
+                border-radius:5px;
+                font-size:12px;
+                font-weight:bold;
+            ">
+                DEVOLUCIÓN TOTAL
+            </span>
+        </div>
+
+        <strong>📦 Libros de la compra</strong>
+        <br><br>
+
+        {% for item in d.compra.items.all %}
+            <div class="item-libro">
+
+                <div>
+                    {{ item.libro.titulo }}
+                    <br>
+                    <small>{{ item.libro.autor }}</small>
+                </div>
+
+                <div>
+                    x{{ item.cantidad }}
+                </div>
+
+                <div>
+                    ${{ item.get_subtotal }}
+                </div>
+
+            </div>
+        {% endfor %}
+
+        <div class="total">
+            Total: ${{ d.compra.get_total }}
+        </div>
+
+    {% endif %}
+
+</div>
+
+            {% if d.estado == "PENDIENTE" %}
+
+            <div class="acciones">
+
+                <a href="{% url 'aprobar_devolucion' d.id %}" class="btn btn-approve">
+                    Aprobar
+                </a>
+
+                <a href="{% url 'rechazar_devolucion' d.id %}" class="btn btn-reject">
+                    Rechazar
+                </a>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+        {% endfor %}
+
+    {% else %}
+
+        <p style="text-align:center; color:#666;">
+            No hay solicitudes de devolución.
+        </p>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
