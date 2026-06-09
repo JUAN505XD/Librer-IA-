@@ -10,6 +10,10 @@ from devoluciones.models import Devolucion, DevolucionItem
 from libros.models import Libro
 from .models import Carrito, ItemCarrito
 from users.models import Tarjeta
+from users.models import CuponCumpleanos
+from django.http import JsonResponse
+from users.models import CuponCumpleanos
+from decimal import Decimal
 
 # ⏱️ CONFIGURACIÓN UNIVERSAL: Cambia a 1440 cuando pases a producción (24 horas)
 SEGUNDOS_EXPIRACION = 50
@@ -107,6 +111,39 @@ def pagar_carrito(request):
 
         # 🔥 asegurar tipo Decimal
         total = Decimal(str(carrito.get_total()))
+        
+        codigo_cupon = request.POST.get(
+            "codigo_cupon"
+        )
+
+        descuento = Decimal("0")
+
+        if codigo_cupon:
+
+            cupon = CuponCumpleanos.objects.filter(
+                codigo=codigo_cupon,
+                usuario=request.user,
+                usado=False
+            ).first()
+
+            if cupon and cupon.vigente():
+
+                descuento = (
+                    total *
+                    Decimal(cupon.descuento)
+                    / Decimal("100")
+                )
+
+                total -= descuento
+
+            else:
+
+                messages.error(
+                    request,
+                    "Cupón inválido o vencido"
+                )
+
+                return redirect("pagar_carrito")
 
         # 🔥 VALIDACIÓN DE SALDO
         if tarjeta.saldo < total:
@@ -129,6 +166,11 @@ def pagar_carrito(request):
             carrito.tarjeta_pago = tarjeta
 
             carrito.save()
+
+            if codigo_cupon and cupon:
+
+                cupon.usado = True
+                cupon.save()
 
         messages.success(request, "¡Compra realizada con éxito!")
 
@@ -306,3 +348,54 @@ def seguimiento_pedido(request, carrito_id):
             "fecha_entrega": fecha_entrega,
         }
     )
+
+@login_required
+def validar_cupon(request):
+
+    codigo = request.GET.get("codigo", "").strip()
+
+    carrito = Carrito.objects.filter(
+        usuario=request.user,
+        estado="ACTIVO"
+    ).first()
+
+    if not carrito:
+        return JsonResponse({
+            "valido": False,
+            "mensaje": "No existe carrito activo"
+        })
+
+    cupon = CuponCumpleanos.objects.filter(
+        codigo=codigo,
+        usuario=request.user,
+        usado=False
+    ).first()
+
+    if not cupon:
+        return JsonResponse({
+            "valido": False,
+            "mensaje": "Cupón no encontrado"
+        })
+
+    if not cupon.vigente():
+        return JsonResponse({
+            "valido": False,
+            "mensaje": "Cupón vencido"
+        })
+
+    total = Decimal(str(carrito.get_total()))
+
+    descuento = (
+        total *
+        Decimal(cupon.descuento)
+        / Decimal("100")
+    )
+
+    nuevo_total = total - descuento
+
+    return JsonResponse({
+        "valido": True,
+        "descuento": float(descuento),
+        "porcentaje": cupon.descuento,
+        "nuevo_total": float(nuevo_total)
+    })

@@ -306,6 +306,7 @@ class TarjetaForm(forms.ModelForm):
                 "placeholder": "MM"
             }),
             "año_vencimiento": forms.NumberInput(attrs={
+                "value":date.today().year,
                 "min": date.today().year,
                 "placeholder": "YYYY"
             }),
@@ -318,7 +319,10 @@ class TarjetaForm(forms.ModelForm):
                 "maxlength": "3"
             }),
             "saldo": forms.NumberInput(attrs={
-                "placeholder": "0.00"
+                "value": "50000",
+                "placeholder": "50000.00",
+                "step": "1000",
+                "min": "50000"
             })
         }
 
