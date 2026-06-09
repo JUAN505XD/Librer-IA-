@@ -119,6 +119,9 @@ class Cliente(models.Model):
 
     correo = models.EmailField()
     direccion_envio = models.CharField(max_length=200)
+    latitud = models.DecimalField(max_length=20, decimal_places=16,max_digits=19)
+    longitud = models.DecimalField(max_length=20, decimal_places=16,max_digits=19)
+
 
 # =========================
 # Preferencias
