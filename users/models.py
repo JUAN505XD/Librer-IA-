@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from libros.models import Genero, Autor
 from django.core.exceptions import ValidationError
-from datetime import date
+from django.utils import timezone
 from django_countries.fields import CountryField
 
 # =========================
@@ -186,3 +186,49 @@ class Tarjeta(models.Model):
 
     def numero_mostrado(self):
         return f"**** **** **** {self.numero[-4:]}"
+    
+
+
+class CuponCumpleanos(models.Model):
+
+    usuario = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+        related_name="cupones_cumpleanos"
+    )
+
+    codigo = models.CharField(
+        max_length=50,
+        unique=True
+    )
+
+    descuento = models.PositiveIntegerField(
+        default=10
+    )
+
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    fecha_expiracion = models.DateTimeField()
+
+    usado = models.BooleanField(
+        default=False
+    )
+
+    def anio_actual():
+        return timezone.localdate().year
+
+    anio_generado = models.PositiveIntegerField(
+        default=anio_actual
+    )
+
+    def vigente(self):
+
+        return (
+            not self.usado
+            and timezone.now() <= self.fecha_expiracion
+        )
+
+    def __str__(self):
+        return self.codigo

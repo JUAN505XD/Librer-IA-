@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% block content %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+{{ form.media }}
+
+<style>
+
+.container {
+    background: white;
+    border-radius: 15px;
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.col {
+    flex: 1;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.btn {
+    background: #0066cc;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    width: 100%;
+    cursor: pointer;
+}
+
+.btn-volver {
+    background: #ff0000;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    text-align: center;
+    display: block;
+    margin-top: 10px;
+}
+
+.error-box {
+    background: #ffe6e6;
+    color: #cc0000;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 5px;
+    font-size: 14px;
+    text-align: center;
+    font-weight: bold;
+}
+
+</style>
+
+<div class="container">
+
+```
+<h2 style="text-align:center;">
+    Editar Libro
+</h2>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    <!-- TITULO -->
+    <div class="row">
+        <div class="col">
+            <label>Título</label>
+            {{ form.titulo }}
+            {% if form.titulo.errors %}
+                <div class="error-box">{{ form.titulo.errors.0 }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ISSN -->
+    <div class="row">
+        <div class="col">
+            <label>ISSN</label>
+            {{ form.issn }}
+            {% if form.issn.errors %}
+                <div class="error-box">{{ form.issn.errors.0 }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- AUTORES Y GENERO -->
+    <div class="row">
+
+        <div class="col">
+            <label>Autores</label>
+            {{ form.autores }}
+            {% if form.autores.errors %}
+                <div class="error-box">{{ form.autores.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="col">
+            <label>Género</label>
+            {{ form.genero }}
+            {% if form.genero.errors %}
+                <div class="error-box">{{ form.genero.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- EDITORIAL Y PAGINAS -->
+    <div class="row">
+
+        <div class="col">
+            <label>Editorial</label>
+            {{ form.editorial }}
+            {% if form.editorial.errors %}
+                <div class="error-box">{{ form.editorial.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="col">
+            <label>Páginas</label>
+            {{ form.numero_paginas }}
+            {% if form.numero_paginas.errors %}
+                <div class="error-box">{{ form.numero_paginas.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- IDIOMA Y AÑO -->
+    <div class="row">
+
+        <div class="col">
+            <label>Idioma</label>
+            {{ form.idioma }}
+            {% if form.idioma.errors %}
+                <div class="error-box">{{ form.idioma.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="col">
+            <label>Año Publicación</label>
+            {{ form.año_publicacion }}
+            {% if form.año_publicacion.errors %}
+                <div class="error-box">{{ form.año_publicacion.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- ESTADO Y PRECIO -->
+    <div class="row">
+
+        <div class="col">
+            <label>Estado</label>
+            {{ form.estado }}
+            {% if form.estado.errors %}
+                <div class="error-box">{{ form.estado.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="col">
+            <label>Precio</label>
+            {{ form.precio }}
+            {% if form.precio.errors %}
+                <div class="error-box">{{ form.precio.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+            <div class="error-box">
+                {{ error }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <button type="submit" class="btn">
+        Actualizar Libro
+    </button>
+
+    <a href="{% url 'detalle_libro' libro.id %}" class="btn-volver">
+        Volver al detalle
+    </a>
+
+</form>
+```
+
+</div>
+
+{% endblock %}
