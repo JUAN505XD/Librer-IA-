@@ -3,9 +3,6 @@
 
 {% block content %}
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@3.0.1/styles/minimal.min.css">
-<script src="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@1.5.1/dist/index.min.js"></script>
-
 <style>
 .registro-container {
     background: white;
@@ -87,48 +84,6 @@ ul.errorlist {
     padding: 0;
     margin: 0;
 }
-
-.geocoder-container {
-	position: relative;
-	width: 100%;
-}
-
-.geoapify-autocomplete-input {
-	width: 100% !important;
-	padding: 10px 10px 10px 10px !important;
-	border-radius: 6px;
-	border: 1px solid #ccc !important;
-	font-size: 14px !important;
-	box-sizing: border-box !important;
-}
-
-.geoapify-autocomplete-items {
-	border-radius: 0 0 6px 6px !important;
-	box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-	z-index: 99;
-}
-
-.geo-spinner {
-	position: absolute;
-	right: 40px;
-	top: 33px;
-	width: 18px;
-	height: 18px;
-	border: 2px solid #ccc;
-	border-top-color:  #0066cc;
-	border-radius: 50%;
-	animation: geo-spin 0.6s linear infinite;
-	z-index: 10;
-	pointer-events: none;
-}
-
-@keyframes geo-spin {
-	to { transform: rotate(360deg); }
-}
-
-.geoapify-autocomplete-input {
-	padding-right: 40px !important;
-}
 </style>
 
 <div class="registro-container">
@@ -195,7 +150,7 @@ ul.errorlist {
                     {% endif %}
                 </div>
                 <div class="col">
-                    <label>País de Nacimiento</label>
+                    <label>Lugar de Nacimiento</label>
                     {{ form.lugar_nacimiento }}
                     {% if form.lugar_nacimiento.errors %}
                         <div class="error-text">{{ form.lugar_nacimiento.errors.0 }}</div>
@@ -216,15 +171,9 @@ ul.errorlist {
                         <div class="error-text">{{ form.email.errors.0 }}</div>
                     {% endif %}
                 </div>
-                <div class="col" style="position: relative;">
+                <div class="col">
                     <label>Dirección</label>
-		    <div id="autocomplete-geoapify" class="geocoder-container" style="position: relative;"></div>
-		    <div id="geo-spinner" class="geo-spinner" style="display:none;"></div>
-		    <div style="display: none;">
                     {{ form.direccion_envio }}
-		    </div>
-		    <input type="hidden" name="latitud" id="geo-latitud" value="{{ request.POST.latitud|default:'' }}">
-		    <input type="hidden" name="longitud" id="geo-longitud" value="{{ request.POST.longitud|default:'' }}">
                     {% if form.direccion_envio.errors %}
                         <div class="error-text">{{ form.direccion_envio.errors.0 }}</div>
                     {% endif %}
@@ -274,64 +223,5 @@ ul.errorlist {
     </form>
 
 </div>
-
-
-<script>
-
-	document.addEventListener('DOMContentLoaded', function() {
-		const API_KEY = "7e9d6968e4724fe589dc595a96d5938a";
-		
-		const inputDjango = document.getElementById('id_direccion_envio');
-		const inputLat = document.getElementById('geo-latitud');
-		const inputLon = document.getElementById('geo-longitud');
-		const spinner = document.getElementById('geo-spinner');
-
-		const autocompleteGeo = new autocomplete.GeocoderAutocomplete(
-			document.getElementById("autocomplete-geoapify"), API_KEY,
-			{
-				placeholder: "Ingresa tu dirección",
-				type: "street",
-				lang: "es",
-				skipDetails: true,
-				bias: {
-					countrycode: ["co"]
-				}
-			}
-	        );
-
-		const inputElement = document.querySelector('.geoapify-autocomplete-input');
-		if (inputElement) {
-			inputElement.addEventListener('input', function() {
-				if (this.value.trim().length > 2) {
-					spinner.style.display = 'block';
-				} else {
-					spinner.style.display = 'none';
-				}
-			});
-		}
-
-
-		autocompleteGeo.on('select', (location) => {
-			spinner.style.display = 'none';
-			if (!location) {
-				if (inputDjango) inputDjango.value = "";
-				inputLat.value = "";
-				inputLon.value = "";
-				return;
-			}
-
-			const info = location.properties;
-			const latitud = info.lat;
-			const longitud = info.lon;
-
-			if (inputLat) inputLat.value = latitud;
-			if (inputLon) inputLon.value = longitud;
-
-			if (inputDjango) inputDjango.value = info.formatted;
-
-			console.log("dirección guardada", info.formatted, "coords:", latitud, longitud);
-		});
-	});
-</script>
 
 {% endblock %}

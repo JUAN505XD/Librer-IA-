@@ -99,10 +99,8 @@ def editar_perfil_cliente(request):
     cliente = Cliente.objects.get(usuario=usuario)
 
     if request.method == "POST":
-        print(request.POST)
         form = EditarclienteForm(request.POST)
 
-        print(form.is_valid())
         if form.is_valid():
 
             data = form.cleaned_data
@@ -138,20 +136,8 @@ def editar_perfil_cliente(request):
             if data["email"]:
                 cliente.correo = data["email"]
 
-            direccion_final = request.POST.get("direccion_envio") or data.get("direccion_envio")
-
-            latitud_final = request.POST.get("latitud") or data.get("latitud")
-
-            longitud_final = request.POST.get("longitud") or data.get("longitud")
-
-            if direccion_final:
-                cliente.direccion_envio = direccion_final
-
-            if latitud_final:
-                cliente.latitud = latitud_final
-            
-            if longitud_final:
-                cliente.longitud = longitud_final
+            if data["direccion_envio"]:
+                cliente.direccion_envio = data["direccion_envio"]
 
             cliente.save()
 
@@ -168,9 +154,7 @@ def editar_perfil_cliente(request):
         "lugar_nacimiento": persona.lugar_nacimiento.code,
         "genero": persona.sexo,
         "email": cliente.correo,
-        "direccion_envio": cliente.direccion_envio,
-        "latitud": cliente.latitud,
-        "longitud": cliente.longitud
+        "direccion_envio": cliente.direccion_envio
     })
 
     return render(request, "editar_perfil.html", {"form": form})

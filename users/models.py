@@ -119,9 +119,6 @@ class Cliente(models.Model):
 
     correo = models.EmailField()
     direccion_envio = models.CharField(max_length=200)
-    latitud = models.DecimalField(max_length=20, decimal_places=16,max_digits=19)
-    longitud = models.DecimalField(max_length=20, decimal_places=16,max_digits=19)
-
 
 # =========================
 # Preferencias
@@ -186,3 +183,49 @@ class Tarjeta(models.Model):
 
     def numero_mostrado(self):
         return f"**** **** **** {self.numero[-4:]}"
+    
+
+
+class CuponCumpleanos(models.Model):
+
+    usuario = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+        related_name="cupones_cumpleanos"
+    )
+
+    codigo = models.CharField(
+        max_length=50,
+        unique=True
+    )
+
+    descuento = models.PositiveIntegerField(
+        default=10
+    )
+
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    fecha_expiracion = models.DateTimeField()
+
+    usado = models.BooleanField(
+        default=False
+    )
+
+    def anio_actual():
+        return timezone.localdate().year
+
+    anio_generado = models.PositiveIntegerField(
+        default=anio_actual
+    )
+
+    def vigente(self):
+
+        return (
+            not self.usado
+            and timezone.now() <= self.fecha_expiracion
+        )
+
+    def __str__(self):
+        return self.codigo
