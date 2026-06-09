@@ -228,7 +228,7 @@ class EditarclienteForm(forms.Form):
         }),
         required=False
     )
-    lugar_nacimiento = CountryField().formfield(disabled=True,blank_label="País de nacimiento")
+    lugar_nacimiento = CountryField().formfield(disabled=True,blank_label="País de nacimiento", required=False)
 
 
 
