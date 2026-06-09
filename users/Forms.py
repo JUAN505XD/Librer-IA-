@@ -28,8 +28,6 @@ class RegistroClienteForm(UserCreationForm):
     ])
 
     direccion_envio = forms.CharField(max_length=200)
-    latitud = forms.DecimalField(decimal_places=16, max_digits=19)
-    longitud = forms.DecimalField(decimal_places=16,max_digits=19)
     email = forms.EmailField()
 
     class Meta:
@@ -99,9 +97,7 @@ class RegistroClienteForm(UserCreationForm):
             Cliente.objects.create(
                 usuario=usuario,
                 correo=self.cleaned_data["email"],
-                direccion_envio=self.cleaned_data["direccion_envio"],
-                latitud=self.cleaned_data["latitud"],
-                longitud=self.cleaned_data["longitud"],
+                direccion_envio=self.cleaned_data["direccion_envio"]
             )
 
         return usuario
@@ -228,7 +224,7 @@ class EditarclienteForm(forms.Form):
         }),
         required=False
     )
-    lugar_nacimiento = CountryField().formfield(disabled=True,blank_label="País de nacimiento", required=False)
+    lugar_nacimiento = CountryField().formfield(disabled=True,blank_label="País de nacimiento")
 
 
 

@@ -3,9 +3,6 @@
 
 {% block content %}
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@3.0.1/styles/minimal.min.css">
-<script src="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@1.5.1/dist/index.min.js"></script>
-
 <style>
 .editar-container {
     background: white;
@@ -41,7 +38,6 @@ input, select {
     padding: 10px;
     border-radius: 6px;
     border: 1px solid #ccc;
-    box-sizing: border-box;
 }
 
 .row {
@@ -62,12 +58,12 @@ input, select {
     width: 100%;
     font-weight: bold;
     margin-bottom: 10px;
-    cursor: pointer;
 }
 
 .btn-guardar:hover {
     background: #0055aa;
 }
+
 
 .btn-eliminar {
     background: #ff0000;
@@ -111,45 +107,6 @@ input, select {
 .btn-password:hover {
     background: #003f0c;
 }
-
-/* 🗺️ ESTILOS DEL COMPONENTE DE MAPA */
-.geocoder-container {
-    position: relative;
-    width: 100%;
-}
-
-.geoapify-autocomplete-input {
-    width: 100% !important;
-    padding: 10px 40px 10px 10px !important;
-    border-radius: 6px;
-    border: 1px solid #ccc !important;
-    font-size: 14px !important;
-    box-sizing: border-box !important;
-}
-
-.geoapify-autocomplete-items {
-    border-radius: 0 0 6px 6px !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-    z-index: 99;
-}
-
-.geo-spinner {
-    position: absolute;
-    right: 40px;
-    top: 33px; /* Perfectamente centrado verticalmente con respecto al input */
-    width: 18px;
-    height: 18px;
-    border: 2px solid #ccc;
-    border-top-color: #0066cc;
-    border-radius: 50%;
-    animation: geo-spin 0.6s linear infinite;
-    z-index: 10;
-    pointer-events: none;
-}
-
-@keyframes geo-spin {
-    to { transform: rotate(360deg); }
-}
 </style>
 
 
@@ -163,9 +120,11 @@ input, select {
     <form method="post">
         {% csrf_token %}
 
+        <!-- 🔵 DATOS PERSONALES -->
         <div class="seccion">
             <h4>Datos Personales</h4>
 
+            <!-- DNI PRIMERO -->
             <div class="row">
                 <div class="col">
                     <label>DNI</label>
@@ -194,12 +153,13 @@ input, select {
                     {{ form.fecha_nacimiento }}
                 </div>
                 <div class="col">
-                    <label>País de Nacimiento</label>
+                    <label>Lugar de Nacimiento</label>
                     {{ form.lugar_nacimiento }}
                 </div>
             </div>
         </div>
 
+        <!-- 🟢 CONTACTO -->
         <div class="seccion">
             <h4>Información de Contacto</h4>
 
@@ -208,28 +168,16 @@ input, select {
                     <label>Email</label>
                     {{ form.email }}
                 </div>
-                
                 {% if user.rol == "CLIENTE" %}
-                <div class="col" style="position: relative;">
+                <div class="col">
                     <label>Dirección</label>
-                    
-		    <div id = "autocomplete-geoapify" class="geocoder-container" style="position:relative;"></div>
-                        <div id="geo-spinner" class="geo-spinner" style="display:none;"></div>
-                    <div style="display: none;">
-                        {{ form.direccion_envio }}
-                    </div>
-
-                    <input type="hidden" name="latitud" id="geo-latitud" value="{{ request.POST.latitud|default:'' }}">
-                    <input type="hidden" name="longitud" id="geo-longitud" value="{{ request.POST.longitud|default:'' }}">
-                    
-                    {% if form.direccion_envio.errors %}
-                        <div class="error-text" style="color:red; font-size:12px; margin-top:5px;">{{ form.direccion_envio.errors.0 }}</div>
-                    {% endif %}
+                    {{ form.direccion_envio }}
                 </div>
                 {% endif %}
             </div>
         </div>
 
+        <!-- 🟣 CUENTA -->
         <div class="seccion">
             <h4>Datos de Cuenta</h4>
 
@@ -241,6 +189,7 @@ input, select {
             </div>
         </div>
 
+        <!-- BOTONES -->
         <button type="submit" class="btn-guardar">
             Guardar Cambios
         </button>
@@ -258,78 +207,7 @@ input, select {
         </a>
 
     </form>
+
 </div>
-
-{% if user.rol == "CLIENTE" %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const API_KEY = "7e9d6968e4724fe589dc595a96d5938a";
-        
-        const inputDjango = document.getElementById('id_direccion_envio');
-        const inputLat = document.getElementById('geo-latitud');
-        const inputLon = document.getElementById('geo-longitud');
-        const spinner = document.getElementById('geo-spinner');
-
-        const autocompleteGeo = new autocomplete.GeocoderAutocomplete(
-            document.getElementById("autocomplete-geoapify"), 
-            API_KEY,
-            {
-                placeholder: "Modifica tu dirección",
-                type: "street",
-                lang: "es",
-                skipDetails: true,
-                debounceDelay: 150, // Respuesta de tipeo ultra rápida
-                bias: {
-                    countrycode: ["co"]
-                }
-            }
-        );
-
-        // 🏠 PRECARGA: Si el usuario ya tiene una dirección guardada en su cuenta, se dibuja de inmediato
-        if (inputDjango && inputDjango.value) {
-            autocompleteGeo.setValue(inputDjango.value);
-        }
-
-        // Evento para encender el spinner al escribir
-        const inputElement = document.querySelector('.geoapify-autocomplete-input');
-        if (inputElement) {
-            inputElement.addEventListener('input', function() {
-                if (this.value.trim().length > 2) {
-                    spinner.style.display = 'block';
-                } else {
-                    spinner.style.display = 'none';
-                }
-            });
-        }
-
-        // Apagar spinner cuando la API retorne sugerencias
-        autocompleteGeo.on('suggestions', (suggestions) => {
-            spinner.style.display = 'none';
-        });
-
-        // Evento de captura al seleccionar la nueva dirección
-        autocompleteGeo.on('select', (location) => {
-            spinner.style.display = 'none';
-            if (!location) {
-                if (inputDjango) inputDjango.value = "";
-                inputLat.value = "";
-                inputLon.value = "";
-                return;
-            }
-
-            const info = location.properties;
-            const latitud = info.lat;
-            const longitud = info.lon;
-
-            // Almacenamos la coordenada única limpia (Anti-Polígonos)
-            if (inputLat) inputLat.value = latitud;
-            if (inputLon) inputLon.value = longitud;
-            if (inputDjango) inputDjango.value = info.formatted;
-
-            console.log("Nueva dirección actualizada:", info.formatted, "coords:", latitud, longitud);
-        });
-    });
-</script>
-{% endif %}
 
 {% endblock %}
