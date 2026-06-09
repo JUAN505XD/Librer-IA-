@@ -112,7 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'es-CO'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Bogota'
 
 USE_I18N = True
 
@@ -131,3 +131,14 @@ STATICFILES_DIRS = [
 STATIC_ROOT = BASE_DIR / "staticfiles"
 AUTH_USER_MODEL = 'users.Usuario'
 LOGIN_URL = 'inicio'
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = "juan505xd.gamertag@gmail.com"
+EMAIL_HOST_PASSWORD = "qwmfhcqqtjedexnq"
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
