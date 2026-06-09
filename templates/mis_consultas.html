@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}Mis Consultas{% endblock %}
+
+{% block content %}
+
+<style>
+
+.container{
+    max-width:900px;
+    margin:40px auto;
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.15);
+}
+
+.consulta{
+    border:1px solid #ddd;
+    border-radius:10px;
+    padding:15px;
+    margin-bottom:15px;
+    background:#fafafa;
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.badge{
+    padding:5px 10px;
+    border-radius:6px;
+    color:white;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.abierto{
+    background:#28a745;
+}
+
+.cerrado{
+    background:#dc3545;
+}
+
+.btn{
+    display:inline-block;
+    background:#0066cc;
+    color:white;
+    text-decoration:none;
+    padding:10px 15px;
+    border-radius:8px;
+    font-weight:bold;
+}
+
+.nueva{
+    margin-bottom:20px;
+}
+
+</style>
+
+<div class="container">
+
+    <h2>Mis Consultas</h2>
+
+    <br>
+
+    <a href="{% url 'crear_tema' %}" class="btn nueva">
+        + Nueva Consulta
+    </a>
+
+    <br><br>
+
+    {% if temas %}
+
+        {% for tema in temas %}
+
+        <div class="consulta">
+
+            <div class="header">
+
+                <div>
+                    <strong>
+                        {{ tema.titulo }}
+                    </strong>
+                </div>
+
+                <div>
+
+                    {% if tema.estado == "ABIERTO" %}
+                        <span class="badge abierto">
+                            ABIERTO
+                        </span>
+                    {% else %}
+                        <span class="badge cerrado">
+                            CERRADO
+                        </span>
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            <br>
+
+            <small>
+                {{ tema.fecha_creacion|date:"d/m/Y H:i" }}
+            </small>
+
+            <br><br>
+
+            <a href="{% url 'ver_tema' tema.id %}" class="btn">
+                Ver conversación
+            </a>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            No has creado consultas todavía.
+        </p>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

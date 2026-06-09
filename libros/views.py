@@ -7,9 +7,17 @@ from libros.models import Libro, Autor, Genero, Idioma, Editorial
 from users.models import Preferencias
 from django.db.models import Q
 from django.contrib import messages
+from django.http import HttpResponseForbidden
 
-
+def es_admin(usuario):
+    return (
+        usuario.is_authenticated
+        and usuario.rol in ["ADMIN", "ROOT"]
+    )
+    
 def crear_libro(request):
+    if not es_admin(request.user):
+        return HttpResponseForbidden("No tienes permisos para acceder aquí")
 
     if request.method == "POST":
         form = LibroForm(request.POST)
@@ -246,4 +254,40 @@ def crear_editorial(request):
     return render(request, "crear_editorial.html", {"error": error})
 
 
+def editar_libro(request, libro_id):
 
+    if not es_admin(request.user):
+        return HttpResponseForbidden("No tienes permisos para acceder aquí")
+
+    libro = get_object_or_404(Libro, id=libro_id)
+
+    if request.method == "POST":
+        form = LibroForm(request.POST, instance=libro)
+        form.fields["issn"].disabled = True
+
+        if form.is_valid():
+            form.save()
+            return redirect("detalle_libro", libro_id=libro.id)
+
+    else:
+        form = LibroForm(instance=libro)
+        form.fields["issn"].disabled = True
+
+    return render(request, "editar_libro.html", {
+        "form": form,
+        "libro": libro
+    })
+
+def eliminar_libro(request, libro_id):
+
+    if not es_admin(request.user):
+        return HttpResponseForbidden("No tienes permisos para acceder aquí")
+
+    libro = get_object_or_404(Libro, id=libro_id)
+
+    if request.method == "POST":
+        libro.delete()
+        messages.success(request, "Libro eliminado correctamente")
+        return redirect("inicio")
+
+    return redirect("detalle_libro", libro_id=libro.id)

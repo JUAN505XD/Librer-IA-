@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from libros.models import Genero, Autor
 from django.core.exceptions import ValidationError
-from datetime import date
+from django.utils import timezone
 from django_countries.fields import CountryField
 
 # =========================

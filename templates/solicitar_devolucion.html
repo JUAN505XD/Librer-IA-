@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% block title %}Solicitar devolución{% endblock %}
+
+{% block content %}
+
+<style>
+
+.container{
+    max-width:800px;
+    margin:40px auto;
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
+}
+
+.detalle-compra{
+    background:#f8f9fa;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:20px;
+}
+
+select,
+textarea{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    box-sizing:border-box;
+}
+
+textarea{
+    min-height:150px;
+    resize:vertical;
+}
+
+.btn{
+    display:inline-block;
+    padding:12px 20px;
+    border:none;
+    border-radius:8px;
+    text-decoration:none;
+    cursor:pointer;
+    color:white;
+    font-weight:bold;
+}
+
+.btn-enviar{
+    background:#dc3545;
+}
+
+.btn-volver{
+    background:#0066cc;
+}
+
+.acciones{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+}
+
+label{
+    font-weight:bold;
+    display:block;
+    margin-bottom:8px;
+}
+
+.error-box{
+    background:#ffe6e6;
+    color:#cc0000;
+    padding:10px;
+    border-radius:8px;
+    margin-top:5px;
+    font-size:14px;
+    text-align:center;
+    font-weight:bold;
+}
+
+</style>
+
+<div class="container">
+
+    <h2>Solicitar devolución</h2>
+
+    <div class="detalle-compra">
+
+        <p>
+            <strong>Pedido:</strong>
+            #{{ compra.id }}
+        </p>
+
+        <p>
+            <strong>Fecha:</strong>
+            {{ compra.fecha_pago|date:"d/m/Y H:i" }}
+        </p>
+
+        <p>
+            <strong>Total:</strong>
+            ${{ compra.get_total }}
+        </p>
+
+    </div>
+
+    <form method="POST" id="formDevolucion">
+
+        {% csrf_token %}
+
+        <label>
+            Motivo de la devolución
+        </label>
+
+        <select name="motivo" id="motivo">
+
+            <option value="">
+                Seleccione un motivo
+            </option>
+
+            <option value="DEFECTUOSO">
+                Libro defectuoso o dañado
+            </option>
+
+            <option value="EQUIVOCADO">
+                Recibí un libro incorrecto
+            </option>
+
+            <option value="INCOMPLETO">
+                Libro incompleto
+            </option>
+
+            <option value="ARREPENTIMIENTO">
+                Ya no deseo el producto
+            </option>
+
+            <option value="OTRO">
+                Otro motivo
+            </option>
+
+        </select>
+
+        <div
+            id="errorMotivo"
+            class="error-box"
+            style="display:none;">
+            Debes seleccionar un motivo de devolución.
+        </div>
+
+        <br>
+
+        <label>
+            Descripción adicional (opcional)
+        </label>
+
+        <textarea
+            name="descripcion"
+            placeholder="Puedes agregar información adicional si lo deseas..."></textarea>
+
+        <div class="acciones">
+
+            <button
+                type="submit"
+                class="btn btn-enviar">
+                Enviar solicitud
+            </button>
+
+            <a
+                href="{% url 'historial' %}"
+                class="btn btn-volver">
+                Volver
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+<script>
+
+document
+.getElementById("formDevolucion")
+.addEventListener("submit", function(e){
+
+    const motivo = document.getElementById("motivo");
+    const error = document.getElementById("errorMotivo");
+
+    if(motivo.value === ""){
+
+        e.preventDefault();
+
+        error.style.display = "block";
+
+        motivo.focus();
+
+        return;
+    }
+
+    error.style.display = "none";
+
+});
+
+document
+.getElementById("motivo")
+.addEventListener("change", function(){
+
+    const error = document.getElementById("errorMotivo");
+
+    if(this.value !== ""){
+        error.style.display = "none";
+    }
+
+});
+
+</script>
+
+{% endblock %}
