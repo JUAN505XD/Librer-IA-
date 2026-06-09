@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from libros.models import Genero, Autor
 from django.core.exceptions import ValidationError
-from datetime import date
+from django.utils import timezone
 from django_countries.fields import CountryField
 
 # =========================
@@ -119,6 +119,9 @@ class Cliente(models.Model):
 
     correo = models.EmailField()
     direccion_envio = models.CharField(max_length=200)
+    latitud = models.DecimalField(max_length=20, decimal_places=16,max_digits=19)
+    longitud = models.DecimalField(max_length=20, decimal_places=16,max_digits=19)
+
 
 # =========================
 # Preferencias

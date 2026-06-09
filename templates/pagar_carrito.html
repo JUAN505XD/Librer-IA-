@@ -15,9 +15,25 @@
     <hr>
 
     <p><strong>Total a pagar:</strong></p>
-    <h2 style="color:#0066cc;">${{ carrito.get_total }}</h2>
 
-    <hr>
+<h2
+    id="total-final"
+    style="color:#0066cc;"
+>
+    ${{ carrito.get_total }}
+</h2>
+
+<div
+    id="descuento-info"
+    style="
+        display:none;
+        margin-top:10px;
+        color:#2e7d32;
+        font-weight:bold;
+    "
+></div>
+
+<hr>
 
     <p style="font-size:14px;color:#666;">
         Selecciona una tarjeta para completar el pago.
@@ -148,6 +164,59 @@
 
         <br>
 
+     <h3>Cupón de descuento</h3>
+
+<div style="
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+">
+
+    <input
+        type="text"
+        id="codigo_cupon"
+        name="codigo_cupon"
+        placeholder="Ingresa tu cupón"
+        style="
+            flex:1;
+            padding:12px;
+            border:1px solid #ddd;
+            border-radius:8px;
+            font-size:14px;
+            outline:none;
+        "
+    >
+
+    <button
+        type="button"
+        id="btn-validar-cupon"
+        style="
+            background:#0066cc;
+            color:white;
+            border:none;
+            border-radius:8px;
+            padding:12px 20px;
+            cursor:pointer;
+            font-weight:bold;
+        "
+    >
+        Validar código
+    </button>
+
+</div>
+
+<div
+    id="mensaje-cupon"
+    style="
+        display:none;
+        padding:10px;
+        border-radius:8px;
+        margin-bottom:15px;
+        text-align:center;
+        font-weight:bold;
+    "
+></div>
+
         <button type="submit"
                 id="btn-pagar"
                 disabled
@@ -218,6 +287,70 @@ radios.forEach(radio => {
         }
 
     });
+
+});
+
+const btnValidarCupon =
+    document.getElementById("btn-validar-cupon");
+
+const mensajeCupon =
+    document.getElementById("mensaje-cupon");
+
+btnValidarCupon.addEventListener("click", async () => {
+
+    const codigo =
+        document.getElementById("codigo_cupon")
+        .value.trim();
+
+    if (!codigo) {
+
+        mensajeCupon.style.display = "block";
+        mensajeCupon.style.background = "#ffe6e6";
+        mensajeCupon.style.color = "#cc0000";
+        mensajeCupon.innerHTML =
+            "Ingresa un código.";
+
+        return;
+    }
+
+    const response = await fetch(
+        `/carrito/validar-cupon/?codigo=${codigo}`
+    );
+
+    const data = await response.json();
+
+    mensajeCupon.style.display = "block";
+
+    if (data.valido) {
+
+        mensajeCupon.style.background = "#e8f5e9";
+        mensajeCupon.style.color = "#2e7d32";
+
+        mensajeCupon.innerHTML =
+            `Cupón aplicado (${data.porcentaje}% OFF)`;
+
+        document.getElementById(
+            "descuento-info"
+        ).style.display = "block";
+
+        document.getElementById(
+            "descuento-info"
+        ).innerHTML =
+            `Descuento: $${data.descuento}`;
+
+        document.getElementById(
+            "total-final"
+        ).innerHTML =
+            `$${data.nuevo_total}`;
+
+    } else {
+
+        mensajeCupon.style.background = "#ffe6e6";
+        mensajeCupon.style.color = "#cc0000";
+
+        mensajeCupon.innerHTML =
+            data.mensaje;
+    }
 
 });
 

@@ -28,6 +28,8 @@ class RegistroClienteForm(UserCreationForm):
     ])
 
     direccion_envio = forms.CharField(max_length=200)
+    latitud = forms.DecimalField(decimal_places=16, max_digits=19)
+    longitud = forms.DecimalField(decimal_places=16,max_digits=19)
     email = forms.EmailField()
 
     class Meta:
@@ -97,7 +99,9 @@ class RegistroClienteForm(UserCreationForm):
             Cliente.objects.create(
                 usuario=usuario,
                 correo=self.cleaned_data["email"],
-                direccion_envio=self.cleaned_data["direccion_envio"]
+                direccion_envio=self.cleaned_data["direccion_envio"],
+                latitud=self.cleaned_data["latitud"],
+                longitud=self.cleaned_data["longitud"],
             )
 
         return usuario
@@ -224,7 +228,7 @@ class EditarclienteForm(forms.Form):
         }),
         required=False
     )
-    lugar_nacimiento = CountryField().formfield(disabled=True,blank_label="País de nacimiento")
+    lugar_nacimiento = CountryField().formfield(disabled=True,blank_label="País de nacimiento", required=False)
 
 
 
@@ -306,6 +310,7 @@ class TarjetaForm(forms.ModelForm):
                 "placeholder": "MM"
             }),
             "año_vencimiento": forms.NumberInput(attrs={
+                "value":date.today().year,
                 "min": date.today().year,
                 "placeholder": "YYYY"
             }),
@@ -318,7 +323,10 @@ class TarjetaForm(forms.ModelForm):
                 "maxlength": "3"
             }),
             "saldo": forms.NumberInput(attrs={
-                "placeholder": "0.00"
+                "value": "50000",
+                "placeholder": "50000.00",
+                "step": "1000",
+                "min": "50000"
             })
         }
 
