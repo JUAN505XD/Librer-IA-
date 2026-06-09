@@ -16,7 +16,7 @@ from users.models import CuponCumpleanos
 from decimal import Decimal
 
 # ⏱️ CONFIGURACIÓN UNIVERSAL: Cambia a 1440 cuando pases a producción (24 horas)
-SEGUNDOS_EXPIRACION = 50
+SEGUNDOS_EXPIRACION = 30
 
 @login_required
 def agregar_al_carrito(request, libro_id):
